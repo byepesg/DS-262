@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Java
+*.class
+*.jar
+*.war
+
+# Build directories
+target/
+out/
+build/
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Logs / temporary files
+*.log
+*.tmp
