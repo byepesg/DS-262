@@ -1,0 +1,148 @@
+\documentclass[conference]{IEEEtran}
+
+% =========================================================
+% PLANTILLA LIGERA PARA OVERLEAF FREE
+% Compilador recomendado: pdfLaTeX
+% =========================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{hyperref}
+
+\definecolor{CodeBackground}{HTML}{F4F6F7}
+\definecolor{CodeKeyword}{HTML}{005F73}
+\definecolor{CodeComment}{HTML}{6C757D}
+\definecolor{CodeString}{HTML}{BB3E03}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=blue
+}
+
+\lstdefinestyle{paperstyle}{
+    backgroundcolor=\color{CodeBackground},
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{CodeKeyword}\bfseries,
+    commentstyle=\color{CodeComment}\itshape,
+    stringstyle=\color{CodeString},
+    numbers=left,
+    numberstyle=\tiny,
+    numbersep=5pt,
+    frame=single,
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4
+}
+
+\lstset{
+    style=paperstyle,
+    language=Python
+}
+
+% =========================================================
+% DATOS DEL ARTÍCULO — EDITAR AQUÍ
+% =========================================================
+
+\title{
+Título del Proyecto o Artículo Científico:
+Subtítulo Descriptivo del Estudio
+}
+
+\author{
+\IEEEauthorblockN{
+Autor 1,
+Autor 2,
+Autor 3,
+Autor 4
+}
+\IEEEauthorblockA{
+\textit{Universidad Nacional de Colombia}\\
+\textit{Sede Bogotá}\\
+Bogotá D.C., Colombia\\
+\{correo1, correo2, correo3, correo4\}@unal.edu.co
+}
+}
+\begin{document}
+
+\maketitle
+
+% =========================================================
+% RESUMEN
+% =========================================================
+
+\begin{abstract}
+Este documento presenta una plantilla para la elaboración de proyectos,
+artículos científicos y ponencias con estructura de congreso. El resumen debe
+describir brevemente el problema, el objetivo, la metodología, los principales
+resultados y la conclusión más importante. Se recomienda una extensión entre
+150 y 250 palabras, dependiendo de las normas del evento.
+\end{abstract}
+
+\begin{IEEEkeywords}
+inteligencia artificial, estructuras de datos, aprendizaje automático,
+ingeniería de software, metodología experimental
+\end{IEEEkeywords}
+
+% =========================================================
+% CONTENIDO
+% =========================================================
+
+\input{sections/01-introduccion}
+\input{sections/02-trabajo-relacionado}
+\input{sections/03-metodologia}
+\input{sections/04-resultados}
+\input{sections/05-discusion}
+\input{sections/06-conclusiones}
+
+% =========================================================
+% AGRADECIMIENTOS
+% =========================================================
+
+\section*{Agradecimientos}
+
+Los autores agradecen a la Universidad Nacional de Colombia, Sede Amazonia,
+y a las personas o instituciones que apoyaron el desarrollo de este proyecto.
+
+% =========================================================
+% REFERENCIAS
+% Sin BibTeX ni Biber para reducir tiempo de compilación.
+% =========================================================
+
+\begin{thebibliography}{00}
+
+\bibitem{cormen}
+T. H. Cormen, C. E. Leiserson, R. L. Rivest y C. Stein,
+\textit{Introduction to Algorithms}, 4th ed.
+Cambridge, MA, USA: MIT Press, 2022.
+
+\bibitem{goodrich}
+M. T. Goodrich, R. Tamassia y M. H. Goldwasser,
+\textit{Data Structures and Algorithms in Python}.
+Hoboken, NJ, USA: Wiley, 2013.
+
+\bibitem{python}
+Python Software Foundation,
+``Python Documentation.''
+[En línea]. Disponible en: \url{https://docs.python.org/3/}
+
+\end{thebibliography}
+
+\end{document}
+
