@@ -4,8 +4,8 @@ public class DynamicArray<T> {
     // 1. 0 <= size <= capacity
     // 2. capacity >= 1
     // 3. 
-    private T[] data;
-    private int size;
+    private  T[] data;
+    public  int size;
     private int capacity;
     public DynamicArray(int initialCapacity) {
         if (initialCapacity < 1) {
@@ -13,7 +13,7 @@ public class DynamicArray<T> {
         }
         this.data = (T[]) new Object[initialCapacity];
         this.capacity = initialCapacity;
-        this.size = 2;
+        this.size = 0;
     }
     
     public int size() {
