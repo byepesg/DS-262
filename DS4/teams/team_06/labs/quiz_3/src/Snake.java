@@ -1,9 +1,4 @@
-import java.util.Scanner;
-import java.util.Random;
-
 public class Snake { // hacer un array circular, elimino el invariante de data[0] = Tail
-    public final Scanner scanner = new Scanner(System.in);
-    public final Random random = new Random();
     public Position[] data; // quiero guardar en data la pos de los segmentos de la serpiente
     public int size;
     public int capacity;
@@ -101,7 +96,7 @@ public class Snake { // hacer un array circular, elimino el invariante de data[0
 
         for (int i = 0; i < size; i++) {
             Position segmento = data[(posTail + i) % capacity];
-            if (cuadricula[segmento.x][segmento.y] == null || "f" == cuadricula[segmento.x][segmento.y]) {
+            if (cuadricula[segmento.x][segmento.y] == null || "f".equals(cuadricula[segmento.x][segmento.y])) {
                 cuadricula[segmento.x][segmento.y] = "#";
             }
             else {
@@ -114,6 +109,9 @@ public class Snake { // hacer un array circular, elimino el invariante de data[0
         Position newHead = new Position(data[(posTail + (size - 1)) % capacity].x + input.x, data[(posTail + (size - 1)) % capacity].y + input.y);
         if (newHead.x < 0 || newHead.x >= cuadriculaSize || newHead.y < 0 || newHead.y >= cuadriculaSize) {
             throw new IllegalArgumentException("La serpiente salio de la cuadricula");
+        }
+        if (occupiedBySnake(newHead)) {
+            throw new IllegalArgumentException("La serpiente colisiono consigo misma");
         }
 
         boolean ateFruit = removeFruit(newHead);
@@ -128,16 +126,6 @@ public class Snake { // hacer un array circular, elimino el invariante de data[0
         for (int i = 0; i < size; i++) {
             Position segmento = data[(posTail + i) % capacity];
             if (segmento.x == position.x && segmento.y == position.y) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean occupiedByFruit(Position position, int limit) {
-        for (int i = 0; i < limit; i++) {
-            Position currentFruit = frutas[i];
-            if (currentFruit != null && currentFruit.x == position.x && currentFruit.y == position.y) {
                 return true;
             }
         }
