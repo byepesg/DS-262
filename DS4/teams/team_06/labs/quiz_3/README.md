@@ -4,11 +4,11 @@
 ## Instrucciones compilacion quiz 3
 ### Version utilizada: Java 26
 ### Instrucciones: 
-Para ejecutar adecuadamente la solucion propuesta es necesario compilar el archivo main.java usando el comando javac:
+Para ejecutar adecuadamente la solucion propuesta es necesario compilar el archivo main.java usando el comando:
 ```bash
-javac main.java
+javac -d out src/*.java
 ```
-Esto creara un archivo .class, para ejecutarlo usamos el comando java:
+Esto creara un archivo .class en la carpeta out, para ejecutarlo usamos el comando:
 ```bash
-java main
+java -cp out Main
 ```
