@@ -4,7 +4,7 @@
 ## Instrucciones compilacion quiz 3
 ### Version utilizada: Java 26
 ### Instrucciones: 
-Para ejecutar adecuadamente la solucion propuesta es necesario compilar el archivo main.java usando el comando:
+Para ejecutar adecuadamente la solucion propuesta es necesario compilar el archivo Main.java usando el comando:
 ```bash
 javac -d out src/*.java
 ```
