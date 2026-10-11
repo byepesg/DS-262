@@ -1,0 +1,41 @@
+[gd_resource type="TileSet" format=3 uid="uid://dnwenmkbiss6b"]
+
+[ext_resource type="Texture2D" uid="uid://rfuyusd680hy" path="res://assets/sprites/doors/doors_front.png" id="1_ae6qt"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_rarhs"]
+load_path = "res://.godot/imported/doors_side.png-4ec5dbec24095ba2ec3e5694e3c57350.ctex"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vcsgt"]
+texture = SubResource("CompressedTexture2D_rarhs")
+texture_region_size = Vector2i(32, 32)
+0:0/next_alternative_id = 3
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, -12, -16, -12, 16, -16, 16)
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(16, -16, 12, -16, 12, 16, 16, 16)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_c01mt"]
+texture = ExtResource("1_ae6qt")
+texture_region_size = Vector2i(48, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-24, -16, -8, -16, 24, -16, 24, 16, 8, 16, 8, -8, -8, -8.24972, -8, 16, -24, 16)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-12, 16, -12, 12, 12, 12, 12, 16)
+2:0/0 = 0
+4:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+
+[resource]
+physics_layer_0/collision_layer = 1
+sources/1 = SubResource("TileSetAtlasSource_vcsgt")
+sources/2 = SubResource("TileSetAtlasSource_c01mt")
