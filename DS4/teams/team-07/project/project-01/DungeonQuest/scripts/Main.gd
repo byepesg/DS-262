@@ -14,6 +14,31 @@ func _ready() -> void:
 				doors[Vector2i(d.from_room, d.to_room)] = d
 				if not d.door_crossed.is_connected(_on_door_door_crossed):
 					d.door_crossed.connect(_on_door_door_crossed)
+					
+					
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action("help") :
+		if event.is_pressed() and not event.is_echo():
+			generar_ayuda_puertas()
+
+func get_room_doors(room_id: int) -> Array:
+	var result: Array = []
+	var room = $Rooms.get_node_or_null("Room%d" % room_id)
+	if room == null:
+		return result
+	for d in room.get_children():
+		if d.has_signal("door_crossed"):
+			result.append(d)
+	return result
+	
+func generar_ayuda_puertas() -> void:
+	var path: Array = graph.bfs_path(current_room, 8)
+	if path.size() < 2:
+		return
+	var next_room: int = path[1]
+	for d in get_room_doors(current_room):
+		if d.to_room == next_room:
+			d.door_glow()
 
 func _on_door_door_crossed(from_room: int, to_room: int, door: Node2D) -> void:
 	if transitioning:

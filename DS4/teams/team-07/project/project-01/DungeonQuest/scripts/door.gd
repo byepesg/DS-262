@@ -18,9 +18,16 @@ enum View { FRONT, BACK, LEFT, RIGHT }
 
 @onready var sprite_back: AnimatedSprite2D = $DoorBack
 @onready var sprite_front: AnimatedSprite2D = $DoorFront
+@onready var sprite_glow: AnimatedSprite2D = $DoorGlow
 
 func _ready() -> void:
+	sprite_glow.modulate.a = 0.0
 	_apply_view()
+
+func door_glow() -> void:
+	var glow_tween = create_tween()
+	glow_tween.tween_property(sprite_glow, "modulate:a", 1.0, 0.5)
+	glow_tween.tween_property(sprite_glow, "modulate:a", 0.0, 0.5)
 
 func _apply_view() -> void:
 	if not is_node_ready():
@@ -29,6 +36,7 @@ func _apply_view() -> void:
 	var anim: String = suffix.to_lower()
 	sprite_back.animation = anim
 	sprite_front.animation = anim
+	sprite_glow.animation = anim
 	# En vista Front el jugador pasa por encima de todo el arco
 	if view == View.FRONT:
 		sprite_front.z_index = 2
@@ -68,3 +76,4 @@ func _on_pass_area_body_entered(body: Node2D) -> void:
 	if not body.is_in_group("player"):
 		return
 	door_crossed.emit(from_room, to_room, self)
+	

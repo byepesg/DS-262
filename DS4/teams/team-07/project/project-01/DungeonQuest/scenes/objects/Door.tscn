@@ -4,6 +4,57 @@
 [ext_resource type="Texture2D" uid="uid://dh2gkim603sgk" path="res://assets/sprites/doors/doors_side.png" id="3_ao1jx"]
 [ext_resource type="Texture2D" uid="uid://rfuyusd680hy" path="res://assets/sprites/doors/doors_front.png" id="3_dfkju"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_l6n4g"]
+atlas = ExtResource("3_dfkju")
+region = Rect2(240, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i7oty"]
+atlas = ExtResource("3_dfkju")
+region = Rect2(192, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1n46g"]
+atlas = ExtResource("3_ao1jx")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qxrry"]
+atlas = ExtResource("3_ao1jx")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_02sv7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l6n4g")
+}],
+"loop": true,
+"name": &"back",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i7oty")
+}],
+"loop": true,
+"name": &"front",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1n46g")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qxrry")
+}],
+"loop": true,
+"name": &"rigtht",
+"speed": 5.0
+}]
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_w5jee"]
 atlas = ExtResource("3_dfkju")
 region = Rect2(144, 0, 48, 32)
@@ -147,14 +198,18 @@ walk_distance_front = 14.0
 walk_distance_side = 8.0
 walk_distance_back = 8.0
 
+[node name="DoorGlow" type="AnimatedSprite2D" parent="." unique_id=471970034]
+sprite_frames = SubResource("SpriteFrames_02sv7")
+animation = &"front"
+
 [node name="DoorBack" type="AnimatedSprite2D" parent="." unique_id=860034957]
 sprite_frames = SubResource("SpriteFrames_pvq0t")
-animation = &"right"
+animation = &"front"
 
 [node name="DoorFront" type="AnimatedSprite2D" parent="." unique_id=488363871]
-z_index = 4
+z_index = 2
 sprite_frames = SubResource("SpriteFrames_m78fr")
-animation = &"back"
+animation = &"front"
 
 [node name="Col_Back_R" type="CollisionShape2D" parent="." unique_id=368318009]
 visible = false
