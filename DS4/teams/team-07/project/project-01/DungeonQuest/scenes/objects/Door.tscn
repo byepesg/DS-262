@@ -4,13 +4,28 @@
 [ext_resource type="Texture2D" uid="uid://dh2gkim603sgk" path="res://assets/sprites/doors/doors_side.png" id="3_ao1jx"]
 [ext_resource type="Texture2D" uid="uid://rfuyusd680hy" path="res://assets/sprites/doors/doors_front.png" id="3_dfkju"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_w5jee"]
+atlas = ExtResource("3_dfkju")
+region = Rect2(144, 0, 48, 32)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_rb0us"]
 atlas = ExtResource("3_dfkju")
 region = Rect2(96, 0, 48, 32)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_pvq0t"]
+atlas = ExtResource("3_ao1jx")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lck7h"]
+atlas = ExtResource("3_ao1jx")
+region = Rect2(96, 0, 32, 32)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_pvq0t"]
 animations = [{
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w5jee")
+}],
 "loop": true,
 "name": &"back",
 "speed": 5.0
@@ -23,12 +38,18 @@ animations = [{
 "name": &"front",
 "speed": 5.0
 }, {
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pvq0t")
+}],
 "loop": true,
 "name": &"left",
 "speed": 5.0
 }, {
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lck7h")
+}],
 "loop": true,
 "name": &"right",
 "speed": 5.0
@@ -122,16 +143,18 @@ size = Vector2(3, 11)
 collision_layer = 8
 collision_mask = 0
 script = ExtResource("1_mg2as")
+walk_distance_front = 14.0
+walk_distance_side = 8.0
+walk_distance_back = 8.0
 
 [node name="DoorBack" type="AnimatedSprite2D" parent="." unique_id=860034957]
-z_index = -1
 sprite_frames = SubResource("SpriteFrames_pvq0t")
-animation = &"back"
+animation = &"right"
 
 [node name="DoorFront" type="AnimatedSprite2D" parent="." unique_id=488363871]
 z_index = 4
 sprite_frames = SubResource("SpriteFrames_m78fr")
-animation = &"left"
+animation = &"back"
 
 [node name="Col_Back_R" type="CollisionShape2D" parent="." unique_id=368318009]
 visible = false
@@ -176,6 +199,7 @@ shape = SubResource("RectangleShape2D_frobt")
 disabled = true
 
 [node name="PassArea" type="Area2D" parent="." unique_id=428117230]
+visible = false
 collision_layer = 0
 collision_mask = 2
 
@@ -198,5 +222,17 @@ disabled = true
 position = Vector2(13, 5)
 shape = SubResource("RectangleShape2D_lch3g")
 disabled = true
+
+[node name="Arrival_Front" type="Marker2D" parent="." unique_id=1160033255]
+position = Vector2(0, 23)
+
+[node name="Arrival_Back" type="Marker2D" parent="." unique_id=1586770965]
+position = Vector2(0, -5)
+
+[node name="Arrival_Left" type="Marker2D" parent="." unique_id=2051623702]
+position = Vector2(4, 3)
+
+[node name="Arrival_Right" type="Marker2D" parent="." unique_id=1318258734]
+position = Vector2(-4, 3)
 
 [connection signal="body_entered" from="PassArea" to="." method="_on_pass_area_body_entered"]

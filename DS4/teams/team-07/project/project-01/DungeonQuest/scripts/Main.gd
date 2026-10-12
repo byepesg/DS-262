@@ -3,12 +3,17 @@ extends Node2D
 var graph := DungeonGraph.new()
 var current_room: int = 1
 var transitioning: bool = false
+var doors: Dictionary = {}
 
 func _ready() -> void:
 	graph.build_default()
 	print("Ruta BFS: ", graph.bfs_path(1, 8))
-	for d in $Dungeon/Doors.get_children():
-		d.door_crossed.connect(_on_door_door_crossed)
+	for room in $Rooms.get_children():
+		for d in room.get_children():
+			if d.has_signal("door_crossed"):
+				doors[Vector2i(d.from_room, d.to_room)] = d
+				if not d.door_crossed.is_connected(_on_door_door_crossed):
+					d.door_crossed.connect(_on_door_door_crossed)
 
 func _on_door_door_crossed(from_room: int, to_room: int, door: Node2D) -> void:
 	if transitioning:
@@ -16,9 +21,12 @@ func _on_door_door_crossed(from_room: int, to_room: int, door: Node2D) -> void:
 	if not graph.are_neighbors(from_room, to_room):
 		print("Conexión inválida: ", from_room, " -> ", to_room)
 		return
-	var spawn = get_node_or_null("Rooms/Room%d/From%d" % [to_room, from_room])
-	if spawn == null:
-		print("No existe Rooms/Room", to_room, "/From", from_room)
+	var twin = doors.get(Vector2i(to_room, from_room))
+	if twin == null:
+		print("Falta la puerta gemela: ", to_room, " -> ", from_room)
+		return
+	if not has_node("FadeLayer/Fade"):
+		print("FALTA FadeLayer/Fade")
 		return
 
 	transitioning = true
@@ -29,7 +37,7 @@ func _on_door_door_crossed(from_room: int, to_room: int, door: Node2D) -> void:
 
 	# 1. Cámara quieta
 	var cam_pos := cam.global_position
-	cam.position_smoothing_enabled = false
+	cam.position_smoothing_enabled = true
 	cam.top_level = true
 	cam.global_position = cam_pos
 
@@ -42,18 +50,20 @@ func _on_door_door_crossed(from_room: int, to_room: int, door: Node2D) -> void:
 	tween.tween_property(player.animated_sprite, "modulate:a", 0.0, 0.5).set_delay(0.5)
 	tween.tween_property($FadeLayer/Fade, "modulate:a", 1.0, 1.0)
 	await tween.finished
+	await get_tree().create_timer(0.1).timeout
 
 	# 3. Teletransporte con pantalla negra
-	player.global_position = spawn.global_position
+	player.global_position = twin.get_arrival_position()
+	player.animated_sprite.modulate.a = 1.0
 	cam.top_level = false
 	cam.position = Vector2.ZERO
 	cam.position_smoothing_enabled = true
 	cam.reset_smoothing()
 	current_room = to_room
+
+	# El jugador mira hacia el interior de la sala
+	player.play_walk(-twin.get_walk_direction())
 	player.update_animation('idle')
-	player.global_position = spawn.global_position
-	player.animated_sprite.modulate.a = 1.0
-	player.animated_sprite.visible = true
 
 	# 4. Fade in
 	var t2 := create_tween()
