@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="DungeonQuest"
-run/main_scene="uid://dgi5tnt6v0m83"
+run/main_scene="uid://dt3kjoht08k3j"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

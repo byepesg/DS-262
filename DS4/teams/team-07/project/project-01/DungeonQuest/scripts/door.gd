@@ -5,6 +5,8 @@ signal door_crossed(from_room: int, to_room: int, door: Node2D)
 
 enum View { FRONT, BACK, LEFT, RIGHT }
 
+@export var is_exit: bool = false
+
 @export var from_room: int = 0
 @export var to_room: int = 0
 @export var view: View = View.FRONT:

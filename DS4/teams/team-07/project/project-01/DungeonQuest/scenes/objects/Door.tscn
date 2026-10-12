@@ -51,7 +51,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_qxrry")
 }],
 "loop": true,
-"name": &"rigtht",
+"name": &"rigth",
 "speed": 5.0
 }]
 
@@ -199,8 +199,9 @@ walk_distance_side = 8.0
 walk_distance_back = 8.0
 
 [node name="DoorGlow" type="AnimatedSprite2D" parent="." unique_id=471970034]
+modulate = Color(1, 1, 1, 0)
 sprite_frames = SubResource("SpriteFrames_02sv7")
-animation = &"front"
+animation = &"rigth"
 
 [node name="DoorBack" type="AnimatedSprite2D" parent="." unique_id=860034957]
 sprite_frames = SubResource("SpriteFrames_pvq0t")

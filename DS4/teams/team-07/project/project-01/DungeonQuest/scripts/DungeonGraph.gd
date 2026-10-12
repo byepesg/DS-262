@@ -32,6 +32,7 @@ func build_default() -> void:
 	add_edge(4, 6)
 	add_edge(6, 7)
 	add_edge(7, 8)
+	add_edge(8, 0)
 	
 func bfs_path(start: int, goal: int) -> Array:
 	if not adjacency.has(start) or not adjacency.has(goal):
