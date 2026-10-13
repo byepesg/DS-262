@@ -26,8 +26,9 @@ llegó primero.
 - **Cancelación**: localiza la solicitud con la misma búsqueda y elimina su
   nodo de la lista enlazada de su nivel, en `Θ(n)` en el peor caso. Una
   solicitud cancelada sale de la cola y nunca es atendida.
-- **Pila** (lista enlazada de encabezado único): registrará el historial de
-  atenciones y permitirá deshacer la más reciente en `Θ(1)`.
+- **Pila** (lista enlazada de encabezado único): registra el historial de
+  atenciones en `Θ(1)` por atención. Al ser LIFO, deja preparada la
+  operación de deshacer la atención más reciente.
 
 ## Estructura del repositorio
 
@@ -39,6 +40,8 @@ llegó primero.
         ├── Ticket.java
         ├── LinkedQueue.java
         ├── LevelPriorityQueue.java
+        ├── LinkedStack.java
+        ├── ServiceHistory.java
         └── TriageSystem.java
 ```
 
@@ -59,9 +62,11 @@ javac -d out src/triage/*.java
   enlazada, recorrible sin modificarla y con eliminación de un elemento
   arbitrario; cola de prioridad `LevelPriorityQueue`, con una cola por nivel
   de urgencia que atiende primero el nivel más urgente y, dentro de cada
-  nivel, la solicitud que llegó primero; y `TriageSystem`, que registra
-  solicitudes (validando identificador, identificadores repetidos y urgencia
-  entre 1 y 5), atiende siempre la de mayor prioridad, busca solicitudes
-  pendientes por identificador y cancela solicitudes pendientes.
-- **Pendiente:** historial de atenciones con deshacer, interfaz de consola,
-  pruebas y documento técnico.
+  nivel, la solicitud que llegó primero; pila genérica `LinkedStack` sobre
+  lista enlazada; historial de atenciones `ServiceHistory`; y `TriageSystem`,
+  que registra solicitudes (validando identificador, identificadores
+  repetidos y urgencia entre 1 y 5), atiende siempre la de mayor prioridad,
+  busca y cancela solicitudes pendientes y consulta el historial de
+  atenciones.
+- **Pendiente:** deshacer la última atención, interfaz de consola, pruebas y
+  documento técnico.

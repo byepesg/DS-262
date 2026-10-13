@@ -1,5 +1,7 @@
 package triage;
 
+import java.util.List;
+
 /**
  * Registra solicitudes de atencion y las atiende por orden de prioridad.
  */
@@ -9,10 +11,12 @@ public class TriageSystem {
     public static final int LEAST_URGENT = 5;
 
     private final LevelPriorityQueue queue;
+    private final ServiceHistory history;
     private long arrivalCounter;
 
     public TriageSystem() {
         this.queue = new LevelPriorityQueue(LEAST_URGENT - MOST_URGENT + 1);
+        this.history = new ServiceHistory();
         this.arrivalCounter = 0;
     }
 
@@ -36,7 +40,9 @@ public class TriageSystem {
         if (queue.isEmpty()) {
             return null;
         }
-        return queue.removeNext();
+        Ticket next = queue.removeNext();
+        history.recordService(next);
+        return next;
     }
 
     public Ticket findById(String id) {
@@ -50,6 +56,13 @@ public class TriageSystem {
      */
     public boolean cancelRequest(String id) {
         return queue.removeById(id) != null;
+    }
+
+    /**
+     * Solicitudes atendidas, de la mas reciente a la mas antigua.
+     */
+    public List<Ticket> getHistory() {
+        return history.getHistory();
     }
 
     public int pendingCount() {
