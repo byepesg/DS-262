@@ -47,6 +47,22 @@ public class LevelPriorityQueue {
         throw new NoSuchElementException("La cola de prioridad esta vacia");
     }
 
+    /**
+     * Busca un ticket por su identificador recorriendo todos los niveles.
+     *
+     * @return el ticket encontrado o null si no existe
+     */
+    public Ticket findById(String id) {
+        for (LinkedQueue<Ticket> level : levels) {
+            for (Ticket t : level) {
+                if (t.getId().equals(id)) {
+                    return t;
+                }
+            }
+        }
+        return null;
+    }
+
     public Ticket peekNext() {
         for (LinkedQueue<Ticket> level : levels) {
             if (!level.isEmpty()) {

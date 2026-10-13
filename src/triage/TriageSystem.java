@@ -24,6 +24,9 @@ public class TriageSystem {
             throw new IllegalArgumentException("La urgencia debe estar entre "
                     + MOST_URGENT + " y " + LEAST_URGENT);
         }
+        if (queue.findById(id) != null) {
+            throw new IllegalArgumentException("Ya existe una solicitud con el id: " + id);
+        }
         Ticket t = new Ticket(id, name, urgency, arrivalCounter++);
         queue.insert(t);
         return t;
@@ -34,6 +37,10 @@ public class TriageSystem {
             return null;
         }
         return queue.removeNext();
+    }
+
+    public Ticket findById(String id) {
+        return queue.findById(id);
     }
 
     public int pendingCount() {

@@ -1,12 +1,13 @@
 package triage;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
  * Cola generica implementada con una lista enlazada simple con referencias
  * a la cabeza (frente) y a la cola (final).
  */
-public class LinkedQueue<T> {
+public class LinkedQueue<T> implements Iterable<T> {
 
     private static class Node<T> {
 
@@ -66,5 +67,31 @@ public class LinkedQueue<T> {
 
     public int size() {
         return size;
+    }
+
+    /**
+     * Recorre la cola desde el frente hasta el final sin modificarla.
+     */
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+
+            private Node<T> current = head;
+
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
+
+            @Override
+            public T next() {
+                if (current == null) {
+                    throw new NoSuchElementException();
+                }
+                T value = current.value;
+                current = current.next;
+                return value;
+            }
+        };
     }
 }

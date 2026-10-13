@@ -20,6 +20,9 @@ llegó primero.
   de urgencia, cada una implementada con una lista enlazada con referencias a
   la cabeza y a la cola): decide el orden de atención. Como la urgencia solo
   toma 5 valores, registrar y atender cuestan `Θ(1)`.
+- **Búsqueda por identificador**: recorre las colas de todos los niveles,
+  con costo `Θ(n)` en el peor caso. También se usa para rechazar
+  identificadores repetidos al registrar.
 - **Pila** (lista enlazada de encabezado único): registrará el historial de
   atenciones y permitirá deshacer la más reciente en `Θ(1)`.
 
@@ -50,11 +53,12 @@ javac -d out src/triage/*.java
 
 - **Implementado:** clase `Ticket` (solicitud con identificador, nombre,
   urgencia y orden de llegada); cola genérica `LinkedQueue` sobre lista
-  enlazada; cola de prioridad `LevelPriorityQueue`, con una cola por nivel de
-  urgencia que atiende primero el nivel más urgente y, dentro de cada nivel,
-  la solicitud que llegó primero; y `TriageSystem`, que registra solicitudes
-  (validando identificador y urgencia entre 1 y 5) y atiende siempre la de
-  mayor prioridad.
-- **Pendiente:** búsqueda por identificador, cancelación de solicitudes,
-  historial de atenciones con deshacer, interfaz de consola, pruebas y
-  documento técnico.
+  enlazada, recorrible sin modificarla; cola de prioridad
+  `LevelPriorityQueue`, con una cola por nivel de urgencia que atiende primero
+  el nivel más urgente y, dentro de cada nivel, la solicitud que llegó
+  primero; y `TriageSystem`, que registra solicitudes (validando
+  identificador, identificadores repetidos y urgencia entre 1 y 5), atiende
+  siempre la de mayor prioridad y busca solicitudes pendientes por
+  identificador.
+- **Pendiente:** cancelación de solicitudes, historial de atenciones con
+  deshacer, interfaz de consola, pruebas y documento técnico.
