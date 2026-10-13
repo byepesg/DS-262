@@ -1,0 +1,48 @@
+{
+	"textures": [
+		{
+			"image": "spritesheet.png",
+			"size": {
+				"w": 224,
+				"h": 32
+			},
+			"sprites": [
+				{
+					"filename": "floors.png",
+					"region": {
+						"x": 144,
+						"y": 0,
+						"w": 80,
+						"h": 16
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "walls.png",
+					"region": {
+						"x": 0,
+						"y": 0,
+						"w": 144,
+						"h": 32
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "1.1",
+		"smartupdate": "$TexturePacker:SmartUpdate:509517eb665def3cc111803e64903a5f:f8b88cdfb62266b3d3af2a3c65e8b2f3:1b6ff94623e0282c57e59f9e13c5e64b$"
+	}
+}
