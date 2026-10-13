@@ -1,37 +1,61 @@
 # Sistema de Priorización de Atención (SPA)
 
-Proyecto semestral, Entrega 1. Asignatura Estructuras de Datos, Universidad
-Nacional de Colombia, semestre 2026-2.
+Proyecto semestral, **Entrega 1** (Propuesta, Diseño e Implementación Inicial).
+Asignatura Estructuras de Datos, Universidad Nacional de Colombia, semestre
+2026-2. Grupo DS3, equipo 02.
 
 ## Integrantes
 
-- [Nombre completo], usuario GitHub: [usuario], [correo]@unal.edu.co
-- [Nombre completo], usuario GitHub: [usuario], [correo]@unal.edu.co
-- [Nombre completo], usuario GitHub: [usuario], [correo]@unal.edu.co
+| Integrante | Usuario GitHub | Correo |
+| --- | --- | --- |
+| Johan Adrian Torres Robles | jotorresro | jotorresro@unal.edu.co |
+| Esteban Mora Lopez | emoritax | emoral@unal.edu.co |
+| Miguel Angel Rodriguez Bohorquez | Maracuya4263 | mrodriguezbo@unal.edu.co |
+
+### Aportes
+
+| Integrante | Aporte |
+| --- | --- |
+| Johan Adrian Torres Robles (jotorresro) | Coordinación del proyecto; diseño de la cola de prioridad por niveles; implementación de `LinkedQueue`, `LevelPriorityQueue`, `TriageSystem` y la cancelación; redacción de la metodología y del pseudocódigo; integración y publicación en el repositorio. |
+| Esteban Mora Lopez (emoritax) | Participó en la definición del problema, el alcance y los requerimientos; implementación de la pila y el historial (`LinkedStack`, `ServiceHistory`); redacción de la introducción y el trabajo relacionado. |
+| Miguel Angel Rodriguez Bohorquez (Maracuya4263) | Participó en el diseño del menú de consola (`Main`) y en las pruebas (`BasicTests`) con sus casos borde; redacción del estado de la implementación, la discusión y las conclusiones; revisión general del documento. |
+
+El proyecto se desarrolló en sesiones de trabajo conjunto, por lo que los
+commits aparecen desde una sola cuenta; todos los integrantes conocen el
+proyecto completo.
 
 ## Descripción del proyecto
 
-Sistema que registra, prioriza, atiende, cancela y consulta solicitudes de
-atención (por ejemplo, una fila de urgencias o una mesa de ayuda técnica),
-atendiendo siempre primero la solicitud de mayor urgencia en lugar de la que
-llegó primero.
+Sistema que registra, prioriza, atiende, busca, cancela y consulta
+solicitudes de atención (por ejemplo, una fila de urgencias o una mesa de
+ayuda técnica), atendiendo siempre primero la solicitud de mayor urgencia en
+lugar de la que llegó primero.
 
-- **Cola de prioridad por niveles** (un arreglo con una cola FIFO por nivel
-  de urgencia, cada una implementada con una lista enlazada con referencias a
-  la cabeza y a la cola): decide el orden de atención. Como la urgencia solo
-  toma 5 valores, registrar y atender cuestan `Θ(1)`.
-- **Búsqueda por identificador**: recorre las colas de todos los niveles,
-  con costo `Θ(n)` en el peor caso. También se usa para rechazar
-  identificadores repetidos al registrar.
-- **Cancelación**: localiza la solicitud con la misma búsqueda y elimina su
-  nodo de la lista enlazada de su nivel, en `Θ(n)` en el peor caso. Una
-  solicitud cancelada sale de la cola y nunca es atendida.
+- **Cola de prioridad por niveles**: un arreglo con una cola FIFO por nivel
+  de urgencia (1 a 5), cada una implementada con una lista enlazada con
+  referencias a la cabeza y a la cola. Decide el orden de atención y resuelve
+  el desempate por orden de llegada.
+- **Búsqueda y cancelación por identificador**: recorren las listas de los
+  cinco niveles; la cancelación elimina el nodo de su lista.
 - **Pila** (lista enlazada de encabezado único): registra el historial de
-  atenciones en `Θ(1)` por atención. Al ser LIFO, deja preparada la
-  operación de deshacer la atención más reciente.
+  atenciones y deja preparada la operación de deshacer.
 
 El documento técnico, con la justificación de cada decisión de diseño, está
 en `docs/main.pdf` (fuente en `docs/main.tex`, compilable con pdfLaTeX).
+
+## Complejidad de las operaciones
+
+`n` es el número de solicitudes pendientes, `k = 5` el número de niveles de
+urgencia y `h` el número de atenciones registradas.
+
+| Operación | Costo | Supuesto |
+| --- | --- | --- |
+| Registrar solicitud | `Θ(n)` | Encolar cuesta `Θ(1)` gracias a la referencia a la cola de la lista; la verificación de identificador repetido recorre las pendientes. |
+| Atender siguiente | `Θ(1)` | Se revisan como máximo `k = 5` niveles, una constante, y desencolar cuesta `Θ(1)`. |
+| Buscar por identificador | `Θ(n)` peor caso | Recorrido lineal de las listas de los cinco niveles. |
+| Cancelar solicitud | `Θ(n)` peor caso | Búsqueda lineal más desenlace del nodo en `Θ(1)`. |
+| Consultar historial | `Θ(h)` | Recorre la pila completa sin modificarla. |
+| Cantidad de pendientes | `Θ(1)` | Se mantiene un contador. |
 
 ## Estructura del repositorio
 
@@ -76,11 +100,36 @@ Ejecutar el menú de consola:
 java -cp out triage.Main
 ```
 
-Ejecutar las pruebas (imprimen el resultado esperado de cada operación junto
-al obtenido):
+## Pruebas
 
 ```bash
 java -cp out triage.BasicTests
+```
+
+Es un programa de prueba manual: cada línea imprime el resultado esperado
+junto al obtenido. Salida esperada:
+
+```
+--- Escenario principal ---
+Pendientes tras registrar 4 solicitudes (esperado 4): 4
+1ra atencion (esperado: A2, urgencia 1): Ticket{id=A2, nombre=Ana Gomez, urgencia=1, llegada=1}
+2da atencion (esperado: A4, urgencia 1, llego despues de A2): Ticket{id=A4, nombre=Eva Leon, urgencia=1, llegada=3}
+Cancelar A3 (esperado true): true
+Buscar A3 tras cancelar (esperado null): null
+Pendientes tras cancelar A3 (esperado 1): 1
+3ra atencion (esperado: A1; A3 ya no esta): Ticket{id=A1, nombre=Juan Perez, urgencia=3, llegada=0}
+4to intento (esperado: null, no quedan pendientes): null
+Historial (esperado: A1, A4, A2):
+  Ticket{id=A1, nombre=Juan Perez, urgencia=3, llegada=0}
+  Ticket{id=A4, nombre=Eva Leon, urgencia=1, llegada=3}
+  Ticket{id=A2, nombre=Ana Gomez, urgencia=1, llegada=1}
+
+--- Casos borde ---
+Urgencia 9 (esperado: error): La urgencia debe estar entre 1 y 5
+Id repetido pendiente (esperado: error): Ya existe una solicitud con el id: C1
+Cancelar id inexistente (esperado false): false
+Reusar id ya atendido (esperado: Sofia Mora): Ticket{id=C1, nombre=Sofia Mora, urgencia=4, llegada=1}
+Atender dos veces (esperado: C1 y luego null): C1, null
 ```
 
 ## Ejemplo básico de uso
@@ -98,20 +147,37 @@ Atendiendo: Ticket{id=A1, nombre=Juan Perez, urgencia=3, llegada=0}
 
 ## Estado de la implementación
 
-- **Implementado:** clase `Ticket` (solicitud con identificador, nombre,
-  urgencia y orden de llegada); cola genérica `LinkedQueue` sobre lista
-  enlazada, recorrible sin modificarla y con eliminación de un elemento
-  arbitrario; cola de prioridad `LevelPriorityQueue`, con una cola por nivel
-  de urgencia que atiende primero el nivel más urgente y, dentro de cada
-  nivel, la solicitud que llegó primero; pila genérica `LinkedStack` sobre
-  lista enlazada; historial de atenciones `ServiceHistory`; y `TriageSystem`,
-  que registra solicitudes (validando identificador, identificadores
-  repetidos y urgencia entre 1 y 5), atiende siempre la de mayor prioridad,
-  busca y cancela solicitudes pendientes y consulta el historial de
-  atenciones; y un menú de consola (`Main`) que expone todas estas
-  operaciones.
-- **Parcial:** pruebas manuales (`BasicTests`) que comparan el resultado
-  esperado con el obtenido en un escenario principal y en casos borde, sin
-  aserciones automáticas.
+- **Implementado:** registrar, atender por prioridad, buscar por
+  identificador, cancelar, consultar el historial de atenciones y menú de
+  consola.
+- **Parcial:** validación de entradas (el nombre no se valida) y pruebas
+  (manuales, sin aserciones automáticas).
 - **Pendiente:** deshacer la última atención, índice por identificador en
-  tiempo constante y análisis experimental de desempeño.
+  tiempo constante, pruebas automatizadas y análisis experimental de
+  desempeño.
+
+El detalle está en la sección "Estado de la implementación" de
+`docs/main.pdf`.
+
+## Limitaciones conocidas
+
+- La búsqueda, la cancelación y la verificación de identificadores repetidos
+  cuestan `Θ(n)`.
+- El costo constante de la cola de prioridad depende de que la urgencia tome
+  solo cinco valores.
+- Los datos existen solo durante la ejecución; no hay persistencia.
+- No se valida el nombre de la solicitud.
+
+## Referencias y declaración de ayudas
+
+- T. H. Cormen, C. E. Leiserson, R. L. Rivest y C. Stein, *Introduction to
+  Algorithms*, 4th ed. MIT Press, 2022.
+- M. T. Goodrich, R. Tamassia y M. H. Goldwasser, *Data Structures and
+  Algorithms in Java*, 6th ed. Wiley, 2014.
+- Las colas, la cola de prioridad y la pila son implementación propia; de la
+  biblioteca estándar de Java solo se usa `ArrayList` para devolver el
+  historial como lista.
+- **Declaración de ayudas:** se utilizó Claude (Anthropic), un asistente de
+  inteligencia artificial, como apoyo en la implementación del código y en la
+  redacción del documento técnico. El equipo revisó, probó y comprende todo
+  el código y las decisiones de diseño presentadas.
