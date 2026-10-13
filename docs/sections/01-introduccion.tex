@@ -1,0 +1,37 @@
+\section{Introducción}
+
+Los centros de atención que reciben solicitudes de servicio (salas de
+urgencias, mesas de ayuda técnica, módulos de atención al cliente) enfrentan
+un mismo reto operativo: las solicitudes no deben atenderse en el orden en
+que llegan, sino según su nivel de urgencia, y el personal necesita poder
+consultar o cancelar solicitudes específicas y revisar las atenciones
+realizadas sin tener que reorganizar manualmente toda la fila.
+
+Resolver este problema de manera eficiente requiere estructuras de datos que
+soporten, simultáneamente: (i) obtener en todo momento la solicitud más
+urgente sin tener que ordenar repetidamente toda la colección, (ii) respetar
+el orden de llegada entre solicitudes de igual urgencia, (iii) ubicar y
+retirar una solicitud puntual por su identificador, y (iv) registrar las
+atenciones en el orden en que ocurren para poder consultarlas y, en una
+entrega posterior, revertir la más reciente.
+
+Este documento presenta el diseño e implementación inicial de un
+\emph{Sistema de Priorización de Atención} (SPA), que resuelve el problema
+anterior combinando estructuras lineales estudiadas en la asignatura: colas
+y listas enlazadas para el orden de atención, y una pila para el historial
+de atenciones.
+
+La contribución de esta primera entrega consiste en: (a) la formulación del
+problema y su alcance, (b) la selección y justificación técnica de las
+estructuras de datos empleadas, y (c) una implementación funcional que
+permite registrar, atender, buscar y cancelar solicitudes, y consultar el
+historial de atenciones.
+
+El resto del documento se organiza así: la Sección~\ref{sec:relacionado}
+presenta trabajo relacionado; la Sección~\ref{sec:metodologia} describe los
+objetivos, el alcance, los requerimientos y el diseño de la solución,
+incluyendo las estructuras de datos seleccionadas; la
+Sección~\ref{sec:resultados} reporta el estado actual de la implementación;
+la Sección~\ref{sec:discusion} discute las limitaciones conocidas; y la
+Sección~\ref{sec:conclusiones} resume el estado del proyecto y el trabajo
+futuro.
