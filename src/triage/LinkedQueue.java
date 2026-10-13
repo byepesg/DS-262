@@ -61,6 +61,33 @@ public class LinkedQueue<T> implements Iterable<T> {
         return head.value;
     }
 
+    /**
+     * Elimina la primera aparicion de value, conservando el orden del resto.
+     *
+     * @return true si el elemento estaba en la cola
+     */
+    public boolean remove(T value) {
+        Node<T> previous = null;
+        Node<T> current = head;
+        while (current != null && !current.value.equals(value)) {
+            previous = current;
+            current = current.next;
+        }
+        if (current == null) {
+            return false;
+        }
+        if (previous == null) {
+            head = current.next;
+        } else {
+            previous.next = current.next;
+        }
+        if (current == tail) {
+            tail = previous;
+        }
+        size--;
+        return true;
+    }
+
     public boolean isEmpty() {
         return head == null;
     }

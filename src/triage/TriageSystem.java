@@ -43,6 +43,15 @@ public class TriageSystem {
         return queue.findById(id);
     }
 
+    /**
+     * Cancela una solicitud pendiente para que nunca sea atendida.
+     *
+     * @return true si la solicitud existia y fue cancelada
+     */
+    public boolean cancelRequest(String id) {
+        return queue.removeById(id) != null;
+    }
+
     public int pendingCount() {
         return queue.size();
     }

@@ -63,6 +63,21 @@ public class LevelPriorityQueue {
         return null;
     }
 
+    /**
+     * Retira de la cola el ticket con el identificador dado.
+     *
+     * @return el ticket retirado o null si no existe
+     */
+    public Ticket removeById(String id) {
+        Ticket t = findById(id);
+        if (t == null) {
+            return null;
+        }
+        levels[t.getUrgency() - 1].remove(t);
+        size--;
+        return t;
+    }
+
     public Ticket peekNext() {
         for (LinkedQueue<Ticket> level : levels) {
             if (!level.isEmpty()) {
