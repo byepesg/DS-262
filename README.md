@@ -32,7 +32,8 @@ llegó primero.
     └── triage/
         ├── Ticket.java
         ├── LinkedQueue.java
-        └── LevelPriorityQueue.java
+        ├── LevelPriorityQueue.java
+        └── TriageSystem.java
 ```
 
 ## Cómo compilar
@@ -49,9 +50,11 @@ javac -d out src/triage/*.java
 
 - **Implementado:** clase `Ticket` (solicitud con identificador, nombre,
   urgencia y orden de llegada); cola genérica `LinkedQueue` sobre lista
-  enlazada; y cola de prioridad `LevelPriorityQueue`, con una cola por nivel
-  de urgencia que atiende primero el nivel más urgente y, dentro de cada
-  nivel, la solicitud que llegó primero.
-- **Pendiente:** registro y atención de solicitudes, búsqueda por
-  identificador, cancelación, historial de atenciones con deshacer, interfaz
-  de consola, pruebas y documento técnico.
+  enlazada; cola de prioridad `LevelPriorityQueue`, con una cola por nivel de
+  urgencia que atiende primero el nivel más urgente y, dentro de cada nivel,
+  la solicitud que llegó primero; y `TriageSystem`, que registra solicitudes
+  (validando identificador y urgencia entre 1 y 5) y atiende siempre la de
+  mayor prioridad.
+- **Pendiente:** búsqueda por identificador, cancelación de solicitudes,
+  historial de atenciones con deshacer, interfaz de consola, pruebas y
+  documento técnico.

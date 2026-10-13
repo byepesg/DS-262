@@ -1,0 +1,42 @@
+package triage;
+
+/**
+ * Registra solicitudes de atencion y las atiende por orden de prioridad.
+ */
+public class TriageSystem {
+
+    public static final int MOST_URGENT = 1;
+    public static final int LEAST_URGENT = 5;
+
+    private final LevelPriorityQueue queue;
+    private long arrivalCounter;
+
+    public TriageSystem() {
+        this.queue = new LevelPriorityQueue(LEAST_URGENT - MOST_URGENT + 1);
+        this.arrivalCounter = 0;
+    }
+
+    public Ticket registerRequest(String id, String name, int urgency) {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("El id no puede estar vacio");
+        }
+        if (urgency < MOST_URGENT || urgency > LEAST_URGENT) {
+            throw new IllegalArgumentException("La urgencia debe estar entre "
+                    + MOST_URGENT + " y " + LEAST_URGENT);
+        }
+        Ticket t = new Ticket(id, name, urgency, arrivalCounter++);
+        queue.insert(t);
+        return t;
+    }
+
+    public Ticket serveNext() {
+        if (queue.isEmpty()) {
+            return null;
+        }
+        return queue.removeNext();
+    }
+
+    public int pendingCount() {
+        return queue.size();
+    }
+}
