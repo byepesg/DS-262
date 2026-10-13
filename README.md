@@ -42,17 +42,37 @@ llegó primero.
         ├── LevelPriorityQueue.java
         ├── LinkedStack.java
         ├── ServiceHistory.java
-        └── TriageSystem.java
+        ├── TriageSystem.java
+        └── Main.java
 ```
 
-## Cómo compilar
+## Cómo compilar y ejecutar
 
 Requiere **Java 17** o superior (JDK). No tiene dependencias externas.
 
-Desde la carpeta raíz del proyecto:
+Desde la carpeta raíz del proyecto, compilar:
 
 ```bash
 javac -d out src/triage/*.java
+```
+
+Ejecutar el menú de consola:
+
+```bash
+java -cp out triage.Main
+```
+
+## Ejemplo básico de uso
+
+```
+Opcion: 1
+ID: A1
+Nombre: Juan Perez
+Urgencia (1 = mas urgente, 5 = menos urgente): 3
+Solicitud registrada.
+
+Opcion: 2
+Atendiendo: Ticket{id=A1, nombre=Juan Perez, urgencia=3, llegada=0}
 ```
 
 ## Estado de la implementación
@@ -67,6 +87,6 @@ javac -d out src/triage/*.java
   que registra solicitudes (validando identificador, identificadores
   repetidos y urgencia entre 1 y 5), atiende siempre la de mayor prioridad,
   busca y cancela solicitudes pendientes y consulta el historial de
-  atenciones.
-- **Pendiente:** deshacer la última atención, interfaz de consola, pruebas y
-  documento técnico.
+  atenciones; y un menú de consola (`Main`) que expone todas estas
+  operaciones.
+- **Pendiente:** deshacer la última atención, pruebas y documento técnico.
