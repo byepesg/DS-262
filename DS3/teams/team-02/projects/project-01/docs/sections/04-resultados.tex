@@ -1,0 +1,64 @@
+\section{Estado de la implementación}
+\label{sec:resultados}
+
+La Tabla~\ref{tab:estado} resume el estado de cada funcionalidad a la
+fecha de esta entrega, distinguiendo entre funcionalidades implementadas,
+parcialmente implementadas y pendientes.
+
+\begin{table}[t]
+  \caption{Estado de las funcionalidades en la primera entrega}
+  \label{tab:estado}
+  \centering
+  \begin{tabular}{p{0.58\columnwidth}p{0.28\columnwidth}}
+    \toprule
+    Funcionalidad & Estado \\
+    \midrule
+    Registrar solicitud (RF1) & Implementada \\
+    Atender por prioridad (RF2) & Implementada \\
+    Buscar por identificador (RF3) & Implementada \\
+    Cancelar solicitud (RF4) & Implementada \\
+    Deshacer última atención (RF5) & Pendiente \\
+    Consultar historial (RF6) & Implementada \\
+    Interfaz de consola & Implementada \\
+    Validación de entradas & Parcial \\
+    Pruebas del sistema & Parcial \\
+    Índice por identificador en $O(1)$ & Pendiente \\
+    Análisis experimental de desempeño & Pendiente \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{Implementadas.} Cinco de los seis requerimientos funcionales están
+disponibles en la clase \texttt{TriageSystem}: \texttt{registerRequest},
+\texttt{serveNext}, \texttt{findById}, \texttt{cancelRequest} y
+\texttt{getHistory}. La interfaz de consola (\texttt{Main}) expone todas
+estas operaciones mediante un menú. Las estructuras de soporte
+(\texttt{LinkedQueue}, \texttt{LevelPriorityQueue} y \texttt{LinkedStack})
+son implementación propia; de la biblioteca estándar de Java solo se usa
+\texttt{ArrayList} para devolver el historial como lista.
+
+\textbf{Parcialmente implementadas.} La validación de entradas rechaza
+identificadores vacíos o repetidos entre las solicitudes pendientes,
+urgencias fuera del rango 1--5 y urgencias no numéricas, pero aún no valida
+el nombre de la solicitud. Las pruebas se realizan mediante un programa de
+prueba manual (\texttt{BasicTests.java}) que imprime el resultado esperado
+junto al obtenido, sin aserciones automáticas. El escenario principal
+registra cuatro solicitudes, verifica el orden de atención por urgencia y
+el desempate por orden de llegada entre dos solicitudes de urgencia 1,
+cancela una solicitud pendiente y comprueba que deja de encontrarse y de
+contarse, y confirma el orden del historial. Los casos borde cubren una
+urgencia fuera de rango, un identificador repetido, la cancelación de un
+identificador inexistente, la reutilización del identificador de una
+solicitud ya atendida y la atención con la cola vacía.
+
+\textbf{Pendientes.} Para la siguiente entrega quedan deshacer la última
+atención (RF5), cuyo diseño se apoya en la pila ya implementada; un índice
+por identificador que reduzca la búsqueda y la cancelación a tiempo
+esperado constante; y la migración de las pruebas manuales a pruebas
+automatizadas. Para la entrega final queda un análisis experimental de
+tiempos de ejecución sobre volúmenes de datos mayores.
+
+No se reportan resultados experimentales de desempeño en esta entrega,
+dado que el énfasis de la primera versión es la corrección funcional y la
+justificación del diseño; el análisis de complejidad teórica se presentó
+en la Sección~\ref{sec:metodologia}.

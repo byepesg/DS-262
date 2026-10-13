@@ -1,0 +1,26 @@
+\section{Discusión}
+\label{sec:discusion}
+
+El diseño adoptado separa la responsabilidad de cada estructura: la cola de
+prioridad por niveles decide el orden de atención, la lista enlazada de
+cada nivel permite retirar solicitudes canceladas, y la pila registra el
+historial. Esta separación evita resolver todas las necesidades con una
+sola estructura, por ejemplo una lista que se recorra linealmente para todo,
+lo que degradaría también la atención a $O(n)$.
+
+La principal limitación conocida es el costo lineal de la búsqueda por
+identificador, que se traslada a la cancelación y a la verificación de
+identificadores repetidos al registrar. Para el tamaño de datos esperado
+(una fila de atención, no miles de solicitudes simultáneas) este costo se
+considera aceptable en esta etapa. Una mejora prevista es mantener un
+índice por identificador que permita ubicar cada solicitud en tiempo
+esperado constante sin alterar el orden de atención.
+
+Otra limitación es que el costo constante de la cola de prioridad depende
+de que la urgencia tome solo cinco valores. Si en el futuro la prioridad
+dependiera de una magnitud continua, como el tiempo de espera acumulado,
+habría que evaluar otra representación de la cola de prioridad.
+
+Finalmente, los datos existen solo durante la ejecución del programa, lo
+cual es consistente con el alcance definido
+(Sección~\ref{sec:metodologia}).
