@@ -43,7 +43,8 @@ llegó primero.
         ├── LinkedStack.java
         ├── ServiceHistory.java
         ├── TriageSystem.java
-        └── Main.java
+        ├── Main.java
+        └── BasicTests.java
 ```
 
 ## Cómo compilar y ejecutar
@@ -60,6 +61,13 @@ Ejecutar el menú de consola:
 
 ```bash
 java -cp out triage.Main
+```
+
+Ejecutar las pruebas (imprimen el resultado esperado de cada operación junto
+al obtenido):
+
+```bash
+java -cp out triage.BasicTests
 ```
 
 ## Ejemplo básico de uso
@@ -89,4 +97,7 @@ Atendiendo: Ticket{id=A1, nombre=Juan Perez, urgencia=3, llegada=0}
   busca y cancela solicitudes pendientes y consulta el historial de
   atenciones; y un menú de consola (`Main`) que expone todas estas
   operaciones.
-- **Pendiente:** deshacer la última atención, pruebas y documento técnico.
+- **Parcial:** pruebas manuales (`BasicTests`) que comparan el resultado
+  esperado con el obtenido en un escenario principal y en casos borde, sin
+  aserciones automáticas.
+- **Pendiente:** deshacer la última atención y documento técnico.
