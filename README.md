@@ -30,11 +30,24 @@ llegó primero.
   atenciones en `Θ(1)` por atención. Al ser LIFO, deja preparada la
   operación de deshacer la atención más reciente.
 
+El documento técnico, con la justificación de cada decisión de diseño, está
+en `docs/main.pdf` (fuente en `docs/main.tex`, compilable con pdfLaTeX).
+
 ## Estructura del repositorio
 
 ```
 .
 ├── README.md
+├── docs/
+│   ├── main.tex
+│   ├── main.pdf
+│   └── sections/
+│       ├── 01-introduccion.tex
+│       ├── 02-trabajo-relacionado.tex
+│       ├── 03-metodologia.tex
+│       ├── 04-resultados.tex
+│       ├── 05-discusion.tex
+│       └── 06-conclusiones.tex
 └── src/
     └── triage/
         ├── Ticket.java
@@ -100,4 +113,5 @@ Atendiendo: Ticket{id=A1, nombre=Juan Perez, urgencia=3, llegada=0}
 - **Parcial:** pruebas manuales (`BasicTests`) que comparan el resultado
   esperado con el obtenido en un escenario principal y en casos borde, sin
   aserciones automáticas.
-- **Pendiente:** deshacer la última atención y documento técnico.
+- **Pendiente:** deshacer la última atención, índice por identificador en
+  tiempo constante y análisis experimental de desempeño.
