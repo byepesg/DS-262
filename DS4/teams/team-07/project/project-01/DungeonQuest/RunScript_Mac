@@ -1,26 +1,23 @@
 #!/bin/bash
 
-
 # 1. Configuración de variables
 GODOT_VERSION="4.6" 
+# URL oficial corregida para la descarga directa desde los releases de Godot
 GODOT_URL="https://github.com{GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_macos.universal.zip"
 ZIP_NAME="Godot.zip"
 APP_NAME="Godot.app"
 INSTALL_DIR="/Applications"
 
-
 # Pedir la ruta del proyecto al usuario
 echo "📁 Por favor, arrastra o escribe la ruta de la carpeta de tu proyecto de Godot y presiona Enter:"
 read -r PROJECT_PATH
 
-
 # Limpiar comillas o espacios extras de la ruta si se arrastró la carpeta
 PROJECT_PATH=$(echo "$PROJECT_PATH" | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//")
 
-
 # 2. Verificar o instalar Godot
 if [ ! -d "$INSTALL_DIR/$APP_NAME" ]; then
-    echo "📥 Godot no está instalado. Descargando versión ${GODOT_VERSION}..."
+    echo "📥 Godot no está instalado en Aplicaciones. Descargando versión ${GODOT_VERSION}..."
     curl -L -o "$ZIP_NAME" "$GODOT_URL"
     
     echo "📦 Descomprimiendo..."
@@ -36,11 +33,10 @@ if [ ! -d "$INSTALL_DIR/$APP_NAME" ]; then
     echo "🔓 Autorizando la aplicación en macOS..."
     xattr -dr com.apple.quarantine "$INSTALL_DIR/$APP_NAME"
     
-    echo "✅ ¡Godot instalado con éxito!"
+    echo "✅ ¡Godot ${GODOT_VERSION} instalado con éxito!"
 else
     echo "✨ Godot ya está instalado en tu sistema."
 fi
-
 
 # 3. Correr el proyecto seleccionado
 if [ -f "$PROJECT_PATH/project.godot" ]; then
