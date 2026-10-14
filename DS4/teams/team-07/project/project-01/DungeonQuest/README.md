@@ -15,6 +15,29 @@ Dungeon Quest es un prototipo 2D de exploración de un calabozo hecho con Godot 
 ## Requisitos
 - Godot 4.x (el proyecto fue creado con la versión 4.7 y el renderizador *Forward Plus*; se recomienda abrirlo con esa versión o una posterior).
 - No requiere complementos ni dependencias externas.
+- 
+## Cómo ejecutar (macOS)
+
+Este proyecto incluye un script de Bash (`ejecutar.sh`) que automatiza por completo la configuración en macOS: descarga e instala **Godot 4.3** de forma automática (si no está instalado), configura los permisos de seguridad del sistema y abre el juego directamente.
+
+### Pasos para iniciar
+
+1. **Dar permisos de ejecución al script**  
+   Abre la Terminal en la raíz del proyecto y ejecuta el siguiente comando (solo es necesario hacerlo la primera vez):
+   ```bash
+   chmod +x ejecutar.sh
+   ```
+
+2. **Lanzar el script**  
+   Inicia el asistente automático con el comando:
+   ```bash
+   ./ejecutar.sh
+   ```
+
+3. **Indicar la ruta del proyecto**  
+   Cuando la Terminal lo solicite, **arrastra la carpeta de este proyecto** directamente a la ventana de la Terminal (o escribe su ruta manualmente) y presiona `Enter`.
+
+El script se encargará de validar tu entorno, solucionar el bloqueo de Gatekeeper de macOS si descarga el motor por primera vez, e iniciará el juego inmediatamente sin necesidad de configurar nada de forma manual.
 
 ## Cómo ejecutar
 1. Abre Godot.
