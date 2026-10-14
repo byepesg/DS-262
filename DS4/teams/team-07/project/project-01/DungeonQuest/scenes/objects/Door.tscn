@@ -1,0 +1,294 @@
+[gd_scene format=3 uid="uid://2h0f1dtasda1"]
+
+[ext_resource type="Script" uid="uid://cvwa2tl08efj2" path="res://scripts/door.gd" id="1_mg2as"]
+[ext_resource type="Texture2D" uid="uid://dh2gkim603sgk" path="res://assets/sprites/doors/doors_side.png" id="3_ao1jx"]
+[ext_resource type="Texture2D" uid="uid://rfuyusd680hy" path="res://assets/sprites/doors/doors_front.png" id="3_dfkju"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l6n4g"]
+atlas = ExtResource("3_dfkju")
+region = Rect2(240, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i7oty"]
+atlas = ExtResource("3_dfkju")
+region = Rect2(192, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1n46g"]
+atlas = ExtResource("3_ao1jx")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qxrry"]
+atlas = ExtResource("3_ao1jx")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_02sv7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l6n4g")
+}],
+"loop": true,
+"name": &"back",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i7oty")
+}],
+"loop": true,
+"name": &"front",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1n46g")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qxrry")
+}],
+"loop": true,
+"name": &"rigth",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w5jee"]
+atlas = ExtResource("3_dfkju")
+region = Rect2(144, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rb0us"]
+atlas = ExtResource("3_dfkju")
+region = Rect2(96, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pvq0t"]
+atlas = ExtResource("3_ao1jx")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lck7h"]
+atlas = ExtResource("3_ao1jx")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pvq0t"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w5jee")
+}],
+"loop": true,
+"name": &"back",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rb0us")
+}],
+"loop": true,
+"name": &"front",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pvq0t")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lck7h")
+}],
+"loop": true,
+"name": &"right",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dfkju"]
+atlas = ExtResource("3_dfkju")
+region = Rect2(48, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hnqep"]
+atlas = ExtResource("3_dfkju")
+region = Rect2(0, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kdo1k"]
+atlas = ExtResource("3_ao1jx")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v12wq"]
+atlas = ExtResource("3_ao1jx")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_m78fr"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dfkju")
+}],
+"loop": true,
+"name": &"back",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hnqep")
+}],
+"loop": true,
+"name": &"front",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kdo1k")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v12wq")
+}],
+"loop": true,
+"name": &"right",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sdj7o"]
+size = Vector2(3, 5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dfkju"]
+size = Vector2(3, 5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w5jee"]
+size = Vector2(4, 29)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0bx5k"]
+size = Vector2(4, 29)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8bb8g"]
+size = Vector2(6, 3)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rb0us"]
+size = Vector2(6, 3)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_frobt"]
+size = Vector2(6, 3)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_i2kkb"]
+size = Vector2(8, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a1yte"]
+size = Vector2(12, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gxhyx"]
+size = Vector2(3, 11)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lch3g"]
+size = Vector2(3, 11)
+
+[node name="Door" type="StaticBody2D" unique_id=335903968]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_mg2as")
+walk_distance_front = 14.0
+walk_distance_side = 8.0
+walk_distance_back = 8.0
+
+[node name="DoorGlow" type="AnimatedSprite2D" parent="." unique_id=471970034]
+modulate = Color(1, 1, 1, 0)
+sprite_frames = SubResource("SpriteFrames_02sv7")
+animation = &"rigth"
+
+[node name="DoorBack" type="AnimatedSprite2D" parent="." unique_id=860034957]
+sprite_frames = SubResource("SpriteFrames_pvq0t")
+animation = &"front"
+
+[node name="DoorFront" type="AnimatedSprite2D" parent="." unique_id=488363871]
+z_index = 2
+sprite_frames = SubResource("SpriteFrames_m78fr")
+animation = &"front"
+
+[node name="Col_Back_R" type="CollisionShape2D" parent="." unique_id=368318009]
+visible = false
+position = Vector2(9, 14)
+shape = SubResource("RectangleShape2D_sdj7o")
+disabled = true
+
+[node name="Col_Back_L" type="CollisionShape2D" parent="." unique_id=1186500018]
+visible = false
+position = Vector2(-8.5, 14)
+shape = SubResource("RectangleShape2D_dfkju")
+disabled = true
+
+[node name="Col_Front_L" type="CollisionShape2D" parent="." unique_id=1757534576]
+visible = false
+position = Vector2(-9, 3.5)
+shape = SubResource("RectangleShape2D_w5jee")
+
+[node name="Col_Front_R" type="CollisionShape2D" parent="." unique_id=1132539280]
+visible = false
+position = Vector2(9, 3.5)
+shape = SubResource("RectangleShape2D_0bx5k")
+
+[node name="Col_Right_D" type="CollisionShape2D" parent="." unique_id=751687606]
+position = Vector2(13, 14.5)
+shape = SubResource("RectangleShape2D_8bb8g")
+disabled = true
+
+[node name="Col_Right_U" type="CollisionShape2D" parent="." unique_id=1191394222]
+position = Vector2(13, -9)
+shape = SubResource("RectangleShape2D_8bb8g")
+disabled = true
+
+[node name="Col_Left_D" type="CollisionShape2D" parent="." unique_id=1357406275]
+position = Vector2(-13, 14.5)
+shape = SubResource("RectangleShape2D_rb0us")
+disabled = true
+
+[node name="Col_Left_U" type="CollisionShape2D" parent="." unique_id=277051054]
+position = Vector2(-13, -9)
+shape = SubResource("RectangleShape2D_frobt")
+disabled = true
+
+[node name="PassArea" type="Area2D" parent="." unique_id=428117230]
+visible = false
+collision_layer = 0
+collision_mask = 2
+
+[node name="Pass_Front" type="CollisionShape2D" parent="PassArea" unique_id=1233431621]
+position = Vector2(0, 5)
+shape = SubResource("RectangleShape2D_i2kkb")
+
+[node name="Pass_Back" type="CollisionShape2D" parent="PassArea" unique_id=2128538792]
+visible = false
+position = Vector2(0, 12.5)
+shape = SubResource("RectangleShape2D_a1yte")
+disabled = true
+
+[node name="Pass_Left" type="CollisionShape2D" parent="PassArea" unique_id=2066260793]
+position = Vector2(-13, 5)
+shape = SubResource("RectangleShape2D_gxhyx")
+disabled = true
+
+[node name="Pass_Right" type="CollisionShape2D" parent="PassArea" unique_id=1009085937]
+position = Vector2(13, 5)
+shape = SubResource("RectangleShape2D_lch3g")
+disabled = true
+
+[node name="Arrival_Front" type="Marker2D" parent="." unique_id=1160033255]
+position = Vector2(0, 23)
+
+[node name="Arrival_Back" type="Marker2D" parent="." unique_id=1586770965]
+position = Vector2(0, -5)
+
+[node name="Arrival_Left" type="Marker2D" parent="." unique_id=2051623702]
+position = Vector2(4, 3)
+
+[node name="Arrival_Right" type="Marker2D" parent="." unique_id=1318258734]
+position = Vector2(-4, 3)
+
+[connection signal="body_entered" from="PassArea" to="." method="_on_pass_area_body_entered"]
