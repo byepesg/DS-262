@@ -1,0 +1,23 @@
+# Archivos y carpetas de compilación de Java
+bin/
+out/
+target/
+*.class
+
+# Visual Studio Code
+.vscode/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
