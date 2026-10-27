@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://oe3j4cbftx5o"]
+
+[ext_resource type="Script" uid="uid://betduiwdus7va" path="res://scripts/victory.gd" id="1_sdctl"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sdctl"]
+
+[node name="Victory" type="Control" unique_id=1421535777]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_sdctl")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1911514851]
+layout_mode = 0
+offset_right = 480.0
+offset_bottom = 272.0
+texture = SubResource("PlaceholderTexture2D_sdctl")
+
+[node name="RetryButton" type="Button" parent="." unique_id=1203339815]
+layout_mode = 0
+offset_left = 144.0
+offset_top = 184.0
+offset_right = 249.0
+offset_bottom = 215.0
+text = "REINTENTAR
+"
+
+[node name="MenuBotton" type="Button" parent="." unique_id=984203741]
+layout_mode = 0
+offset_left = 264.0
+offset_top = 184.0
+offset_right = 369.0
+offset_bottom = 215.0
+text = "MENU
+
+"
+
+[node name="Label" type="Label" parent="." unique_id=1475586199]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 40.0
+offset_right = 273.0
+offset_bottom = 89.0
+text = "GANASTE"
