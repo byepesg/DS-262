@@ -1,0 +1,34 @@
+\section{Trabajo relacionado}
+\label{sec:relacionado}
+
+El problema de atender elementos según su prioridad se modela con el tipo
+abstracto \emph{cola de prioridad}, cuyas operaciones básicas son insertar
+un elemento y extraer el de mayor prioridad~\cite{cormen,goodrich}. La
+literatura distingue entre el tipo abstracto y su representación: el mismo
+comportamiento puede implementarse con estructuras distintas, y es la
+representación la que determina el costo de cada operación.
+
+Una representación directa es una lista ordenada por prioridad, que permite
+extraer el elemento más prioritario en tiempo constante, pero cuya inserción
+cuesta $O(n)$, pues debe recorrer la lista hasta encontrar la posición
+correcta. En el extremo opuesto, una lista sin orden inserta en tiempo
+constante pero obliga a recorrerla completa, en $O(n)$, cada vez que se
+extrae el elemento más prioritario~\cite{goodrich}. Para prioridades
+arbitrarias, la representación clásica que equilibra ambos costos es el
+\emph{heap} binario, con inserción y extracción en $O(\log n)$~\cite{cormen}.
+
+Cuando la prioridad solo puede tomar un número pequeño y fijo de valores,
+como ocurre en los esquemas de triage que clasifican a cada paciente en
+unos pocos niveles de urgencia, existe una alternativa más simple: mantener
+una cola FIFO independiente por cada nivel. Insertar consiste en encolar en
+el nivel correspondiente, y extraer consiste en revisar los niveles en orden
+de urgencia hasta encontrar uno no vacío. Como el número de niveles es una
+constante, ambas operaciones cuestan $O(1)$, y el orden FIFO de cada cola
+resuelve de forma natural el desempate por orden de llegada. Esta es la
+representación que adopta este proyecto (Sección~\ref{sec:metodologia}).
+
+Sistemas reales de mesa de ayuda y de triage hospitalario resuelven un
+problema equivalente: priorizar solicitudes por urgencia y permitir su
+consulta puntual. Este proyecto no pretende replicar un sistema de
+producción, sino aislar y resolver correctamente el núcleo algorítmico
+común a este tipo de sistemas.

@@ -1,0 +1,18 @@
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+Esta primera entrega formuló el problema de priorizar y gestionar
+solicitudes de atención y presentó una solución basada en estructuras
+lineales: una cola de prioridad formada por una cola enlazada por nivel de
+urgencia, que registra y atiende en tiempo constante y resuelve el
+desempate por orden de llegada sin comparaciones adicionales, y una pila
+enlazada para el historial de atenciones. La implementación inicial cubre
+cinco de los seis requerimientos funcionales y fue verificada mediante un
+programa de prueba manual que recorre el escenario principal y varios casos
+borde.
+
+Como trabajo futuro se plantea: implementar el deshacer de la última
+atención sobre la pila existente, incorporar un índice por identificador
+para reducir el costo de la búsqueda y la cancelación, añadir pruebas
+automatizadas y medir experimentalmente el desempeño con volúmenes de datos
+mayores.
