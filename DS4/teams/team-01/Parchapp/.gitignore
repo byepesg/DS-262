@@ -1,0 +1,15 @@
+# Salidas de compilación (NetBeans, VS Code, terminal)
+build/
+dist/
+bin/
+out/
+*.class
+
+# Configuración local de NetBeans (rutas de cada equipo)
+nbproject/private/
+
+# IDEs y sistema
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
