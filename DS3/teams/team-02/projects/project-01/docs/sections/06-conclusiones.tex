@@ -1,18 +1,25 @@
 \section{Conclusiones}
 \label{sec:conclusiones}
 
-Esta primera entrega formuló el problema de priorizar y gestionar
-solicitudes de atención y presentó una solución basada en estructuras
-lineales: una cola de prioridad formada por una cola enlazada por nivel de
-urgencia, que registra y atiende en tiempo constante y resuelve el
-desempate por orden de llegada sin comparaciones adicionales, y una pila
-enlazada para el historial de atenciones. La implementación inicial cubre
-cinco de los seis requerimientos funcionales y fue verificada mediante un
-programa de prueba manual que recorre el escenario principal y varios casos
-borde.
+Este trabajo formuló el problema de priorizar, gestionar y derivar
+solicitudes de atención y lo resolvió con una estructura de datos
+justificada para cada necesidad: colas enlazadas por nivel y un min-heap
+por plazo como representaciones de la cola de pendientes, un árbol AVL como
+índice por identificador, una pila para deshacer, Heap-Sort para los
+reportes, un árbol de decisión para clasificar la urgencia y un grafo de
+sedes con BFS y Dijkstra para la derivación. Registrar, atender, buscar,
+cancelar y deshacer cuestan $O(\log n)$ en el peor caso.
 
-Como trabajo futuro se plantea: implementar el deshacer de la última
-atención sobre la pila existente, incorporar un índice por identificador
-para reducir el costo de la búsqueda y la cancelación, añadir pruebas
-automatizadas y medir experimentalmente el desempeño con volúmenes de datos
-mayores.
+La implementación cubre los doce requerimientos funcionales y pasa 69
+verificaciones automáticas. Los experimentos mostraron que el AVL evita la
+degeneración del BST con identificadores consecutivos, con una altura de 14
+frente a 19\,999 y un tiempo 280 veces menor para 20\,000 solicitudes, y que
+la política por plazo elimina la inanición del nivel menos urgente bajo
+sobrecarga, a cambio de un costo por operación mayor que el de la cola por
+niveles.
+
+Como trabajo futuro se plantea: cargar el protocolo de triage y la red de
+sedes desde archivos; permitir cambiar la urgencia de una solicitud con una
+operación de disminución de clave sobre un heap indexado; migrar las
+pruebas a un marco como JUnit; y evaluar el sistema con datos de llegada
+más realistas.

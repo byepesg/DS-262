@@ -41,6 +41,20 @@ public class LinkedQueue<T> implements Iterable<T> {
         size++;
     }
 
+    /**
+     * Inserta al frente de la cola en Theta(1). Solo se usa para deshacer una
+     * atencion: devuelve el elemento a la posicion de la que salio.
+     */
+    public void addFirst(T value) {
+        Node<T> node = new Node<>(value);
+        node.next = head;
+        head = node;
+        if (tail == null) {
+            tail = node;
+        }
+        size++;
+    }
+
     public T dequeue() {
         if (isEmpty()) {
             throw new NoSuchElementException("La cola esta vacia");

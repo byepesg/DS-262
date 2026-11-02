@@ -1,26 +1,38 @@
 \section{Discusión}
 \label{sec:discusion}
 
-El diseño adoptado separa la responsabilidad de cada estructura: la cola de
-prioridad por niveles decide el orden de atención, la lista enlazada de
-cada nivel permite retirar solicitudes canceladas, y la pila registra el
-historial. Esta separación evita resolver todas las necesidades con una
-sola estructura, por ejemplo una lista que se recorra linealmente para todo,
-lo que degradaría también la atención a $O(n)$.
+El diseño separa la responsabilidad de cada estructura en lugar de resolver
+todo con una sola. La cola de pendientes decide el orden, el índice ubica
+solicitudes, la pila recuerda las atenciones, el árbol de decisión
+clasifica y el grafo relaciona las sedes. Ninguna estructura resuelve bien
+todas las operaciones: el heap sabe cuál es la siguiente solicitud pero no
+dónde está una arbitraria, y el AVL sabe dónde está cada una pero no cuál
+sigue. Combinarlas obliga a mantener un invariante de consistencia, que el
+sistema protege concentrando todas las modificaciones en la fachada
+\texttt{TriageSystem} y verificándolo en las pruebas.
 
-La principal limitación conocida es el costo lineal de la búsqueda por
-identificador, que se traslada a la cancelación y a la verificación de
-identificadores repetidos al registrar. Para el tamaño de datos esperado
-(una fila de atención, no miles de solicitudes simultáneas) este costo se
-considera aceptable en esta etapa. Una mejora prevista es mantener un
-índice por identificador que permita ubicar cada solicitud en tiempo
-esperado constante sin alterar el orden de atención.
+La separación entre tipo abstracto y representación permitió comparar
+alternativas sin cambiar al cliente. Las dos colas de pendientes
+implementan la misma interfaz y difieren en su costo y en su política; los
+dos índices implementan la misma interfaz y difieren en su garantía de
+peor caso. Los experimentos confirmaron los dos análisis teóricos: el BST
+degenera con identificadores consecutivos, y la cola por niveles, aunque
+más rápida, deja sin atender a los menos urgentes bajo sobrecarga.
 
-Otra limitación es que el costo constante de la cola de prioridad depende
-de que la urgencia tome solo cinco valores. Si en el futuro la prioridad
-dependiera de una magnitud continua, como el tiempo de espera acumulado,
-habría que evaluar otra representación de la cola de prioridad.
+La elección de política no es solo técnica. La política por niveles es la
+adecuada cuando la urgencia debe primar siempre, por ejemplo con pocos
+casos críticos y capacidad suficiente; la política por plazo es preferible
+cuando hay sobrecarga sostenida y se quiere acotar la espera de todos. Por
+eso el sistema permite elegirla al iniciar.
 
-Finalmente, los datos existen solo durante la ejecución del programa, lo
-cual es consistente con el alcance definido
-(Sección~\ref{sec:metodologia}).
+La cancelación perezosa intercambia memoria por tiempo: las solicitudes
+canceladas permanecen en la cola hasta llegar al frente, de modo que la
+memoria es $O(n + c)$ con $c$ cancelaciones aún no descartadas, a cambio de
+cancelar en $O(\log n)$ en lugar de $\Theta(n)$.
+
+Las principales limitaciones son: el protocolo de triage y la red de sedes
+están fijados en el código y son ilustrativos; cambiar la urgencia de una
+solicitud registrada exigiría una operación de disminución de clave en el
+heap, que requiere conocer la posición de cada elemento; los tiempos de la
+política por niveles dependen de que la urgencia tome solo cinco valores; y
+los datos existen solo durante la ejecución.
