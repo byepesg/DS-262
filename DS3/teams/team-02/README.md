@@ -6,7 +6,7 @@
 | --- | --- |
 | Johan Adrian Torres Robles | [jotorresro](https://github.com/jotorresro) |
 | Esteban Mora Lopez | [emoritax](https://github.com/emoritax) |
-| Miguel Angel Rodriguez Bohorquez | [Maracuya4263](https://github.com/Maracuya4263) |
+| Miguel Angel Rodriguez Bohorquez | [Maracuya4](https://github.com/Maracuya4) |
 
 ## Laboratorios
 
@@ -18,4 +18,4 @@
 
 | Actividad | Carpeta |
 | --- | --- |
-| Proyecto semestral — Entrega 1: Sistema de Priorización de Atención (SPA) | [`projects/project-01/`](projects/project-01/) |
+| Proyecto semestral — Entrega 1 (versión revisada): Sistema de Priorización de Atención (SPA) | [`projects/project-01/`](projects/project-01/) |

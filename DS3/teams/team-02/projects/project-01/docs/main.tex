@@ -22,6 +22,8 @@
 \usepackage{listings}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
 \usepackage{hyperref}
 
 \floatname{algorithm}{Algoritmo}
@@ -63,8 +65,8 @@
 % =========================================================
 
 \title{
-Sistema de Priorización de Atención: Diseño e Implementación Inicial de una
-Cola de Prioridad por Niveles y una Pila sobre Listas Enlazadas
+Sistema de Priorización de Atención: Colas, Árboles Balanceados, Heaps y
+Grafos para la Gestión de Solicitudes Urgentes
 }
 
 \author{
@@ -89,26 +91,30 @@ Bogotá D.C., Colombia\\
 % =========================================================
 
 \begin{abstract}
-Los centros de atención que reciben solicitudes de servicio deben atenderlas
-según su nivel de urgencia y no según su orden de llegada, además de poder
-consultar y cancelar solicitudes puntuales y revisar las atenciones
-realizadas. Este documento presenta el diseño e implementación inicial de un
-Sistema de Priorización de Atención (SPA) que resuelve este problema con
-estructuras lineales. Una cola de prioridad formada por una cola FIFO por
-nivel de urgencia, cada una sobre una lista enlazada con referencias a la
-cabeza y a la cola, registra y atiende solicitudes en tiempo constante y
-resuelve el desempate por orden de llegada sin comparaciones adicionales; la
-búsqueda y la cancelación por identificador recorren estas listas en tiempo
-lineal; y una pila enlazada registra el historial de atenciones. La primera
-entrega incluye una implementación funcional con menú de consola que cubre
-el registro, la atención, la búsqueda, la cancelación y la consulta del
-historial, verificada mediante un programa de prueba manual con casos
-borde. Deshacer la última atención y la reducción del costo de la búsqueda
-quedan planteados para las siguientes entregas.
+Los centros de atención deben decidir en todo momento qué solicitud atender,
+clasificar su urgencia de forma consistente, ubicar y cancelar solicitudes
+puntuales, revertir errores de operación y, cuando una sede se satura,
+derivar a las personas a la sede con cupo más cercana. Este documento
+presenta el diseño, la implementación en Java y la evaluación de un
+\emph{Sistema de Priorización de Atención} (SPA) que resuelve cada una de
+estas necesidades con la estructura de datos adecuada: colas enlazadas por
+nivel y un min-heap por plazo máximo como dos representaciones del mismo
+tipo abstracto de cola de pendientes; un árbol AVL como índice por
+identificador, comparado con un árbol binario de búsqueda ordinario; una
+pila para el historial y la operación de deshacer; Heap-Sort para listar
+los pendientes en orden de atención; un árbol de decisión recursivo para
+asignar el nivel de urgencia; y un grafo ponderado de sedes recorrido con
+BFS y Dijkstra para la derivación. Registrar, atender, buscar, cancelar y
+deshacer cuestan $O(\log n)$ en el peor caso. La implementación pasa 69
+verificaciones automáticas, y los experimentos muestran que el AVL evita la
+degeneración del BST con identificadores consecutivos (altura 14 frente a
+19\,999 con $n=20\,000$) y que la política por plazo elimina la inanición
+de las solicitudes menos urgentes bajo sobrecarga.
 \end{abstract}
 
 \begin{IEEEkeywords}
-cola de prioridad, cola, lista enlazada, pila, estructuras de datos
+cola de prioridad, heap binario, árbol AVL, árbol binario de búsqueda,
+Heap-Sort, árbol de decisión, grafos, Dijkstra, BFS, análisis amortizado
 \end{IEEEkeywords}
 
 % =========================================================
@@ -126,10 +132,14 @@ cola de prioridad, cola, lista enlazada, pila, estructuras de datos
 % AGRADECIMIENTOS
 % =========================================================
 
-\section*{Agradecimientos}
+\section*{Agradecimientos y declaración de ayudas}
 
 Los autores agradecen a la Universidad Nacional de Colombia y al equipo
-docente de la asignatura Estructuras de Datos.
+docente de la asignatura Estructuras de Datos. Se utilizó Claude
+(Anthropic), un asistente de inteligencia artificial, como apoyo en la
+implementación del código y en la redacción de este documento; el equipo
+revisó, probó y comprende todo el código y las decisiones de diseño
+presentadas.
 
 % =========================================================
 % REFERENCIAS
@@ -147,6 +157,32 @@ Cambridge, MA, USA: MIT Press, 2022.
 M. T. Goodrich, R. Tamassia y M. H. Goldwasser,
 \textit{Data Structures and Algorithms in Java}, 6th ed.
 Hoboken, NJ, USA: Wiley, 2014.
+
+\bibitem{avl}
+G. M. Adelson-Velsky y E. M. Landis, ``An algorithm for the organization of
+information,'' \textit{Soviet Mathematics Doklady}, vol.~3, pp.~1259--1263,
+1962.
+
+\bibitem{williams}
+J. W. J. Williams, ``Algorithm 232: Heapsort,''
+\textit{Communications of the ACM}, vol.~7, no.~6, pp.~347--348, 1964.
+
+\bibitem{floyd}
+R. W. Floyd, ``Algorithm 245: Treesort 3,''
+\textit{Communications of the ACM}, vol.~7, no.~12, p.~701, 1964.
+
+\bibitem{dijkstra}
+E. W. Dijkstra, ``A note on two problems in connexion with graphs,''
+\textit{Numerische Mathematik}, vol.~1, pp.~269--271, 1959.
+
+\bibitem{liu}
+C. L. Liu y J. W. Layland, ``Scheduling algorithms for multiprogramming in
+a hard-real-time environment,'' \textit{Journal of the ACM}, vol.~20,
+no.~1, pp.~46--61, 1973.
+
+\bibitem{mts}
+Manchester Triage Group, \textit{Emergency Triage}, 3rd ed.
+Chichester, UK: Wiley-Blackwell, 2014.
 
 \end{thebibliography}
 

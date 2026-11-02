@@ -18,6 +18,16 @@ public class ServiceHistory {
         stack.push(t);
     }
 
+    /** Ultima atencion registrada, sin retirarla; null si no hay. Theta(1). */
+    public Ticket peekLast() {
+        return stack.isEmpty() ? null : stack.peek();
+    }
+
+    /** Retira la ultima atencion (LIFO) para deshacerla. Theta(1). */
+    public Ticket undoLast() {
+        return stack.isEmpty() ? null : stack.pop();
+    }
+
     public int size() {
         return stack.size();
     }

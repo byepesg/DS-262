@@ -1,34 +1,49 @@
 \section{Trabajo relacionado}
 \label{sec:relacionado}
 
-El problema de atender elementos según su prioridad se modela con el tipo
-abstracto \emph{cola de prioridad}, cuyas operaciones básicas son insertar
-un elemento y extraer el de mayor prioridad~\cite{cormen,goodrich}. La
-literatura distingue entre el tipo abstracto y su representación: el mismo
-comportamiento puede implementarse con estructuras distintas, y es la
-representación la que determina el costo de cada operación.
+\textbf{Colas de prioridad.} Atender elementos según su prioridad se modela
+con el tipo abstracto \emph{cola de prioridad}, cuyas operaciones básicas
+son insertar y extraer el elemento más prioritario~\cite{cormen,goodrich}.
+El mismo comportamiento admite representaciones distintas, y es la
+representación la que fija el costo de cada operación: una lista ordenada
+extrae en $O(1)$ pero inserta en $O(n)$; una lista sin orden hace lo
+contrario; y el \emph{heap} binario equilibra ambas operaciones en
+$O(\log n)$~\cite{cormen,williams}. Cuando la prioridad solo toma un número
+pequeño y fijo de valores, basta una cola FIFO por valor, con ambas
+operaciones en $O(1)$. El SPA usa ambas representaciones detrás de una
+misma interfaz.
 
-Una representación directa es una lista ordenada por prioridad, que permite
-extraer el elemento más prioritario en tiempo constante, pero cuya inserción
-cuesta $O(n)$, pues debe recorrer la lista hasta encontrar la posición
-correcta. En el extremo opuesto, una lista sin orden inserta en tiempo
-constante pero obliga a recorrerla completa, en $O(n)$, cada vez que se
-extrae el elemento más prioritario~\cite{goodrich}. Para prioridades
-arbitrarias, la representación clásica que equilibra ambos costos es el
-\emph{heap} binario, con inserción y extracción en $O(\log n)$~\cite{cormen}.
+\textbf{Triage y plazos máximos.} Las escalas de triage hospitalario, como
+el sistema de Manchester~\cite{mts}, clasifican a cada paciente en cinco
+niveles mediante diagramas de preguntas encadenadas y asignan a cada nivel
+un tiempo máximo de espera (inmediato, 10, 60, 120 y 240 minutos). El
+protocolo de preguntas es, estructuralmente, un árbol de decisión. El
+tiempo máximo por nivel permite ordenar por \emph{plazo más próximo}, idea
+clásica de planificación conocida como \emph{earliest deadline
+first}~\cite{liu}, que evita que las tareas de baja prioridad esperen sin
+límite. El SPA toma ambas ideas como inspiración; no pretende ser un
+protocolo clínico.
 
-Cuando la prioridad solo puede tomar un número pequeño y fijo de valores,
-como ocurre en los esquemas de triage que clasifican a cada paciente en
-unos pocos niveles de urgencia, existe una alternativa más simple: mantener
-una cola FIFO independiente por cada nivel. Insertar consiste en encolar en
-el nivel correspondiente, y extraer consiste en revisar los niveles en orden
-de urgencia hasta encontrar uno no vacío. Como el número de niveles es una
-constante, ambas operaciones cuestan $O(1)$, y el orden FIFO de cada cola
-resuelve de forma natural el desempate por orden de llegada. Esta es la
-representación que adopta este proyecto (Sección~\ref{sec:metodologia}).
+\textbf{Árboles de búsqueda balanceados.} Un BST busca, inserta y elimina en
+$O(h)$, pero su altura depende del orden de inserción y llega a $n-1$ con
+claves ordenadas~\cite{cormen}. El árbol AVL~\cite{avl} mantiene en cada
+nodo una diferencia de alturas entre subárboles de a lo sumo uno mediante
+rotaciones, lo que garantiza $h=O(\log n)$. Las tablas hash ofrecen
+búsqueda en $O(1)$ esperado, pero sin garantía de peor caso ni recorrido
+ordenado de las claves.
 
-Sistemas reales de mesa de ayuda y de triage hospitalario resuelven un
-problema equivalente: priorizar solicitudes por urgencia y permitir su
-consulta puntual. Este proyecto no pretende replicar un sistema de
-producción, sino aislar y resolver correctamente el núcleo algorítmico
-común a este tipo de sistemas.
+\textbf{Heap-Sort y construcción de heaps.} Heap-Sort~\cite{williams}
+ordena en $\Theta(n \log n)$ en el peor caso con espacio auxiliar $O(1)$;
+la construcción ascendente de Floyd~\cite{floyd} arma el heap inicial en
+$O(n)$.
+
+\textbf{Caminos mínimos.} En un grafo con pesos no negativos, el algoritmo
+de Dijkstra~\cite{dijkstra} calcula las distancias mínimas desde un origen;
+implementado con un heap binario cuesta $O((V+E)\log V)$. Cuando solo
+importa el número de aristas, el recorrido en anchura (BFS) lo resuelve en
+$O(V+E)$~\cite{cormen}.
+
+Sistemas reales de mesa de ayuda y de triage hospitalario integran estas
+mismas piezas con persistencia, concurrencia e interfaces gráficas. Este
+proyecto no pretende replicar un sistema de producción, sino aislar y
+resolver correctamente su núcleo algorítmico.

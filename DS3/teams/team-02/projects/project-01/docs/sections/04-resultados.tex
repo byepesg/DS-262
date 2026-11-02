@@ -1,64 +1,122 @@
-\section{Estado de la implementación}
+\section{Resultados}
 \label{sec:resultados}
 
-La Tabla~\ref{tab:estado} resume el estado de cada funcionalidad a la
-fecha de esta entrega, distinguiendo entre funcionalidades implementadas,
-parcialmente implementadas y pendientes.
+\subsection{Estado de la implementación}
+
+La Tabla~\ref{tab:estado} resume el estado de cada funcionalidad. Las
+estructuras principales (colas, pila, heap, BST, AVL, árbol de decisión y
+grafo) son implementación propia; de la biblioteca estándar de Java solo se
+usan \texttt{ArrayList} para devolver listas, \texttt{Comparator} para
+definir órdenes y \texttt{Random} y \texttt{Scanner} en pruebas, experimentos
+y consola.
 
 \begin{table}[t]
-  \caption{Estado de las funcionalidades en la primera entrega}
+  \caption{Estado de las funcionalidades}
   \label{tab:estado}
   \centering
-  \begin{tabular}{p{0.58\columnwidth}p{0.28\columnwidth}}
+  \begin{tabular}{p{0.62\columnwidth}p{0.24\columnwidth}}
     \toprule
     Funcionalidad & Estado \\
     \midrule
-    Registrar solicitud (RF1) & Implementada \\
-    Atender por prioridad (RF2) & Implementada \\
-    Buscar por identificador (RF3) & Implementada \\
-    Cancelar solicitud (RF4) & Implementada \\
-    Deshacer última atención (RF5) & Pendiente \\
-    Consultar historial (RF6) & Implementada \\
-    Interfaz de consola & Implementada \\
-    Validación de entradas & Parcial \\
-    Pruebas del sistema & Parcial \\
-    Índice por identificador en $O(1)$ & Pendiente \\
-    Análisis experimental de desempeño & Pendiente \\
+    Registrar, atender, buscar, cancelar (RF1--RF4) & Implementada \\
+    Deshacer la última atención (RF5) & Implementada \\
+    Historial y reportes ordenados (RF6--RF8) & Implementada \\
+    Reloj lógico y vencidas (RF9) & Implementada \\
+    Protocolo de triage (RF10) & Implementada \\
+    Derivación, rutas y saltos (RF11--RF12) & Implementada \\
+    Menú de consola & Implementada \\
+    Pruebas automáticas & Implementada \\
+    Experimentos de desempeño & Implementada \\
+    Cargar protocolo y red desde archivo & Pendiente \\
+    Cambiar la urgencia de una solicitud & Pendiente \\
+    Persistencia de datos & Fuera de alcance \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\textbf{Implementadas.} Cinco de los seis requerimientos funcionales están
-disponibles en la clase \texttt{TriageSystem}: \texttt{registerRequest},
-\texttt{serveNext}, \texttt{findById}, \texttt{cancelRequest} y
-\texttt{getHistory}. La interfaz de consola (\texttt{Main}) expone todas
-estas operaciones mediante un menú. Las estructuras de soporte
-(\texttt{LinkedQueue}, \texttt{LevelPriorityQueue} y \texttt{LinkedStack})
-son implementación propia; de la biblioteca estándar de Java solo se usa
-\texttt{ArrayList} para devolver el historial como lista.
+El programa \texttt{BasicTests} ejecuta 69 verificaciones automáticas,
+agrupadas en ocho bloques: escenario principal, casos borde (urgencia y
+textos inválidos, identificador repetido, reutilización de identificadores
+atendidos o cancelados), deshacer, índices, heap y Heap-Sort, política por
+plazo, árbol de decisión y grafo. Cada verificación imprime
+\texttt{[OK]} o \texttt{[FALLA]} y el programa termina con código 1 si
+alguna falla. Entre ellas: tras 5000 inserciones y eliminaciones
+aleatorias el AVL conserva el orden, los factores de balance y las alturas
+guardadas; el BST con 1023 identificadores consecutivos queda con altura
+1022 mientras el AVL queda perfecto, con altura 9; y en la red de ejemplo,
+con la sede Chapinero saturada, la derivación desde la sede Central elige
+la sede Sur (20 minutos). Las 69 verificaciones pasan.
 
-\textbf{Parcialmente implementadas.} La validación de entradas rechaza
-identificadores vacíos o repetidos entre las solicitudes pendientes,
-urgencias fuera del rango 1--5 y urgencias no numéricas, pero aún no valida
-el nombre de la solicitud. Las pruebas se realizan mediante un programa de
-prueba manual (\texttt{BasicTests.java}) que imprime el resultado esperado
-junto al obtenido, sin aserciones automáticas. El escenario principal
-registra cuatro solicitudes, verifica el orden de atención por urgencia y
-el desempate por orden de llegada entre dos solicitudes de urgencia 1,
-cancela una solicitud pendiente y comprueba que deja de encontrarse y de
-contarse, y confirma el orden del historial. Los casos borde cubren una
-urgencia fuera de rango, un identificador repetido, la cancelación de un
-identificador inexistente, la reutilización del identificador de una
-solicitud ya atendida y la atención con la cola vacía.
+\subsection{Evaluación experimental}
 
-\textbf{Pendientes.} Para la siguiente entrega quedan deshacer la última
-atención (RF5), cuyo diseño se apoya en la pila ya implementada; un índice
-por identificador que reduzca la búsqueda y la cancelación a tiempo
-esperado constante; y la migración de las pruebas manuales a pruebas
-automatizadas. Para la entrega final queda un análisis experimental de
-tiempos de ejecución sobre volúmenes de datos mayores.
+El programa \texttt{Experiments} usa semillas fijas, por lo que los
+resultados son reproducibles; los tiempos corresponden a una ejecución en
+la JVM tras una ronda de calentamiento y varían entre equipos, pero las
+tendencias no.
 
-No se reportan resultados experimentales de desempeño en esta entrega,
-dado que el énfasis de la primera versión es la corrección funcional y la
-justificación del diseño; el análisis de complejidad teórica se presentó
-en la Sección~\ref{sec:metodologia}.
+\textbf{BST frente a AVL.} La Tabla~\ref{tab:indices} mide $n$ inserciones
+seguidas de $n$ búsquedas exitosas. Con identificadores ordenados, el BST
+degenera en una cadena de altura $n-1$ y su tiempo crece de forma
+cuadrática: pasar de 5000 a 20\,000 identificadores multiplica el tiempo
+por 23. El AVL mantiene altura logarítmica (14 con $n=20\,000$, cerca de
+$\log_2 n \approx 14{,}3$) y es 280 veces más rápido. Con identificadores
+aleatorios el BST queda razonablemente balanceado por azar y es incluso
+algo más rápido que el AVL, que paga el costo de las rotaciones; la ventaja
+del AVL es la \emph{garantía} de peor caso, no el caso promedio.
+
+\begin{table}[t]
+  \caption{Índice por identificador: altura y tiempo (ms) de $n$ inserciones y $n$ búsquedas}
+  \label{tab:indices}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{llrrrr}
+    \toprule
+    Ids & $n$ & $h$ BST & $h$ AVL & ms BST & ms AVL \\
+    \midrule
+    Ordenados & 1000 & 999 & 9 & 12,3 & 1,1 \\
+    Ordenados & 5000 & 4999 & 12 & 142,0 & 2,8 \\
+    Ordenados & 20\,000 & 19\,999 & 14 & 3222,2 & 11,5 \\
+    Aleatorios & 1000 & 24 & 11 & 0,9 & 0,8 \\
+    Aleatorios & 5000 & 27 & 14 & 3,1 & 4,6 \\
+    Aleatorios & 20\,000 & 38 & 16 & 20,6 & 26,9 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{Niveles frente a heap.} Con $n$ inserciones seguidas de $n$
+extracciones y urgencias aleatorias, la cola por niveles tarda 1,8; 9,5 y
+104,0~ms para $n=10^4$, $10^5$ y $10^6$, y el heap 9,3; 70,6 y 845,0~ms.
+La cola por niveles crece linealmente, como corresponde a $\Theta(1)$ por
+operación, y el heap algo más rápido que linealmente, como corresponde a
+$O(\log n)$. El heap es unas ocho veces más lento, pero ambos costos son
+despreciables para el tamaño de una fila de atención.
+
+\textbf{Inanición bajo sobrecarga.} Se simuló un turno de 480 minutos con
+1,25 llegadas y una atención por minuto, de modo que la fila crece
+inevitablemente. La Tabla~\ref{tab:inanicion} muestra el resultado para las
+urgencias 4 y 5; los niveles 1 a 3 se atienden a tiempo en ambas
+políticas. Con la política por niveles, el nivel 5 casi no se atiende: 90
+de 119 solicitudes quedan sin atender, la espera máxima llega a 359 minutos
+y solo el 55~\% de las atendidas cumple su plazo de 240 minutos. Con la
+política por plazo, el retraso inevitable se reparte entre los niveles 3, 4
+y 5, todas las solicitudes atendidas cumplen su plazo y la espera máxima
+del nivel 5 baja a 205 minutos.
+
+\begin{table}[t]
+  \caption{Sobrecarga de 480 minutos: urgencias 4 y 5}
+  \label{tab:inanicion}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lcrrrr}
+    \toprule
+    Política & Urg. & Atendidas & A tiempo & Espera máx. & Sin atender \\
+    \midrule
+    Niveles & 4 & 185 & 100~\% & 16 & 0 \\
+    Niveles & 5 & 29 & 55,2~\% & 359 & 90 \\
+    Plazo & 4 & 153 & 100~\% & 84 & 32 \\
+    Plazo & 5 & 68 & 100~\% & 205 & 51 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -3,152 +3,282 @@
 
 \subsection{Objetivos}
 
-\textbf{Objetivo general.} Diseñar e implementar un sistema que permita
-registrar, priorizar, atender, cancelar y consultar solicitudes de atención
-de forma eficiente, aplicando estructuras de datos apropiadas para cada
-operación.
+\textbf{Objetivo general.} Diseñar, implementar y evaluar un sistema que
+permita clasificar, registrar, priorizar, atender, cancelar, consultar y
+derivar solicitudes de atención de forma eficiente, aplicando para cada
+operación la estructura de datos apropiada y justificando su costo.
 
 \textbf{Objetivos específicos.}
 \begin{enumerate}
-  \item Implementar una cola de prioridad formada por una cola FIFO por
-    nivel de urgencia, cada una sobre una lista enlazada, para determinar
-    la solicitud a atender en tiempo constante.
-  \item Implementar la búsqueda y la cancelación de una solicitud pendiente
-    por su identificador.
-  \item Implementar una pila sobre lista enlazada que registre el historial
-    de atenciones y permita, en una entrega posterior, deshacer la más
-    reciente.
-  \item Integrar las estructuras en una interfaz de consola que exponga las
-    operaciones del sistema.
+  \item Implementar el tipo abstracto \emph{cola de pendientes} con dos
+    representaciones intercambiables: colas enlazadas por nivel, en
+    $\Theta(1)$ por operación, y un min-heap por plazo máximo, en
+    $O(\log n)$, que evite la inanición.
+  \item Implementar un índice AVL por identificador que garantice
+    búsqueda, cancelación y validación en $O(\log n)$ en el peor caso, y
+    compararlo experimentalmente con un BST ordinario.
+  \item Implementar una pila que registre el historial de atenciones y
+    permita deshacer la más reciente.
+  \item Listar los pendientes en orden de atención con Heap-Sort, sin
+    modificar la cola.
+  \item Implementar un árbol de decisión que asigne el nivel de urgencia
+    mediante preguntas de sí o no.
+  \item Modelar la red de sedes como un grafo ponderado y derivar
+    solicitudes a la sede con cupo más cercana con el algoritmo de
+    Dijkstra.
+  \item Verificar la corrección con pruebas automáticas y medir el
+    desempeño con experimentos reproducibles.
 \end{enumerate}
 
 \subsection{Alcance y limitaciones}
 
-El sistema completo contempla: registrar una solicitud con un
-identificador, un nombre y un nivel de urgencia (de 1, más urgente, a 5,
-menos urgente); atender la solicitud de mayor prioridad; buscar y cancelar
-una solicitud pendiente por identificador; consultar el historial de
-atenciones; y deshacer la atención más reciente. Esta primera entrega
-implementa todas estas operaciones excepto deshacer, que queda diseñada y
-se implementará en la siguiente entrega.
+El sistema registra solicitudes con identificador, nombre y nivel de
+urgencia (1, más urgente, a 5, menos urgente), asignado a mano o con el
+protocolo de preguntas; las atiende según la política elegida al iniciar;
+permite buscarlas, cancelarlas, deshacer la última atención, consultar el
+historial, listar pendientes y vencidas; y gestiona una red de seis sedes
+de ejemplo, cada una con su propia cola, índice e historial.
 
-Quedan explícitamente fuera del alcance del proyecto: persistencia en base
-de datos, interfaz gráfica, acceso concurrente de múltiples usuarios y
-autenticación. Se asume que los identificadores son proporcionados por
-quien registra la solicitud; el sistema rechaza un identificador que ya
-pertenezca a otra solicitud pendiente. Se asume también que la urgencia
-toma solo cinco valores, supuesto del que depende el costo constante de la
-cola de prioridad elegida.
+Quedan fuera del alcance: persistencia en archivos o bases de datos,
+interfaz gráfica, acceso concurrente, autenticación y cambio de urgencia de
+una solicitud ya registrada. El tiempo es un reloj lógico en minutos que
+avanza el operador. El protocolo de triage y la red de sedes son ejemplos
+ilustrativos fijados en el código. Se asume que los identificadores los
+proporciona quien registra, y que el número de niveles es la constante
+$k=5$.
 
 \subsection{Requerimientos principales}
 
 \begin{itemize}
-  \item RF1: El sistema debe permitir registrar una solicitud con
-    identificador único entre las pendientes, nombre y nivel de urgencia
-    entre 1 y 5, rechazando valores fuera de ese rango.
-  \item RF2: El sistema debe atender siempre la solicitud pendiente de
-    mayor urgencia; en caso de empate, debe atenderse primero la que llegó
-    antes.
-  \item RF3: El sistema debe permitir buscar una solicitud pendiente por su
-    identificador.
-  \item RF4: El sistema debe permitir cancelar una solicitud pendiente de
-    modo que nunca sea atendida.
-  \item RF5: El sistema debe permitir deshacer la atención más reciente,
-    devolviendo la solicitud correspondiente a la cola de pendientes.
-  \item RF6: El sistema debe permitir consultar el historial de
-    solicitudes atendidas.
+  \item RF1: Registrar una solicitud con identificador único entre las
+    pendientes, nombre no vacío y urgencia entre 1 y 5.
+  \item RF2: Atender la siguiente solicitud según la política: por niveles
+    (urgencia y luego llegada) o por plazo máximo.
+  \item RF3: Buscar una solicitud pendiente por identificador.
+  \item RF4: Cancelar una solicitud pendiente para que nunca sea atendida.
+  \item RF5: Deshacer la atención más reciente, devolviendo la solicitud a
+    la posición que tenía.
+  \item RF6: Consultar el historial de atenciones.
+  \item RF7: Listar los pendientes en el orden en que serán atendidos.
+  \item RF8: Listar los pendientes ordenados por identificador.
+  \item RF9: Avanzar el reloj y listar las solicitudes con plazo vencido.
+  \item RF10: Asignar la urgencia con un protocolo de preguntas.
+  \item RF11: Indicar la sede con cupo más cercana y la ruta para llegar.
+  \item RF12: Calcular la ruta mínima y el número de saltos entre sedes.
 \end{itemize}
 
 \subsection{Diseño de la solución}
 
-El sistema se organiza en los siguientes componentes: una clase
-\texttt{Ticket} que representa una solicitud; una cola genérica
-\texttt{LinkedQueue<T>} sobre lista enlazada; una cola de prioridad
-\texttt{LevelPriorityQueue}, formada por un arreglo de cinco
-\texttt{LinkedQueue<Ticket>}, una por nivel de urgencia; una pila genérica
-\texttt{LinkedStack<T>}; y un historial \texttt{ServiceHistory} construido
-sobre esa pila. Una clase fachada, \texttt{TriageSystem}, coordina la cola
-de prioridad y el historial para que cada operación pública los mantenga
-consistentes, y una clase \texttt{Main} ofrece el menú de consola.
+La Fig.~\ref{fig:arquitectura} muestra los componentes. \texttt{Main}
+ofrece el menú de consola y trabaja sobre la sede seleccionada de una
+\texttt{SiteNetwork}. Cada sede tiene un \texttt{TriageSystem}, fachada que
+coordina tres estructuras: la cola de pendientes, el índice y el historial.
+El \texttt{DecisionTree} es independiente de las sedes: solo produce el
+nivel de urgencia que luego se registra.
 
-\begin{figure}[h]
+\begin{figure}[t]
   \centering
-  \fbox{\parbox{0.9\linewidth}{\centering
-    \texttt{Main} (consola) \\[4pt]
-    $\downarrow$ \\[4pt]
-    \texttt{TriageSystem} \\[4pt]
-    $\swarrow$ \hspace{3em} $\searrow$ \\[4pt]
-    \texttt{LevelPriorityQueue} \hspace{1em} \texttt{ServiceHistory} \\[2pt]
-    {\footnotesize 5 $\times$ \texttt{LinkedQueue<Ticket>}} \hspace{2.5em}
-    {\footnotesize \texttt{LinkedStack<Ticket>}}
-  }}
-  \caption{Componentes principales del sistema y la estructura de datos
-  que resuelve cada responsabilidad.}
+  \begin{tikzpicture}[
+      box/.style={draw, rounded corners=2pt, align=center,
+        font=\scriptsize\ttfamily, inner sep=3pt, minimum height=5mm},
+      note/.style={font=\tiny, align=center, text=black!70},
+      arr/.style={-{Stealth[length=1.6mm]}}]
+    \node[box] (main) at (0,0) {Main};
+    \node[box] (tree) at (2.6,0) {DecisionTree\\[-1pt]{\tiny\rmfamily árbol de decisión}};
+    \node[box] (net) at (0,-1.1) {SiteNetwork\\[-1pt]{\tiny\rmfamily grafo: BFS, Dijkstra}};
+    \node[box] (sys) at (0,-2.2) {TriageSystem\\[-1pt]{\tiny\rmfamily una por sede}};
+    \node[box] (pq) at (-2.7,-3.4) {PendingQueue};
+    \node[box] (idx) at (0,-3.4) {TicketIndex};
+    \node[box] (hist) at (2.7,-3.4) {ServiceHistory};
+    \node[note, below=1mm of pq] {LevelPriorityQueue\\(5 colas enlazadas)\\DeadlinePriorityQueue\\(MinHeap)};
+    \node[note, below=1mm of idx] {AvlIndex\\(BstIndex para\\comparar)};
+    \node[note, below=1mm of hist] {LinkedStack};
+    \draw[arr] (main) -- (tree);
+    \draw[arr] (main) -- (net);
+    \draw[arr] (net) -- (sys);
+    \draw[arr] (sys) -- (pq);
+    \draw[arr] (sys) -- (idx);
+    \draw[arr] (sys) -- (hist);
+  \end{tikzpicture}
+  \caption{Componentes del sistema y estructura que resuelve cada
+  responsabilidad. \texttt{MinHeap} se reutiliza en la cola por plazo, en
+  Heap-Sort y en Dijkstra.}
   \label{fig:arquitectura}
 \end{figure}
 
+La Tabla~\ref{tab:temas} relaciona cada tema de la asignatura con el
+componente que lo aplica y la necesidad del problema que justifica usarlo.
+Ninguna estructura se incluye solo para aumentar su cantidad: cada una
+responde a una de las dificultades enumeradas en la introducción.
+
+\begin{table*}[t]
+  \caption{Temas de la asignatura, componente que los aplica y necesidad que justifica su uso}
+  \label{tab:temas}
+  \centering
+  \small
+  \begin{tabular}{>{\raggedright\arraybackslash}p{0.2\textwidth}>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.48\textwidth}}
+    \toprule
+    Tema & Componente & Necesidad del problema \\
+    \midrule
+    TAD frente a representación & \texttt{PendingQueue}, \texttt{TicketIndex} &
+      Cada interfaz tiene dos representaciones con distinto costo y el mismo comportamiento observable. \\
+    Listas enlazadas & \texttt{LinkedQueue}, \texttt{LinkedStack}, aristas del grafo &
+      Tamaño desconocido de antemano; inserción en los extremos en $\Theta(1)$. \\
+    Colas (FIFO) & Niveles de \texttt{LevelPriorityQueue}; BFS &
+      Desempate por orden de llegada; recorrido del grafo por niveles. \\
+    Pilas (LIFO) & \texttt{ServiceHistory}; inorder iterativo; reconstrucción de rutas &
+      Deshacer la atención más reciente; invertir el camino de predecesores. \\
+    Arreglos dinámicos y análisis amortizado & Arreglo de \texttt{MinHeap}; eliminación perezosa &
+      Crecer sin capacidad fija; descartar cancelados con costo amortizado $\Theta(1)$. \\
+    Recursión e inducción & \texttt{AvlIndex}, \texttt{DecisionTree} &
+      Operaciones definidas sobre subárboles; pruebas de corrección por inducción estructural. \\
+    Recorridos de árboles & Inorder, preorder, por niveles &
+      Pendientes por identificador, protocolo completo, altura del BST sin recursión. \\
+    BST & \texttt{BstIndex} &
+      Línea base: muestra la degeneración con identificadores consecutivos. \\
+    AVL & \texttt{AvlIndex} &
+      Búsqueda, cancelación y validación en $O(\log n)$ garantizado. \\
+    Heaps binarios & \texttt{MinHeap}, \texttt{DeadlinePriorityQueue} &
+      Prioridad por plazo, con muchos valores posibles; cola de Dijkstra. \\
+    Heap-Sort & \texttt{MinHeap.heapSort} &
+      Reporte de pendientes en orden de atención sin vaciar la cola. \\
+    Árboles de decisión (IA) & \texttt{DecisionTree} &
+      Clasificar la urgencia con un protocolo consistente en $O(h)$ preguntas. \\
+    Grafos, BFS y Dijkstra & \texttt{SiteNetwork} &
+      Derivar a la sede con cupo más cercana; saltos entre sedes. \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
 \subsection{Estructuras de datos seleccionadas}
 
-\textbf{Cola de prioridad por niveles.} Representa el conjunto de
-solicitudes pendientes. Está formada por un arreglo de cinco colas FIFO;
-la cola de índice $u-1$ contiene, en orden de llegada, las solicitudes de
-urgencia $u$. Debe soportar insertar una solicitud y extraer la más
-prioritaria. Insertar consiste en encolar al final de la cola de su nivel,
-y extraer consiste en recorrer los niveles desde el más urgente y desencolar
-del primero que no esté vacío (Algoritmo~\ref{alg:atender}). Como el número
-de niveles es la constante $k=5$, ambas operaciones cuestan $O(k)=O(1)$. El
-desempate por orden de llegada (RF2) no requiere comparaciones adicionales:
-lo garantiza el comportamiento FIFO de cada cola. Se descartó una lista
-ordenada por prioridad, cuya inserción cuesta $O(n)$, y no se requiere un
-\emph{heap}, cuyo costo $O(\log n)$ solo se justifica cuando la prioridad
-puede tomar muchos valores distintos.
+En lo que sigue, $n$ es el número de solicitudes pendientes de una sede,
+$k=5$ el número de niveles, $h$ la altura del árbol correspondiente, $V$ el
+número de sedes y $E$ el de vías.
 
-\textbf{Cola sobre lista enlazada con referencias a cabeza y cola.} Cada
-nivel es una cola implementada como lista simplemente enlazada que mantiene
-una referencia a la cabeza (frente) y otra al último nodo (final). La
-referencia al final es la que permite encolar en $O(1)$; sin ella, encolar
-requeriría recorrer la lista en $O(n)$. Se prefirió la lista enlazada sobre
-un arreglo circular porque el número de solicitudes por nivel no se conoce
-de antemano y porque la cancelación necesita retirar un elemento
-arbitrario, operación que en una lista enlazada solo exige reenlazar el
-nodo anterior con el siguiente, sin desplazar elementos.
+\subsubsection{Colas sobre listas enlazadas}
+Cada \texttt{LinkedQueue} es una lista simplemente enlazada con
+referencias a la cabeza y al último nodo. La referencia al final permite
+encolar en $\Theta(1)$; sin ella habría que recorrer la lista. Se prefirió
+la lista sobre un arreglo circular porque el número de solicitudes por
+nivel no se conoce de antemano. Para deshacer se añadió
+\texttt{addFirst}, también $\Theta(1)$.
 
-\textbf{Búsqueda y cancelación por identificador.} La cola de prioridad
-resuelve eficientemente ``\textquestiondown{}cuál es la siguiente solicitud a
-atender?'', pero no ``\textquestiondown{}dónde está la solicitud con
-identificador X?''. En esta entrega la búsqueda recorre las colas de los
-cinco niveles, con costo $O(n)$ en el peor caso. La cancelación usa esa
-búsqueda y luego elimina el nodo de la lista enlazada de su nivel en $O(1)$,
-actualizando la referencia al final cuando el nodo eliminado es el último
-(Algoritmo~\ref{alg:cancelar}); su costo total es $O(n)$. La misma búsqueda
-permite rechazar identificadores repetidos al registrar, por lo que el
-registro completo cuesta $O(n)$. Reducir estos costos a $O(1)$ esperado
-mediante un índice por identificador es una de las mejoras previstas para
-las siguientes entregas (Sección~\ref{sec:discusion}).
+\subsubsection{Cola de pendientes por niveles}
+Es un arreglo de cinco colas; la cola $u$ guarda, en orden de llegada, las
+solicitudes de urgencia $u$. Insertar es encolar en el nivel de la
+solicitud; atender es recorrer los niveles desde el más urgente y
+desencolar del primero no vacío (Algoritmo~\ref{alg:atender}). Ambas
+operaciones cuestan $O(k)=\Theta(1)$ y el desempate por llegada no requiere
+comparaciones: lo garantiza el FIFO de cada cola. Su debilidad es que,
+bajo sobrecarga, el nivel 5 puede no atenderse nunca.
 
-\textbf{Pila (lista enlazada simple, encabezado único).} Registra las
-solicitudes ya atendidas en orden inverso de atención. Se eligió una pila
-porque la operación prevista, deshacer la atención más reciente (RF5), es
-exactamente el comportamiento LIFO: apilar al atender, en $O(1)$, y
-desapilar al deshacer, en $O(1)$. Se implementó como lista enlazada con
-solo referencia al tope, ya que todas las operaciones ocurren en ese
-extremo. Consultar el historial completo (RF6) recorre la pila en $O(h)$,
-siendo $h$ el número de atenciones.
+\subsubsection{Min-heap y cola por plazo máximo}
+Para evitar la inanición, la segunda política asigna a cada solicitud un
+plazo: minuto de llegada más el tiempo máximo de su nivel (0, 10, 60, 120
+o 240 minutos) y atiende el plazo más próximo, desempatando por urgencia y
+luego por llegada. Como el plazo ya no toma cinco valores, la cola de
+niveles deja de servir y se usa un min-heap binario guardado en un arreglo
+con índices desde cero (hijos de $i$ en $2i+1$ y $2i+2$). Sus invariantes
+son la \emph{forma} (árbol completo, por lo que $h=\lfloor\log_2 n\rfloor$)
+y el \emph{orden} (cada padre es menor o igual que sus hijos). Insertar
+coloca el elemento al final y lo sube con \emph{sift-up}; extraer mueve el
+último a la raíz y lo baja con \emph{sift-down} por el hijo de mayor
+prioridad. Ambas cuestan $O(\log n)$ con espacio auxiliar $O(1)$, pues son
+iterativas. El arreglo duplica su capacidad al llenarse, de modo que el
+costo de copiar es $\Theta(1)$ amortizado por inserción. El heap es
+genérico: recibe un \texttt{Comparator}, y el mismo código se reutiliza en
+Heap-Sort y en Dijkstra.
 
-En los algoritmos, $L[1..5]$ denota el arreglo de colas por nivel y $S$ la
-pila del historial.
+\subsubsection{Índice AVL por identificador}
+La cola responde ``¿cuál sigue?'', pero no ``¿dónde está la solicitud
+X?''. Sin un índice, buscar, cancelar y validar identificadores repetidos
+costaría $\Theta(n)$. El índice es un árbol AVL ordenado por
+identificador. Su invariante combina el orden BST (todas las claves del
+subárbol izquierdo son menores y las del derecho mayores) con el balance:
+$\mathrm{BF}(v)=h(v.\mathit{izq})-h(v.\mathit{der})\in\{-1,0,1\}$, con
+$h(\textsc{null})=-1$. Tras cada inserción o eliminación recursiva se
+recalcula la altura y, si $|\mathrm{BF}|=2$, se aplica la rotación del caso
+LL, RR, LR o RL (Algoritmo~\ref{alg:rebalance}). Cada rotación cuesta
+$\Theta(1)$ y conserva el inorder, por lo que conserva el orden BST. El
+mínimo de nodos de un AVL de altura $h$ cumple
+$N(h)=1+N(h-1)+N(h-2)\ge 2^{h/2}$, de donde $h=O(\log n)$ y las tres
+operaciones cuestan $O(\log n)$ en el peor caso. La eliminación con dos
+hijos copia el sucesor inorder y lo elimina del subárbol derecho.
+
+Se descartó un BST ordinario porque los identificadores suelen ser
+consecutivos (A001, A002, \dots): insertarlos en orden produce una cadena
+de altura $n-1$ y operaciones en $\Theta(n)$. El BST se conserva como
+\texttt{BstIndex} para demostrarlo experimentalmente. Se descartó una tabla
+hash porque no garantiza el peor caso y porque el AVL además entrega los
+pendientes ordenados por identificador con un recorrido inorder (RF8) en
+$\Theta(n)$.
+
+\subsubsection{Cancelación perezosa e invariante de consistencia}
+Retirar un elemento arbitrario de un heap o de una cola exige primero
+encontrarlo, en $\Theta(n)$. Para cancelar en $O(\log n)$, el sistema
+elimina la solicitud del índice y solo la \emph{marca} como cancelada; la
+cola la descarta cuando llega al frente. Cada solicitud cancelada se
+descarta una sola vez, así que el costo adicional es $\Theta(1)$
+amortizado por cancelación. El sistema mantiene el invariante: \emph{el
+índice contiene exactamente las solicitudes pendientes no canceladas, y
+todas ellas están en la cola}; la cola puede tener además canceladas aún no
+descartadas. Por eso la cantidad de pendientes se lee del índice.
+
+\subsubsection{Pila para el historial y deshacer}
+Cada atención se apila en $\Theta(1)$. Deshacer es exactamente LIFO: se
+desapila la última atención, se reinserta en el índice y se devuelve a la
+cola en la misma posición (Algoritmo~\ref{alg:deshacer}). En la cola por
+niveles vuelve al \emph{frente} de su nivel, porque cuando se atendió era
+el frente; en el heap basta reinsertarla, pues su clave no cambió. Si el
+identificador ya fue reutilizado, la operación se rechaza para no romper la
+unicidad.
+
+\subsubsection{Heap-Sort para los reportes}
+Listar los pendientes en orden de atención (RF7) no debe vaciar la cola.
+Se copian del índice a un arreglo en $\Theta(n)$ y se ordenan con Heap-Sort
+in-place usando el comparador de la política activa: construcción
+ascendente de un max-heap en $O(n)$ y $n-1$ extracciones del máximo hacia
+el final del arreglo, cada una $O(\log n)$. Total $\Theta(n\log n)$ en el
+peor caso y espacio auxiliar $O(1)$ además de la copia.
+
+\subsubsection{Árbol de decisión para clasificar la urgencia}
+Cada nodo interno es una pregunta de sí o no y cada hoja un nivel. El
+protocolo de ejemplo tiene 11 nodos, 6 hojas y altura 5. Clasificar sigue
+un único camino raíz-hoja, $O(h)$ preguntas sin importar el tamaño del
+árbol. Contar nodos, contar hojas y calcular la altura son recursivos, con
+caso base en el árbol vacío, y cuestan $\Theta(n)$ en tiempo y $\Theta(h)$
+en espacio de pila. El protocolo se lista con un recorrido preorder. A
+diferencia de un BST, los nodos no guardan claves comparables: la posición
+indica la respuesta, no un orden.
+
+\subsubsection{Grafo de sedes}
+La red es un grafo no dirigido y ponderado: cada vértice es una sede con
+capacidad y su propio \texttt{TriageSystem}, y cada arista una vía con su
+tiempo de traslado. Se representa con listas de adyacencia, de espacio
+$\Theta(V+E)$, preferidas sobre la matriz de adyacencia, de espacio
+$\Theta(V^2)$, porque cada sede tiene pocos vecinos. BFS, con una cola,
+calcula el menor número de saltos en $O(V+E)$. Dijkstra, con el mismo
+\texttt{MinHeap} y eliminación perezosa de entradas obsoletas, calcula los
+tiempos mínimos en $O((V+E)\log V)$; los pesos son positivos, condición que
+el algoritmo requiere y que el sistema valida. Para derivar
+(Algoritmo~\ref{alg:derivar}) se toma la sede no saturada con menor
+distancia y el camino se reconstruye siguiendo predecesores con una pila.
 
 \begin{algorithm}[t]
-\caption{Atender la siguiente solicitud}
+\caption{Atender la siguiente solicitud (política por niveles)}
 \label{alg:atender}
 \begin{algorithmic}[1]
 \Function{ServeNext}{}
   \For{$u \gets 1$ \textbf{to} $5$}
-    \If{$L[u]$ no está vacía}
+    \While{$L[u]$ no está vacía}
       \State $t \gets$ \Call{Dequeue}{$L[u]$}
-      \State apilar $t$ en $S$
-      \State \Return $t$
-    \EndIf
+      \If{$t$ no está cancelada}
+        \State eliminar $t.id$ del índice AVL
+        \State apilar $t$ en el historial $S$
+        \State \Return $t$
+      \EndIf
+    \EndWhile
   \EndFor
   \State \Return \textsc{null}
 \EndFunction
@@ -156,28 +286,92 @@ pila del historial.
 \end{algorithm}
 
 \begin{algorithm}[t]
-\caption{Cancelar una solicitud pendiente}
-\label{alg:cancelar}
+\caption{Rebalanceo de un nodo AVL}
+\label{alg:rebalance}
 \begin{algorithmic}[1]
-\Function{CancelRequest}{$id$}
-  \For{$u \gets 1$ \textbf{to} $5$}
-    \State $prev \gets$ \textsc{null}; $cur \gets L[u].head$
-    \While{$cur \neq$ \textsc{null}}
-      \If{$cur.value.id = id$}
-        \If{$prev =$ \textsc{null}}
-          \State $L[u].head \gets cur.next$
-        \Else
-          \State $prev.next \gets cur.next$
-        \EndIf
-        \If{$cur = L[u].tail$}
-          \State $L[u].tail \gets prev$
-        \EndIf
-        \State \Return \textsc{true}
-      \EndIf
-      \State $prev \gets cur$; $cur \gets cur.next$
-    \EndWhile
-  \EndFor
-  \State \Return \textsc{false}
+\Function{Rebalance}{$x$}
+  \State $x.h \gets 1 + \max(h(x.izq), h(x.der))$
+  \If{$\mathrm{BF}(x) > 1$}
+    \If{$\mathrm{BF}(x.izq) < 0$} \Comment{caso LR}
+      \State $x.izq \gets$ \Call{RotarIzq}{$x.izq$}
+    \EndIf
+    \State \Return \Call{RotarDer}{$x$} \Comment{caso LL}
+  \EndIf
+  \If{$\mathrm{BF}(x) < -1$}
+    \If{$\mathrm{BF}(x.der) > 0$} \Comment{caso RL}
+      \State $x.der \gets$ \Call{RotarDer}{$x.der$}
+    \EndIf
+    \State \Return \Call{RotarIzq}{$x$} \Comment{caso RR}
+  \EndIf
+  \State \Return $x$
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Deshacer la atención más reciente}
+\label{alg:deshacer}
+\begin{algorithmic}[1]
+\Function{Undo}{}
+  \If{$S$ está vacía} \Return \textsc{null} \EndIf
+  \State $t \gets$ \Call{Peek}{$S$}
+  \If{$t.id$ está en el índice} \State error: id reutilizado \EndIf
+  \State \Call{Pop}{$S$}; insertar $t$ en el índice AVL
+  \State \Call{Restore}{$t$} \Comment{a su posición previa}
+  \State \Return $t$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Sede con cupo más cercana}
+\label{alg:derivar}
+\begin{algorithmic}[1]
+\Function{NearestAvailable}{$s$}
+  \State $d[v] \gets \infty$ y $p[v] \gets \textsc{null}$ para todo $v$
+  \State $d[s] \gets 0$
+  \State $H \gets$ min-heap con $(s, 0)$
+  \While{$H$ no está vacío}
+    \State $(u, \cdot) \gets$ \Call{RemoveMin}{$H$}
+    \If{$u$ ya fue procesado} \textbf{continue} \EndIf
+    \For{cada vía $(u, v, w)$}
+      \If{$d[u] + w < d[v]$}
+        \State $d[v] \gets d[u] + w$; $p[v] \gets u$
+        \State insertar $(v, d[v])$ en $H$
+      \EndIf
+    \EndFor
+  \EndWhile
+  \State $b \gets$ sede $v \neq s$ no saturada con $d[v]$ mínimo
+  \State \Return $b$, $d[b]$ y el camino armado con $p$ y una pila
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Resumen de complejidades}
+
+La Tabla~\ref{tab:costos} resume el costo de cada operación pública.
+
+\begin{table*}[t]
+  \caption{Costo de las operaciones ($n$ pendientes de la sede, $h$ atenciones registradas)}
+  \label{tab:costos}
+  \centering
+  \small
+  \begin{tabular}{>{\raggedright\arraybackslash}p{0.24\textwidth}p{0.17\textwidth}p{0.17\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}}
+    \toprule
+    Operación & Política por niveles & Política por plazo & Operaciones dominantes \\
+    \midrule
+    Registrar (RF1) & $O(\log n)$ & $O(\log n)$ & Validar e insertar en el AVL; encolar $\Theta(1)$ o sift-up $O(\log n)$. \\
+    Atender (RF2) & $O(\log n)$ & $O(\log n)$ & Eliminar del AVL; descarte de canceladas $\Theta(1)$ amortizado. \\
+    Buscar (RF3) & $O(\log n)$ & $O(\log n)$ & Un camino raíz-hoja del AVL. \\
+    Cancelar (RF4) & $O(\log n)$ & $O(\log n)$ & Eliminar del AVL y marcar. \\
+    Deshacer (RF5) & $O(\log n)$ & $O(\log n)$ & Desapilar $\Theta(1)$; insertar en el AVL; restaurar. \\
+    Historial (RF6) & $\Theta(h)$ & $\Theta(h)$ & Recorrer la pila. \\
+    Pendientes en orden (RF7) & $\Theta(n\log n)$ & $\Theta(n\log n)$ & Inorder $\Theta(n)$ y Heap-Sort. \\
+    Pendientes por id (RF8) & $\Theta(n)$ & $\Theta(n)$ & Recorrido inorder del AVL. \\
+    Vencidas (RF9) & $\Theta(n)$ & $\Theta(n)$ & Recorrido inorder y comparación de plazos. \\
+    Clasificar (RF10) & $O(h_{\text{árbol}})$ & $O(h_{\text{árbol}})$ & Un camino raíz-hoja del árbol de decisión. \\
+    Derivar y ruta (RF11, RF12) & \multicolumn{2}{l}{$O((V+E)\log V)$} & Dijkstra con min-heap. \\
+    Saltos entre sedes (RF12) & \multicolumn{2}{l}{$O(V+E)$} & BFS con cola. \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
