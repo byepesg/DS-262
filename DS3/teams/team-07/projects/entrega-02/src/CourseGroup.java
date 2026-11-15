@@ -1,6 +1,6 @@
 /**
- * Grupo de una asignatura con cupo máximo, lista de inscritos y lista de
- * espera ordenada por la prioridad oficial de los estudiantes.
+ * Grupo de una asignatura con cupo máximo, horario, lista de inscritos y lista
+ * de espera ordenada por la prioridad oficial de los estudiantes.
  */
 public class CourseGroup
 {
@@ -8,6 +8,7 @@ public class CourseGroup
     private String courseName;
     private String groupNumber;
     private int capacity;
+    private LinkedList<TimeSlot> schedule;
     private LinkedList<Student> enrolled;
     private PriorityQueueADT<Student> waitlist;
 
@@ -17,8 +18,20 @@ public class CourseGroup
         this.courseName = courseName;
         this.groupNumber = groupNumber;
         this.capacity = capacity;
+        this.schedule = new LinkedList<>();
         this.enrolled = new LinkedList<>();
         this.waitlist = new BinaryHeapPriorityQueue<>();
+    }
+
+    public void addTimeSlot(TimeSlot slot) {
+        schedule.addLast(slot);
+    }
+
+    public boolean clashesWith(CourseGroup other) {
+        for (TimeSlot mine : schedule)
+            for (TimeSlot theirs : other.schedule)
+                if (mine.overlaps(theirs)) return true;
+        return false;
     }
 
     /** O(1). */
@@ -26,24 +39,21 @@ public class CourseGroup
         return enrolled.size() < capacity;
     }
 
-    /**
-     * Solicitud de inscripción. Si hay cupo, inscribe. Si no, el estudiante
-     * entra a la lista de espera solo si confirmó que acepta que el cupo se le
-     * asigne automáticamente cuando alguien cancele.
-     * Costo: O(c + w) por la verificación de duplicados; insertar en espera es O(w).
-     *
-     * @param acceptsAutoAssignment true si el estudiante acepta la asignación automática
-     */
-    public RequestResult request(Student student, boolean acceptsAutoAssignment) {
-        if (enrolled.contains(student) || waitlist.contains(student))
-            throw new IllegalStateException(student.getName() + " ya está en " + this);
-        if (hasSeat()) {
-            enrolled.addLast(student);
-            return RequestResult.ENROLLED;
-        }
-        if (!acceptsAutoAssignment) return RequestResult.REJECTED;
+    public boolean isEnrolled(Student student) {
+        return enrolled.contains(student);
+    }
+
+    public boolean isWaiting(Student student) {
+        return waitlist.contains(student);
+    }
+
+    public void enroll(Student student) {
+        if (!hasSeat()) throw new IllegalStateException(this + " no tiene cupo");
+        enrolled.addLast(student);
+    }
+
+    public void addToWaitlist(Student student) {
         waitlist.insert(student);
-        return RequestResult.WAITLISTED;
     }
 
     /** El estudiante retira su aceptación y sale de la lista de espera. O(w). */
@@ -51,19 +61,16 @@ public class CourseGroup
         return waitlist.remove(student);
     }
 
-    /**
-     * Cancela la inscripción de un estudiante. Si había alguien en espera,
-     * el cupo pasa automáticamente al de mayor prioridad.
-     *
-     * @return el estudiante que recibió el cupo, o null si no había nadie en espera
-     */
-    public Student cancel(Student student) {
-        if (!enrolled.remove(student))
-            throw new IllegalStateException(student.getName() + " no está inscrito en " + this);
-        if (waitlist.isEmpty()) return null;
-        Student promoted = waitlist.removeHighest();
-        enrolled.addLast(promoted);
-        return promoted;
+    public Student nextInWaitlist() {
+        return waitlist.isEmpty() ? null : waitlist.removeHighest();
+    }
+
+    public boolean drop(Student student) {
+        return enrolled.remove(student);
+    }
+
+    public String getKey() {
+        return courseCode + "-" + groupNumber;
     }
 
     public String getCourseCode() {
@@ -80,6 +87,9 @@ public class CourseGroup
     }
     public int getAvailableSeats() {
         return capacity - enrolled.size();
+    }
+    public LinkedList<TimeSlot> getSchedule() {
+        return schedule;
     }
     public LinkedList<Student> getEnrolled() {
         return enrolled;

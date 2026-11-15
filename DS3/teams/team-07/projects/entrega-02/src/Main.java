@@ -1,78 +1,102 @@
-/**
- * Demostración guiada de la Entrega 1: citas en orden de prioridad, lista de
- * espera por prioridad y reasignación automática de un cupo liberado.
- */
-public class Main {
+public class Main
+{
     public static void main(String[] args) {
-        CourseGroup calculo = new CourseGroup("1000004", "Cálculo Diferencial", "Gr-1", 2);
-        CourseGroup calculo2 = new CourseGroup("1000004", "Cálculo Diferencial", "Gr-2", 3);
+        RegistrationSystem system = new RegistrationSystem();
 
-        // Student(código, nombre, discapacidad, PAPA, vulnerabilidad, avance %, IPA oficial)
-        // El IPA es un dato de entrada: no se calcula.
+        CourseGroup calculo1 = group("1000004", "Cálculo Diferencial", "Gr-1", 2, "LUN", 7, 9);
+        CourseGroup calculo2 = group("1000004", "Cálculo Diferencial", "Gr-2", 1, "MAR", 9, 11);
+        CourseGroup algebra = group("1000003", "Álgebra Lineal", "Gr-1", 3, "LUN", 8, 10);
+        system.addGroup(calculo1);
+        system.addGroup(calculo2);
+        system.addGroup(algebra);
+
         Student ana    = new Student("2024101", "Ana",    true,  3.8, false, 40.0, 0.0);
         Student carla  = new Student("2024102", "Carla",  false, 4.1, false, 92.0, 0.0);
         Student daniel = new Student("2024103", "Daniel", false, 3.9, false, 85.0, 0.0);
         Student elena  = new Student("2024104", "Elena",  false, 4.3, false, 55.0, 7.5);
         Student felipe = new Student("2024105", "Felipe", false, 4.0, false, 35.0, 6.0);
+        for (Student s : new Student[] {ana, carla, daniel, elena, felipe}) system.addStudent(s);
 
-        // 1. Ordenar por prioridad oficial usando la cola de prioridad y armar
-        //    la cola de la cita (FIFO) en ese orden. Daniel no alcanza a
-        //    inscribir en su cita; llega en el periodo de adiciones.
-        PriorityQueueADT<Student> orden = new SortedLinkedPriorityQueue<>();
-        orden.insert(felipe);
-        orden.insert(elena);
-        orden.insert(carla);
-        orden.insert(ana);
-        System.out.println("Orden de prioridad para las citas: " + orden);
+        PriorityQueueADT<Student> order = new BinaryHeapPriorityQueue<>();
+        order.insert(felipe);
+        order.insert(elena);
+        order.insert(carla);
+        order.insert(ana);
+        System.out.println("Orden de prioridad para las citas: " + order);
 
-        LinkedQueue<Student> cita = new LinkedQueue<>();
-        while (!orden.isEmpty())
-            cita.enqueue(orden.removeHighest());
+        LinkedQueue<Student> appointment = new LinkedQueue<>();
+        while (!order.isEmpty()) appointment.enqueue(order.removeHighest());
 
-        // Cada estudiante decide si acepta que el cupo se le asigne
-        // automáticamente si alguien cancela. Felipe no lo acepta.
-        System.out.println("\n--- 1. Citas: todos piden " + calculo + " (cupo " + calculo.getCapacity() + ") ---");
-        while (!cita.isEmpty()) {
-            Student current = cita.dequeue();
+        title("1. Citas: todos piden " + calculo1 + " (cupo " + calculo1.getCapacity() + ")");
+        while (!appointment.isEmpty()) {
+            Student current = appointment.dequeue();
             boolean accepts = current != felipe;
-            RequestResult result = calculo.request(current, accepts);
-            System.out.println(current + " -> " + describe(result));
+            show(current, system.request(current.getCode(), calculo1.getKey(), accepts));
         }
-        printState(calculo);
+        printState(calculo1);
 
-        // 2. Adiciones: Daniel llega después, pero su prioridad (grupo 3) lo
-        //    pone por delante de Elena (grupo 4).
-        System.out.println("\n--- 2. Adiciones: Daniel pide " + calculo + " ---");
-        System.out.println(daniel + " -> " + describe(calculo.request(daniel, true)));
-        printState(calculo);
+        title("2. Adiciones: Daniel pide " + calculo1 + " y " + calculo2);
+        system.setPhase(Phase.ADD_AND_DROP);
+        show(daniel, system.request(daniel.getCode(), calculo1.getKey(), true));
+        show(elena, system.request(elena.getCode(), calculo2.getKey(), true));
+        show(daniel, system.request(daniel.getCode(), calculo2.getKey(), true));
+        printState(calculo1);
+        printState(calculo2);
 
-        // 3. Cancelación: el cupo pasa solo al primero de la lista de espera.
-        System.out.println("\n--- 3. Carla cancela ---");
-        Student promoted = calculo.cancel(carla);
-        System.out.println("El cupo liberado se asignó automáticamente a: " + promoted);
-        printState(calculo);
+        title("3. Ana pide " + algebra + ", que se cruza con " + calculo1);
+        show(ana, system.request(ana.getCode(), algebra.getKey(), true));
 
-        // 4. Carrito de selección con deshacer (pila LIFO).
-        System.out.println("\n--- 4. Carrito de Felipe con deshacer ---");
-        LinkedStack<CourseGroup> carrito = new LinkedStack<>();
-        carrito.push(calculo);
-        carrito.push(calculo2);
-        System.out.println("Último grupo añadido: " + carrito.peek());
-        System.out.println("Deshacer -> se quita: " + carrito.pop());
-        System.out.println("Queda en el tope del carrito: " + carrito.peek());
+        title("4. Carla cancela " + calculo1);
+        Student promoted = system.cancel(carla.getCode(), calculo1.getKey());
+        System.out.println("El cupo se asignó automáticamente a: " + promoted);
+        System.out.println("Listas de espera de Daniel después de recibir cupo: " + system.getWaitingGroups(daniel.getCode()));
+        printState(calculo1);
+        printState(calculo2);
+
+        title("5. Fase de solo cancelaciones: Elena cancela " + calculo2);
+        system.setPhase(Phase.DROP_ONLY);
+        system.cancel(elena.getCode(), calculo2.getKey());
+        System.out.println("El cupo queda libre: en esta fase no se reasigna");
+        show(felipe, system.request(felipe.getCode(), calculo2.getKey(), true));
+        printState(calculo2);
+
+        title("6. Búsqueda por código y carrito con deshacer");
+        System.out.println("Estudiante 2024105: " + system.findStudent("2024105"));
+        System.out.println("Grupo 1000004-Gr-2: " + system.findGroup("1000004-Gr-2"));
+        LinkedStack<CourseGroup> cart = new LinkedStack<>();
+        cart.push(calculo1);
+        cart.push(algebra);
+        System.out.println("Deshacer -> se quita: " + cart.pop() + "; queda: " + cart.peek());
+    }
+
+    private static CourseGroup group(String code, String name, String number, int capacity,
+                                     String day, int start, int end) {
+        CourseGroup group = new CourseGroup(code, name, number, capacity);
+        group.addTimeSlot(new TimeSlot(day, start, end));
+        return group;
+    }
+
+    private static void title(String text) {
+        System.out.println("\n--- " + text + " ---");
+    }
+
+    private static void show(Student student, RequestResult result) {
+        System.out.println(student + " -> " + describe(result));
     }
 
     private static String describe(RequestResult result) {
         switch (result) {
-            case ENROLLED:   return "inscrito";
-            case WAITLISTED: return "sin cupo; aceptó la asignación automática, entra a lista de espera";
-            default:         return "sin cupo; no aceptó la asignación automática, no entra a la lista";
+            case ENROLLED:          return "inscrito";
+            case WAITLISTED:        return "sin cupo; aceptó la asignación automática, entra a lista de espera";
+            case REJECTED:          return "sin cupo; no aceptó la asignación automática, no entra a la lista";
+            case SCHEDULE_CLASH:    return "rechazado: se cruza con su horario";
+            case ALREADY_IN_COURSE: return "rechazado: ya tiene un grupo de esa asignatura";
+            default:                return "rechazado: la fase actual no permite inscribir";
         }
     }
 
     private static void printState(CourseGroup group) {
-        System.out.println("   Inscritos en " + group + ": " + group.getEnrolled()
-                + " | Cupos libres: " + group.getAvailableSeats());
-        System.out.println("   Lista de espera: " + group.getWaitlist());
+        System.out.println("   " + group + " " + group.getSchedule() + " | Inscritos: " + group.getEnrolled()
+                + " | Libres: " + group.getAvailableSeats() + " | Espera: " + group.getWaitlist());
     }
 }

@@ -6,5 +6,8 @@ public enum RequestResult
     /** No había cupo; el estudiante aceptó la asignación automática y quedó en lista de espera. */
     WAITLISTED,
     /** No había cupo y el estudiante no aceptó la asignación automática. */
-    REJECTED
+    REJECTED,
+    SCHEDULE_CLASH,
+    ALREADY_IN_COURSE,
+    PHASE_CLOSED
 }
