@@ -21,3 +21,4 @@ Equipo 07 del curso Estructuras de Datos (DS-262), semestre 2026-2.
 | Actividad | Carpeta |
 |---|---|
 | Proyecto semestral — SISO-UNAL, Entrega 1 | [projects/entrega-01](projects/entrega-01/) |
+| Proyecto semestral — SISO-UNAL, Entrega 2 | [projects/entrega-02](projects/entrega-02/) |
