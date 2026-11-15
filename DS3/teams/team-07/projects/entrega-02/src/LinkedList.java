@@ -1,10 +1,13 @@
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 /**
  * Lista simplemente enlazada con referencias al primero y al último nodo.
  * Se usa para los inscritos de un grupo.
  *
  * @param <T> tipo de los elementos
  */
-public class LinkedList<T>
+public class LinkedList<T> implements Iterable<T>
 {
     private Node<T> head;
     private Node<T> tail;
@@ -57,6 +60,26 @@ public class LinkedList<T>
 
     public int size() {
         return size;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            private Node<T> current = head;
+
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
+
+            @Override
+            public T next() {
+                if (current == null) throw new NoSuchElementException();
+                T item = current.data;
+                current = current.next;
+                return item;
+            }
+        };
     }
 
     /** "[a, b, c]". O(n). */
