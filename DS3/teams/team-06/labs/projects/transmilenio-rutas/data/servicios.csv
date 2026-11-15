@@ -1,0 +1,19 @@
+codigo,origen,destino,paradas
+K16,Terminal,Portal Eldorado,E10|E09|E07|E06|E05|E04|E02|E01
+B16,Portal Eldorado,Terminal,E01|E02|E04|E05|E06|E07|E09|E10
+K23,Alcalá,Portal Eldorado,E12|E11|E08|E07|E06|E05|E04|E01
+B23,Portal Eldorado,Alcalá,E01|E04|E05|E06|E07|E08|E11|E12
+K10,Portal 20 de Julio,Portal Eldorado,E13|E11|E08|E07|E06|E03|E02|E01
+L10,Portal Eldorado,Portal 20 de Julio,E01|E02|E03|E06|E07|E08|E11|E13
+K43,San Mateo,Portal Eldorado,E10|E08|E06|E05|E03|E02|E01
+S43,Portal Eldorado,San Mateo,E01|E02|E03|E05|E06|E08|E10
+K53,Portal Sur,Portal Eldorado,E11|E09|E07|E04|E01
+G53,Portal Eldorado,Portal Sur,E01|E04|E07|E09|E11
+K54,Portal Usme,Portal Eldorado,E12|E11|E10|E09|E07|E06|E05|E04|E02|E01
+H54,Portal Eldorado,Portal Usme,E01|E02|E04|E05|E06|E07|E09|E10|E11|E12
+K86,AK 7 - CL 118,Portal Eldorado,E12|E10|E08|E07|E05|E04|E01
+M86,Portal Eldorado,AK 7 - CL 116,E01|E04|E05|E07|E08|E10|E12
+1,Universidades,Portal Eldorado,E14|E13|E12|E11|E10|E09|E08|E07|E06|E05|E04|E03|E02|E01
+1,Portal Eldorado,Universidades,E01|E02|E03|E04|E05|E06|E07|E08|E09|E10|E11|E12|E13|E14
+3,Portal Tunal,Corferias,E13|E12|E11|E10
+3,Corferias,Portal Tunal,E10|E11|E12|E13

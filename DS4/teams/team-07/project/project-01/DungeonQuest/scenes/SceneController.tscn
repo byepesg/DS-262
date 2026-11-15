@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://viacimbvtcdi"]
+
+[ext_resource type="Script" uid="uid://d3s1uc0t3p47k" path="res://scripts/scene_controller.gd" id="1_68wv5"]
+
+[node name="SceneController" type="Node" unique_id=491413048]
+script = ExtResource("1_68wv5")
+
+[node name="FadeLayer" type="CanvasLayer" parent="." unique_id=1039847080]
+
+[node name="Fade" type="ColorRect" parent="FadeLayer" unique_id=1639899340]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true

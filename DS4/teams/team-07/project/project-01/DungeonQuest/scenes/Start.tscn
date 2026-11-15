@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://dt3kjoht08k3j"]
+
+[ext_resource type="Script" uid="uid://68pm1kirojo6" path="res://scripts/start.gd" id="1_8t08e"]
+[ext_resource type="Texture2D" uid="uid://ch8hewwrwp7w5" path="res://assets/sprites/backgrounds/TitleBackGround.png" id="2_j3bqk"]
+[ext_resource type="Texture2D" uid="uid://c3dal1yuirmf7" path="res://assets/sprites/backgrounds/Start_Button.png" id="3_yx83k"]
+[ext_resource type="Texture2D" uid="uid://drk2mem68v68j" path="res://assets/sprites/backgrounds/Start_Button2.png" id="4_yx83k"]
+[ext_resource type="Texture2D" uid="uid://xx0wtmbefts7" path="res://assets/sprites/backgrounds/Start_Button3.png" id="5_lynlw"]
+[ext_resource type="Texture2D" uid="uid://ddslorl0nheb7" path="res://assets/sprites/backgrounds/Exit_Button.png" id="6_yrm6t"]
+[ext_resource type="Texture2D" uid="uid://tyo3vnkc1wy" path="res://assets/sprites/backgrounds/Exit_Button2.png" id="7_q7y7s"]
+[ext_resource type="Texture2D" uid="uid://cb4endsttni38" path="res://assets/sprites/backgrounds/Exit_Button3.png" id="8_nqh5h"]
+
+[node name="Start" type="Control" unique_id=1522448993]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_8t08e")
+
+[node name="ColorRect" type="TextureRect" parent="." unique_id=315341556]
+layout_mode = 0
+offset_right = 480.0
+offset_bottom = 272.0
+texture = ExtResource("2_j3bqk")
+
+[node name="StartButton" type="TextureButton" parent="." unique_id=2003231355]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 144.0
+offset_right = 161.0
+offset_bottom = 177.0
+texture_normal = ExtResource("3_yx83k")
+texture_pressed = ExtResource("4_yx83k")
+texture_hover = ExtResource("5_lynlw")
+
+[node name="ExitButton" type="TextureButton" parent="." unique_id=1433482625]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 184.0
+offset_right = 178.0
+offset_bottom = 218.0
+texture_normal = ExtResource("6_yrm6t")
+texture_pressed = ExtResource("7_q7y7s")
+texture_hover = ExtResource("8_nqh5h")
+
+[node name="FadeLayer" type="CanvasLayer" parent="." unique_id=497796406]
+
+[node name="Fade" type="ColorRect" parent="FadeLayer" unique_id=896697759]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true

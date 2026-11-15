@@ -1,0 +1,19 @@
+# Archivos compilados de Java
+*.class
+bin/
+build/
+dist/
+out/
+
+# Archivos de configuración de IDEs
+.vscode/
+.idea/
+*.iml
+nbproject/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db

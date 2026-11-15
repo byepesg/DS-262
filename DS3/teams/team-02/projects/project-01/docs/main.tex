@@ -1,0 +1,153 @@
+\documentclass[conference]{IEEEtran}
+
+% =========================================================
+% PLANTILLA LIGERA PARA OVERLEAF FREE
+% Compilador recomendado: pdfLaTeX
+% =========================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{hyperref}
+
+\floatname{algorithm}{Algoritmo}
+
+\definecolor{CodeBackground}{HTML}{F4F6F7}
+\definecolor{CodeKeyword}{HTML}{005F73}
+\definecolor{CodeComment}{HTML}{6C757D}
+\definecolor{CodeString}{HTML}{BB3E03}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=blue
+}
+
+\lstdefinestyle{paperstyle}{
+    backgroundcolor=\color{CodeBackground},
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{CodeKeyword}\bfseries,
+    commentstyle=\color{CodeComment}\itshape,
+    stringstyle=\color{CodeString},
+    numbers=left,
+    numberstyle=\tiny,
+    numbersep=5pt,
+    frame=single,
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4
+}
+
+\lstset{
+    style=paperstyle,
+    language=Java
+}
+
+% =========================================================
+% DATOS DEL ARTÍCULO
+% =========================================================
+
+\title{
+Sistema de Priorización de Atención: Diseño e Implementación Inicial de una
+Cola de Prioridad por Niveles y una Pila sobre Listas Enlazadas
+}
+
+\author{
+\IEEEauthorblockN{
+Johan Adrian Torres Robles,
+Esteban Mora Lopez,
+Miguel Angel Rodriguez Bohorquez
+}
+\IEEEauthorblockA{
+\textit{Universidad Nacional de Colombia}\\
+\textit{Sede Bogotá}\\
+Bogotá D.C., Colombia\\
+\{jotorresro, emoral, mrodriguezbo\}@unal.edu.co
+}
+}
+\begin{document}
+
+\maketitle
+
+% =========================================================
+% RESUMEN
+% =========================================================
+
+\begin{abstract}
+Los centros de atención que reciben solicitudes de servicio deben atenderlas
+según su nivel de urgencia y no según su orden de llegada, además de poder
+consultar y cancelar solicitudes puntuales y revisar las atenciones
+realizadas. Este documento presenta el diseño e implementación inicial de un
+Sistema de Priorización de Atención (SPA) que resuelve este problema con
+estructuras lineales. Una cola de prioridad formada por una cola FIFO por
+nivel de urgencia, cada una sobre una lista enlazada con referencias a la
+cabeza y a la cola, registra y atiende solicitudes en tiempo constante y
+resuelve el desempate por orden de llegada sin comparaciones adicionales; la
+búsqueda y la cancelación por identificador recorren estas listas en tiempo
+lineal; y una pila enlazada registra el historial de atenciones. La primera
+entrega incluye una implementación funcional con menú de consola que cubre
+el registro, la atención, la búsqueda, la cancelación y la consulta del
+historial, verificada mediante un programa de prueba manual con casos
+borde. Deshacer la última atención y la reducción del costo de la búsqueda
+quedan planteados para las siguientes entregas.
+\end{abstract}
+
+\begin{IEEEkeywords}
+cola de prioridad, cola, lista enlazada, pila, estructuras de datos
+\end{IEEEkeywords}
+
+% =========================================================
+% CONTENIDO
+% =========================================================
+
+\input{sections/01-introduccion}
+\input{sections/02-trabajo-relacionado}
+\input{sections/03-metodologia}
+\input{sections/04-resultados}
+\input{sections/05-discusion}
+\input{sections/06-conclusiones}
+
+% =========================================================
+% AGRADECIMIENTOS
+% =========================================================
+
+\section*{Agradecimientos}
+
+Los autores agradecen a la Universidad Nacional de Colombia y al equipo
+docente de la asignatura Estructuras de Datos.
+
+% =========================================================
+% REFERENCIAS
+% Sin BibTeX ni Biber para reducir tiempo de compilación.
+% =========================================================
+
+\begin{thebibliography}{00}
+
+\bibitem{cormen}
+T. H. Cormen, C. E. Leiserson, R. L. Rivest y C. Stein,
+\textit{Introduction to Algorithms}, 4th ed.
+Cambridge, MA, USA: MIT Press, 2022.
+
+\bibitem{goodrich}
+M. T. Goodrich, R. Tamassia y M. H. Goldwasser,
+\textit{Data Structures and Algorithms in Java}, 6th ed.
+Hoboken, NJ, USA: Wiley, 2014.
+
+\end{thebibliography}
+
+\end{document}

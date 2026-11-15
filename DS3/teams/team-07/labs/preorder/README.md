@@ -1,0 +1,1 @@
+Execute with `javac ./src/*.java -d ./build; java -cp .\build\ Main`

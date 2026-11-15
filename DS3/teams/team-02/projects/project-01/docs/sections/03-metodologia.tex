@@ -1,0 +1,183 @@
+\section{Metodología}
+\label{sec:metodologia}
+
+\subsection{Objetivos}
+
+\textbf{Objetivo general.} Diseñar e implementar un sistema que permita
+registrar, priorizar, atender, cancelar y consultar solicitudes de atención
+de forma eficiente, aplicando estructuras de datos apropiadas para cada
+operación.
+
+\textbf{Objetivos específicos.}
+\begin{enumerate}
+  \item Implementar una cola de prioridad formada por una cola FIFO por
+    nivel de urgencia, cada una sobre una lista enlazada, para determinar
+    la solicitud a atender en tiempo constante.
+  \item Implementar la búsqueda y la cancelación de una solicitud pendiente
+    por su identificador.
+  \item Implementar una pila sobre lista enlazada que registre el historial
+    de atenciones y permita, en una entrega posterior, deshacer la más
+    reciente.
+  \item Integrar las estructuras en una interfaz de consola que exponga las
+    operaciones del sistema.
+\end{enumerate}
+
+\subsection{Alcance y limitaciones}
+
+El sistema completo contempla: registrar una solicitud con un
+identificador, un nombre y un nivel de urgencia (de 1, más urgente, a 5,
+menos urgente); atender la solicitud de mayor prioridad; buscar y cancelar
+una solicitud pendiente por identificador; consultar el historial de
+atenciones; y deshacer la atención más reciente. Esta primera entrega
+implementa todas estas operaciones excepto deshacer, que queda diseñada y
+se implementará en la siguiente entrega.
+
+Quedan explícitamente fuera del alcance del proyecto: persistencia en base
+de datos, interfaz gráfica, acceso concurrente de múltiples usuarios y
+autenticación. Se asume que los identificadores son proporcionados por
+quien registra la solicitud; el sistema rechaza un identificador que ya
+pertenezca a otra solicitud pendiente. Se asume también que la urgencia
+toma solo cinco valores, supuesto del que depende el costo constante de la
+cola de prioridad elegida.
+
+\subsection{Requerimientos principales}
+
+\begin{itemize}
+  \item RF1: El sistema debe permitir registrar una solicitud con
+    identificador único entre las pendientes, nombre y nivel de urgencia
+    entre 1 y 5, rechazando valores fuera de ese rango.
+  \item RF2: El sistema debe atender siempre la solicitud pendiente de
+    mayor urgencia; en caso de empate, debe atenderse primero la que llegó
+    antes.
+  \item RF3: El sistema debe permitir buscar una solicitud pendiente por su
+    identificador.
+  \item RF4: El sistema debe permitir cancelar una solicitud pendiente de
+    modo que nunca sea atendida.
+  \item RF5: El sistema debe permitir deshacer la atención más reciente,
+    devolviendo la solicitud correspondiente a la cola de pendientes.
+  \item RF6: El sistema debe permitir consultar el historial de
+    solicitudes atendidas.
+\end{itemize}
+
+\subsection{Diseño de la solución}
+
+El sistema se organiza en los siguientes componentes: una clase
+\texttt{Ticket} que representa una solicitud; una cola genérica
+\texttt{LinkedQueue<T>} sobre lista enlazada; una cola de prioridad
+\texttt{LevelPriorityQueue}, formada por un arreglo de cinco
+\texttt{LinkedQueue<Ticket>}, una por nivel de urgencia; una pila genérica
+\texttt{LinkedStack<T>}; y un historial \texttt{ServiceHistory} construido
+sobre esa pila. Una clase fachada, \texttt{TriageSystem}, coordina la cola
+de prioridad y el historial para que cada operación pública los mantenga
+consistentes, y una clase \texttt{Main} ofrece el menú de consola.
+
+\begin{figure}[h]
+  \centering
+  \fbox{\parbox{0.9\linewidth}{\centering
+    \texttt{Main} (consola) \\[4pt]
+    $\downarrow$ \\[4pt]
+    \texttt{TriageSystem} \\[4pt]
+    $\swarrow$ \hspace{3em} $\searrow$ \\[4pt]
+    \texttt{LevelPriorityQueue} \hspace{1em} \texttt{ServiceHistory} \\[2pt]
+    {\footnotesize 5 $\times$ \texttt{LinkedQueue<Ticket>}} \hspace{2.5em}
+    {\footnotesize \texttt{LinkedStack<Ticket>}}
+  }}
+  \caption{Componentes principales del sistema y la estructura de datos
+  que resuelve cada responsabilidad.}
+  \label{fig:arquitectura}
+\end{figure}
+
+\subsection{Estructuras de datos seleccionadas}
+
+\textbf{Cola de prioridad por niveles.} Representa el conjunto de
+solicitudes pendientes. Está formada por un arreglo de cinco colas FIFO;
+la cola de índice $u-1$ contiene, en orden de llegada, las solicitudes de
+urgencia $u$. Debe soportar insertar una solicitud y extraer la más
+prioritaria. Insertar consiste en encolar al final de la cola de su nivel,
+y extraer consiste en recorrer los niveles desde el más urgente y desencolar
+del primero que no esté vacío (Algoritmo~\ref{alg:atender}). Como el número
+de niveles es la constante $k=5$, ambas operaciones cuestan $O(k)=O(1)$. El
+desempate por orden de llegada (RF2) no requiere comparaciones adicionales:
+lo garantiza el comportamiento FIFO de cada cola. Se descartó una lista
+ordenada por prioridad, cuya inserción cuesta $O(n)$, y no se requiere un
+\emph{heap}, cuyo costo $O(\log n)$ solo se justifica cuando la prioridad
+puede tomar muchos valores distintos.
+
+\textbf{Cola sobre lista enlazada con referencias a cabeza y cola.} Cada
+nivel es una cola implementada como lista simplemente enlazada que mantiene
+una referencia a la cabeza (frente) y otra al último nodo (final). La
+referencia al final es la que permite encolar en $O(1)$; sin ella, encolar
+requeriría recorrer la lista en $O(n)$. Se prefirió la lista enlazada sobre
+un arreglo circular porque el número de solicitudes por nivel no se conoce
+de antemano y porque la cancelación necesita retirar un elemento
+arbitrario, operación que en una lista enlazada solo exige reenlazar el
+nodo anterior con el siguiente, sin desplazar elementos.
+
+\textbf{Búsqueda y cancelación por identificador.} La cola de prioridad
+resuelve eficientemente ``\textquestiondown{}cuál es la siguiente solicitud a
+atender?'', pero no ``\textquestiondown{}dónde está la solicitud con
+identificador X?''. En esta entrega la búsqueda recorre las colas de los
+cinco niveles, con costo $O(n)$ en el peor caso. La cancelación usa esa
+búsqueda y luego elimina el nodo de la lista enlazada de su nivel en $O(1)$,
+actualizando la referencia al final cuando el nodo eliminado es el último
+(Algoritmo~\ref{alg:cancelar}); su costo total es $O(n)$. La misma búsqueda
+permite rechazar identificadores repetidos al registrar, por lo que el
+registro completo cuesta $O(n)$. Reducir estos costos a $O(1)$ esperado
+mediante un índice por identificador es una de las mejoras previstas para
+las siguientes entregas (Sección~\ref{sec:discusion}).
+
+\textbf{Pila (lista enlazada simple, encabezado único).} Registra las
+solicitudes ya atendidas en orden inverso de atención. Se eligió una pila
+porque la operación prevista, deshacer la atención más reciente (RF5), es
+exactamente el comportamiento LIFO: apilar al atender, en $O(1)$, y
+desapilar al deshacer, en $O(1)$. Se implementó como lista enlazada con
+solo referencia al tope, ya que todas las operaciones ocurren en ese
+extremo. Consultar el historial completo (RF6) recorre la pila en $O(h)$,
+siendo $h$ el número de atenciones.
+
+En los algoritmos, $L[1..5]$ denota el arreglo de colas por nivel y $S$ la
+pila del historial.
+
+\begin{algorithm}[t]
+\caption{Atender la siguiente solicitud}
+\label{alg:atender}
+\begin{algorithmic}[1]
+\Function{ServeNext}{}
+  \For{$u \gets 1$ \textbf{to} $5$}
+    \If{$L[u]$ no está vacía}
+      \State $t \gets$ \Call{Dequeue}{$L[u]$}
+      \State apilar $t$ en $S$
+      \State \Return $t$
+    \EndIf
+  \EndFor
+  \State \Return \textsc{null}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Cancelar una solicitud pendiente}
+\label{alg:cancelar}
+\begin{algorithmic}[1]
+\Function{CancelRequest}{$id$}
+  \For{$u \gets 1$ \textbf{to} $5$}
+    \State $prev \gets$ \textsc{null}; $cur \gets L[u].head$
+    \While{$cur \neq$ \textsc{null}}
+      \If{$cur.value.id = id$}
+        \If{$prev =$ \textsc{null}}
+          \State $L[u].head \gets cur.next$
+        \Else
+          \State $prev.next \gets cur.next$
+        \EndIf
+        \If{$cur = L[u].tail$}
+          \State $L[u].tail \gets prev$
+        \EndIf
+        \State \Return \textsc{true}
+      \EndIf
+      \State $prev \gets cur$; $cur \gets cur.next$
+    \EndWhile
+  \EndFor
+  \State \Return \textsc{false}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
