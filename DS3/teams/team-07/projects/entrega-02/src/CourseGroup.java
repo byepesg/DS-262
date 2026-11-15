@@ -18,7 +18,7 @@ public class CourseGroup
         this.groupNumber = groupNumber;
         this.capacity = capacity;
         this.enrolled = new LinkedList<>();
-        this.waitlist = new SortedLinkedPriorityQueue<>();
+        this.waitlist = new BinaryHeapPriorityQueue<>();
     }
 
     /** O(1). */
