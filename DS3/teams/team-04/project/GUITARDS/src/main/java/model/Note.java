@@ -10,12 +10,12 @@ public class Note {
     private final int pitchClass; // 0-11
     private final String name;
 
-    public Note(int pitchClass, String name) {
+    public Note(int pitchClass) {
         /** Invariante de pitchClass Notas desde 0 hasta 11*/
         if (pitchClass < 0 || pitchClass > 11)
             throw new IllegalArgumentException("pitchClass debe estar en 0-11");
         this.pitchClass = pitchClass;
-        this.name = name;
+        this.name = MusicConstants.nameOf(pitchClass);
     }
 
     public int getPitchClass() { return pitchClass; }
@@ -24,7 +24,7 @@ public class Note {
     /** Suma semitonos con aritmética modular (lista circular). Pasar de nota a nota*/
     public Note transpose(int semitones) {
         int newPc = Math.floorMod(pitchClass + semitones, 12);
-        return new Note(newPc, MusicConstants.nameOf(newPc));
+        return new Note(newPc);
     }
 
     @Override

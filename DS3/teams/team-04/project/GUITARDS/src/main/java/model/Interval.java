@@ -21,7 +21,7 @@ public class Interval {
         NAMES.put(11, "Séptima mayor");
     }
 
-    /** Intervalo en semitonos entre dos notas (0-11). */
+    // devuelve el número de semitonos entre dos notas (0..11)
     public static int between(Note from, Note to) {
         return Math.floorMod(to.getPitchClass() - from.getPitchClass(), 12);
     }

@@ -1,5 +1,9 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Mástil representado como matriz [cuerda][traste] de notas.
  * Fila 0 = cuerda 6 (grave), fila 5 = cuerda 1 (aguda).
@@ -29,6 +33,32 @@ public class Fretboard {
         if (fret < 0 || fret > frets)
             throw new IllegalArgumentException("traste fuera de rango");
         return grid[string][fret];
+    }
+
+    /** Devuelve todas las posiciones [cuerda, traste] donde aparece la nota dada. */
+    public List<int[]> findAll(Note note) {
+        List<int[]> positions = new ArrayList<>();
+        for (int s = 0; s < stringCount(); s++) {
+            for (int f = 0; f <= frets; f++) {
+                if (grid[s][f].equals(note)) {
+                    positions.add(new int[]{s, f});
+                }
+            }
+        }
+        return positions;
+    }
+
+    // devuelve todas las posiciones [cuerda, traste] donde aparece alguna de las notas dadas del conjunto
+    public List<int[]> findAllIn(Set<Note> notes) {
+        List<int[]> positions = new ArrayList<>();
+        for (int s = 0; s < stringCount(); s++) {
+            for (int f = 0; f <= frets; f++) {
+                if (notes.contains(grid[s][f])) {  // O(1) por hashCode
+                    positions.add(new int[]{s, f});
+                }
+            }
+        }
+        return positions;
     }
 
     public int stringCount() { return grid.length; }
