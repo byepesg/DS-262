@@ -95,7 +95,7 @@ Estructuras de Datos (DS3, grupo 03) --- team-07 --- 2026-2
 \maketitle
 
 \begin{abstract}
-En la sede Bogotá de la Universidad Nacional de Colombia, cerca de 28.700 estudiantes de pregrado inscriben asignaturas mediante citas asignadas según una prioridad institucional: los grupos de prelación y el Índice de Prioridad de Asignación (IPA). Esa prioridad deja de tener efecto después de la cita, porque no existen listas de espera y cada cupo liberado lo obtiene quien recargue el sistema en ese momento. El objetivo del proyecto es diseñar e implementar en Java un sistema, SISO-UNAL, que complemente las citas con listas de espera por prioridad y reasignación automática de los cupos liberados. En la Entrega 1 se construyó un producto mínimo con estructuras lineales. En esta segunda entrega el sistema se amplió de forma sustancial: la lista de espera pasó de una lista enlazada ordenada a un montículo binario, la búsqueda de estudiantes y grupos por código se hace con un árbol AVL, cada grupo tiene un horario y se impiden los cruces, el estudiante sale de las demás esperas de la asignatura cuando obtiene un cupo, y el sistema distingue la fase de adiciones de la fase de solo cancelaciones. Una nueva clase, \texttt{RegistrationSystem}, coordina estas operaciones. La implementación se verificó con 42 pruebas automáticas, todas exitosas, y con una medición de tiempos: con 20.000 estudiantes, llenar y vaciar la lista de espera tomó 968~ms con la lista ordenada y 8~ms con el montículo, y 20.000 búsquedas por código tomaron 1.579~ms con una lista enlazada y 6~ms con el árbol AVL.
+En la sede Bogotá de la Universidad Nacional de Colombia, cerca de 28.700 estudiantes de pregrado inscriben asignaturas mediante citas asignadas según una prioridad institucional: los grupos de prelación y el Índice de Prioridad de Asignación (IPA). Esa prioridad deja de tener efecto después de la cita, porque no existen listas de espera y cada cupo liberado lo obtiene quien recargue el sistema en ese momento. El objetivo del proyecto es diseñar e implementar en Java un sistema, SISO-UNAL, que complemente las citas con listas de espera por prioridad y reasignación automática de los cupos liberados. En la Entrega 1 se construyó un producto mínimo con estructuras lineales. En esta segunda entrega el sistema se amplió de forma sustancial: la lista de espera pasó de una lista enlazada ordenada a un montículo binario, la búsqueda de estudiantes y grupos por código se hace con un árbol AVL, cada grupo tiene un horario y se impiden los cruces, el estudiante sale de las demás esperas de la asignatura cuando obtiene un cupo, el sistema distingue la fase de adiciones de la fase de solo cancelaciones, sugiere otros grupos de la misma asignatura con cupo y sin cruce cuando el deseado está lleno, y reporta los $k$ grupos con más demanda insatisfecha con un montículo acotado. Una nueva clase, \texttt{RegistrationSystem}, coordina estas operaciones, y un menú por consola permite usarlas. La implementación se verificó con 48 pruebas automáticas, todas exitosas, y con una medición de tiempos: con 20.000 estudiantes, llenar y vaciar la lista de espera tomó 968~ms con la lista ordenada y 8~ms con el montículo, y 20.000 búsquedas por código tomaron 1.579~ms con una lista enlazada y 6~ms con el árbol AVL.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -125,7 +125,9 @@ Horarios & No se modelaban & Franjas por grupo y control de cruces \\
 Varias esperas de la misma asignatura & El estudiante seguía en las otras esperas & Sale de ellas al obtener cupo \\
 Fases del calendario & \texttt{cancel} siempre reasignaba & En solo cancelaciones no se inscribe ni se reasigna \\
 Coordinación & Cada grupo trabajaba aislado & \texttt{RegistrationSystem} coordina grupos y estudiantes \\
-Pruebas & Revisión manual de casos borde & 42 pruebas automáticas y medición de tiempos \\
+Sugerencias y reportes & No existían & Otro grupo sin cruce; top-$k$ de demanda \\
+Interfaz & Demostración guiada & Demostración guiada y menú por consola \\
+Pruebas & Revisión manual de casos borde & 48 pruebas automáticas y medición de tiempos \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -180,8 +182,8 @@ El problema afecta a todos los estudiantes de pregrado cada semestre. Que un cup
 SISO-UNAL no reemplaza las citas: las \emph{complementa}. Mantiene la prioridad institucional y el orden de atención de la cita, y agrega tres componentes:
 \begin{enumerate}
     \item \textbf{Lista de espera por prioridad:} cada grupo lleno tiene una lista de espera ordenada por la prioridad institucional, y cada cupo liberado se asigna automáticamente al primer estudiante de la espera que pueda tomarlo, es decir, que no tenga ya la asignatura ni un cruce de horario. Este componente está completo en la Entrega 2.
-    \item \textbf{Grupos alternativos:} si el grupo deseado está lleno, el sistema sugiere otros grupos de la misma asignatura con cupo y sin cruce de horario. La detección de cruces, que es la base de este componente, ya está implementada; la sugerencia está en desarrollo.
-    \item \textbf{Reportes de demanda:} los grupos y asignaturas con más estudiantes en espera, para planear cupos en semestres futuros. Está en desarrollo.
+    \item \textbf{Grupos alternativos:} si el grupo deseado está lleno, el sistema sugiere otros grupos de la misma asignatura con cupo y sin cruce de horario. Este componente está implementado en la Entrega 2.
+    \item \textbf{Reportes de demanda:} los grupos y asignaturas con más estudiantes en espera, para planear cupos en semestres futuros. En la Entrega 2 se reportan los $k$ grupos con más estudiantes en espera; en la Entrega 3 se agregarán los cupos perdidos en la fase de solo cancelaciones.
 \end{enumerate}
 La lista de espera es el núcleo del sistema, porque los otros dos componentes se construyen sobre ella: las sugerencias parten de quienes esperan, y los reportes se calculan con el tamaño de las esperas.
 
@@ -202,8 +204,8 @@ Los objetivos se mantienen respecto a la Entrega 1. Entre paréntesis se indica 
     \item Permitir que el estudiante arme un carrito de selección con la opción de \emph{deshacer}, usando una pila (cumplido).
     \item Implementar una lista de espera por grupo que entregue siempre al estudiante de mayor prioridad, primero con una lista enlazada ordenada y luego con un montículo binario (cumplido).
     \item Reasignar automáticamente cada cupo liberado al estudiante de mayor prioridad que haya aceptado la asignación y no tenga cruce de horario (cumplido).
-    \item Sugerir grupos alternativos de la misma asignatura, con cupo y sin cruce de horario, cuando el grupo deseado esté lleno (en desarrollo).
-    \item Generar reportes de demanda insatisfecha por asignatura y grupo (en desarrollo).
+    \item Sugerir grupos alternativos de la misma asignatura, con cupo y sin cruce de horario, cuando el grupo deseado esté lleno (cumplido).
+    \item Generar reportes de demanda insatisfecha por asignatura y grupo (cumplido para grupos; el reporte por asignatura y los cupos perdidos, en la Entrega 3).
     \item Comparar experimentalmente, con 28.700 estudiantes simulados, la asignación ``gana quien recarga primero'' frente a la lista de espera por prioridad, y las distintas implementaciones de cada estructura (comparación de estructuras iniciada; simulación completa en la Entrega 3).
 \end{enumerate}
 
@@ -220,7 +222,7 @@ Registro de asignaturas, grupos y estudiantes; clasificación por prioridad; ate
 Interfaz gráfica, base de datos, autenticación, conexión con el SIA real, posgrado, la asignación de las citas (fase 1; el sistema solo usa su resultado), los sobrecupos, la cancelación extemporánea (fase 5), el control de la bolsa de créditos y de la carga mínima de 10 créditos, y los criterios propios de cada facultad para estudiantes de primera matrícula.
 
 \subsection{Restricciones técnicas}
-Java 17 o superior, ejecución por consola y estructuras de datos implementadas por el equipo, sin usar las colecciones de \texttt{java.util}. Del paquete \texttt{java.util} solo se usan la interfaz \texttt{Iterator}, para recorrer la lista enlazada propia con un ciclo \texttt{for}, y, en las pruebas y la medición, \texttt{Random} y \texttt{Arrays}.
+Java 17 o superior, ejecución por consola y estructuras de datos implementadas por el equipo, sin usar las colecciones de \texttt{java.util}. Del paquete \texttt{java.util} solo se usan la interfaz \texttt{Iterator}, para recorrer la lista enlazada propia con un ciclo \texttt{for}; la clase \texttt{Scanner}, para leer las opciones del menú; y, en las pruebas y la medición, \texttt{Random} y \texttt{Arrays}.
 
 \subsection{Supuestos}
 \begin{itemize}
@@ -261,11 +263,12 @@ RF8 & Mostrar los inscritos, los cupos libres, el horario y la espera de un grup
 RF9 & Validar el cruce de horario al inscribir y al reasignar un cupo. & Hecho \\
 RF10 & Retirar a un estudiante de las demás esperas de la misma asignatura cuando obtiene cupo. & Hecho \\
 RF11 & Buscar estudiantes y grupos por código en tiempo sublineal. & Hecho \\
-RF12 & Reportar los grupos con mayor demanda insatisfecha (top-$k$). & En curso \\
-RF13 & Sugerir otro grupo de la misma asignatura con cupo y sin cruce. & En curso \\
+RF12 & Reportar los grupos con mayor demanda insatisfecha (top-$k$). & Hecho \\
+RF13 & Sugerir otro grupo de la misma asignatura con cupo y sin cruce. & Hecho \\
 RF14 & Validar los prerrequisitos de la malla curricular. & Entrega 3 \\
 RF15 & Simular las fases del calendario con 28.700 estudiantes y comparar estrategias. & Entrega 3 \\
 RF16 & No inscribir ni reasignar en la fase de solo cancelaciones. & Hecho \\
+RF17 & Usar el sistema desde un menú por consola. & Hecho \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -300,10 +303,10 @@ El equipo trabaja de forma incremental. Cada estructura que puede cambiar se usa
 \subsection{Arquitectura}
 El código de la Entrega 2 se organiza en tres capas y dos programas de verificación (Fig.~\ref{fig:clases}):
 \begin{itemize}
-    \item \textbf{Coordinación:} \texttt{RegistrationSystem} recibe las solicitudes, las cancelaciones y las salidas de la espera. Busca al estudiante y al grupo por código, revisa la fase, la asignatura repetida y los cruces de horario, y decide a quién entregar cada cupo liberado. También guarda, para cada estudiante, los grupos en que está inscrito y los grupos en que espera.
+    \item \textbf{Coordinación:} \texttt{RegistrationSystem} recibe las solicitudes, las cancelaciones y las salidas de la espera. Busca al estudiante y al grupo por código, revisa la fase, la asignatura repetida y los cruces de horario, y decide a quién entregar cada cupo liberado. Además sugiere grupos alternativos (\texttt{suggestAlternatives}) y arma el reporte de demanda (\texttt{topDemand}). También guarda, para cada estudiante, los grupos en que está inscrito y los grupos en que espera, y para cada asignatura, sus grupos.
     \item \textbf{Modelo:} \texttt{Student} guarda los datos de prioridad y define el orden con \texttt{compareTo}. \texttt{CourseGroup} guarda la asignatura, el número de grupo, el cupo, el horario, los inscritos y la lista de espera. \texttt{TimeSlot} representa una franja del horario y detecta solapamientos. \texttt{Phase} indica la fase del calendario y \texttt{RequestResult}, el resultado de una solicitud.
     \item \textbf{Estructuras de datos:} implementadas por el equipo y genéricas: \texttt{Node<T>}, \texttt{LinkedList<T>}, \texttt{LinkedQueue<T>}, \texttt{LinkedStack<T>}, la interfaz \texttt{PriorityQueueADT<T>} con sus implementaciones \texttt{SortedLinkedPriorityQueue<T>} y \texttt{BinaryHeapPriorityQueue<T>}, y la interfaz \texttt{Dictionary<K,V>} con su implementación \texttt{AVLTreeDictionary<K,V>}.
-    \item \textbf{Verificación:} \texttt{Main} recorre un escenario guiado; \texttt{TestRunner} ejecuta las pruebas automáticas; y \texttt{Benchmark} mide los tiempos de las estructuras.
+    \item \textbf{Interfaz y verificación:} \texttt{Menu} permite usar el sistema desde la consola con los datos de ejemplo de \texttt{SampleData}; \texttt{Main} recorre un escenario guiado; \texttt{TestRunner} ejecuta las pruebas automáticas; y \texttt{Benchmark} mide los tiempos de las estructuras.
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -313,7 +316,7 @@ El código de la Entrega 2 se organiza en tres capas y dos programas de verifica
   box/.style={draw, rounded corners=2pt, align=center, inner sep=2.5pt, font=\scriptsize\ttfamily},
   arr/.style={-{Stealth[length=4pt]}},
   impl/.style={dashed, -{Triangle[open, length=5pt]}}]
-\node[box] (main) {Main};
+\node[box] (main) {Main / Menu};
 \node[box, below=0.45cm of main] (sys) {RegistrationSystem\\[1pt]\rmfamily\tiny request, cancel, leaveWaitlist};
 \node[box, below left=0.55cm and -0.4cm of sys] (dict) {Dictionary};
 \node[box, below=0.4cm of dict] (avl) {AVLTreeDictionary};
@@ -397,11 +400,30 @@ Toda la regla de prioridad sigue en un solo método de comparación de \texttt{S
 
 En el Algoritmo~\ref{alg:reassign}, un candidato que ya no puede tomar el cupo (porque en el tiempo de espera inscribió otro grupo que se cruza) sale de la espera y el cupo pasa al siguiente. Así el cupo nunca queda bloqueado por un estudiante que no puede usarlo.
 
+\textbf{Sugerencia de grupos.} \texttt{suggestAlternatives} toma los grupos de la misma asignatura desde el árbol de grupos por asignatura, en $O(\log n)$, y devuelve los que tienen cupo y no se cruzan con el horario del estudiante. Si la asignatura tiene $a$ grupos, el costo es $O(\log n + a\,k)$.
+
+\textbf{Reporte de demanda.} \texttt{topDemand} recorre todos los grupos y guarda los $k$ con más estudiantes en espera en un montículo de tamaño $k$ (Algoritmo~\ref{alg:topk}). La raíz del montículo es el grupo con \emph{menos} demanda entre los guardados; si llega uno con más demanda y ya hay $k$, se descarta la raíz. Así se reutiliza la misma clase \texttt{BinaryHeapPriorityQueue} sin ordenar todos los grupos: con $g$ grupos el costo es $O(g \log k)$, menor que $O(g \log g)$ cuando $k$ es pequeño.
+
+\begin{algorithm}[htbp]
+\caption{Los $k$ grupos con más demanda (\texttt{topDemand})}
+\label{alg:topk}
+\begin{algorithmic}[1]
+\Require grupos $G$, entero $k > 0$
+\Ensure los $k$ grupos con más estudiantes en espera, de mayor a menor
+\State $H \gets$ montículo vacío; raíz = menor demanda
+\For{cada grupo $g \in G$ con espera no vacía}
+    \State insertar $g$ en $H$ \Comment{$O(\log k)$}
+    \If{$|H| > k$} \State sacar la raíz de $H$ \Comment{$O(\log k)$} \EndIf
+\EndFor
+\State sacar todos de $H$ y devolverlos en orden inverso
+\end{algorithmic}
+\end{algorithm}
+
 \subsection{Ejemplo de funcionamiento}
-La demostración de \texttt{Main} usa tres grupos: Cálculo Diferencial grupo 1 (cupo 2, lunes de 7 a 9), Cálculo Diferencial grupo 2 (cupo 1, martes de 9 a 11) y Álgebra Lineal grupo 1 (cupo 3, lunes de 8 a 10). Los estudiantes son los mismos de la Entrega 1: Ana (grupo 1), Carla y Daniel (grupo 3), y Elena y Felipe (grupo 4).
+La demostración de \texttt{Main} usa cuatro grupos: Cálculo Diferencial grupo 1 (cupo 2, lunes de 7 a 9), grupo 2 (cupo 1, martes de 9 a 11) y grupo 3 (cupo 3, jueves de 14 a 16), y Álgebra Lineal grupo 1 (cupo 3, lunes de 8 a 10). Los estudiantes son los mismos de la Entrega 1: Ana (grupo 1), Carla y Daniel (grupo 3), y Elena y Felipe (grupo 4).
 \begin{enumerate}
     \item \textbf{Cita.} Ana y Carla quedan inscritas en Cálculo grupo 1. Elena acepta la asignación automática y entra a la espera; Felipe no la acepta y su solicitud se rechaza.
-    \item \textbf{Adiciones.} Daniel entra a la espera del grupo 1. Elena se inscribe en el grupo 2 y, por eso, sale de la espera del grupo 1. Daniel entra también a la espera del grupo 2, que quedó lleno.
+    \item \textbf{Adiciones.} Daniel entra a la espera del grupo 1. Elena se inscribe en el grupo 2 y, por eso, sale de la espera del grupo 1. Daniel entra también a la espera del grupo 2, que quedó lleno. El reporte muestra los dos grupos con más demanda (los grupos 1 y 2 de Cálculo) y, para Felipe, el sistema sugiere el grupo 3, que tiene cupo y no se le cruza.
     \item \textbf{Cruce.} Ana pide Álgebra Lineal, pero se cruza con su grupo de Cálculo el lunes de 8 a 9, y la solicitud se rechaza.
     \item \textbf{Cancelación.} Carla cancela y el cupo pasa a Daniel, que sale además de la espera del grupo 2.
     \item \textbf{Solo cancelaciones.} Elena cancela el grupo 2; el cupo queda libre y Felipe ya no puede inscribirse.
@@ -427,7 +449,7 @@ La Tabla~\ref{tab:ed} resume las estructuras de la Entrega 2. En ella, $w$ es el
 \toprule
 \textbf{Estructura} & \textbf{Información} & \textbf{Operaciones} & \textbf{Por qué es apropiada} & \textbf{Alternativas} & \textbf{Costo} \\
 \midrule
-Montículo binario (\texttt{BinaryHeap}\allowbreak\texttt{PriorityQueue}, interfaz \texttt{PriorityQueueADT}) \textbf{nueva} & Lista de espera de cada grupo; orden de los estudiantes para las citas & insert, removeHighest, peekHighest, remove, contains & Una lista de espera recibe estudiantes en cualquier orden y siempre entrega al de mayor prioridad. El montículo hace ambas cosas en tiempo logarítmico, y al estar en un arreglo no necesita nodos ni referencias. & Lista enlazada ordenada (Entrega 1); árbol AVL & insert y removeHighest $O(\log w)$; peekHighest $O(1)$; remove y contains $O(w)$ \\
+Montículo binario (\texttt{BinaryHeap}\allowbreak\texttt{PriorityQueue}, interfaz \texttt{PriorityQueueADT}) \textbf{nueva} & Lista de espera de cada grupo; orden de los estudiantes para las citas; reporte top-$k$ & insert, removeHighest, peekHighest, remove, contains & Una lista de espera recibe estudiantes en cualquier orden y siempre entrega al de mayor prioridad. El montículo hace ambas cosas en tiempo logarítmico, y al estar en un arreglo no necesita nodos ni referencias. & Lista enlazada ordenada (Entrega 1); árbol AVL & insert y removeHighest $O(\log w)$; peekHighest $O(1)$; remove y contains $O(w)$ \\
 Lista enlazada ordenada (\texttt{SortedLinked}\allowbreak\texttt{PriorityQueue}) & Se conserva para comparar con el montículo & las mismas & Extraer es $O(1)$, pero insertar cuesta $O(w)$; por eso se reemplazó en la espera. & --- & insert $O(w)$; removeHighest $O(1)$ \\
 Árbol AVL (\texttt{AVLTreeDictionary}, interfaz \texttt{Dictionary}) \textbf{nueva} & Estudiantes por código; grupos por clave asignatura-grupo; inscripciones y esperas de cada estudiante & put, get, containsKey, remove & Cada operación del sistema empieza buscando un estudiante y un grupo. El AVL garantiza $O(\log n)$ aun si los códigos llegan en orden, caso en que un árbol sin balancear degenera en una lista. & Lista enlazada ($O(n)$); tabla hash (Entrega 3) & $O(\log n)$ en el peor caso \\
 Lista enlazada con referencia al último nodo (\texttt{LinkedList}), ahora recorrible con \texttt{for} & Inscritos y horario de un grupo; grupos de cada estudiante & addLast, remove, contains, recorrido & Las listas son cortas (cupo, franjas, grupos de un estudiante) y se recorren completas; agregar al final cuesta $O(1)$. & Arreglo dinámico & addLast $O(1)$; remove y contains $O(c)$ \\
@@ -441,7 +463,7 @@ Pila enlazada (\texttt{LinkedStack}) & Grupos del carrito de selección & push, 
 
 \textbf{Montículo binario.} El montículo guarda los elementos en un arreglo que se duplica cuando se llena, con costo amortizado $O(1)$ por inserción. El hijo izquierdo de la posición $i$ está en $2i+1$ y el derecho en $2i+2$, y cada padre tiene más prioridad que sus hijos. Insertar coloca el elemento al final y lo sube mientras tenga más prioridad que su padre; extraer reemplaza la raíz por el último elemento y lo baja mientras algún hijo tenga más prioridad. Ambas operaciones recorren a lo sumo la altura del árbol, $\lfloor \log_2 w \rfloor$. Para que un estudiante salga de la espera se busca su posición en $O(w)$ y se reemplaza por el último elemento, que luego se sube o se baja según corresponda.
 
-\textbf{Árbol AVL.} Cada nodo guarda su altura. Después de insertar o eliminar, al volver por el camino de la recursión se recalcula la altura y, si la diferencia entre los dos subárboles es mayor que 1, se aplica una rotación simple o una doble (caso zigzag). La eliminación de un nodo con dos hijos lo reemplaza por su sucesor, el menor del subárbol derecho. El sistema usa cuatro árboles: estudiantes, grupos, inscripciones por estudiante y esperas por estudiante.
+\textbf{Árbol AVL.} Cada nodo guarda su altura. Después de insertar o eliminar, al volver por el camino de la recursión se recalcula la altura y, si la diferencia entre los dos subárboles es mayor que 1, se aplica una rotación simple o una doble (caso zigzag). La eliminación de un nodo con dos hijos lo reemplaza por su sucesor, el menor del subárbol derecho. El sistema usa cinco árboles: estudiantes, grupos, inscripciones por estudiante, esperas por estudiante y grupos por asignatura. El recorrido en orden del árbol (\texttt{values}, $O(n)$) entrega todos los grupos, lo que usan el reporte y el menú.
 
 \textbf{Costo de las operaciones del sistema.} La Tabla~\ref{tab:ops} resume el costo de las operaciones de \texttt{RegistrationSystem}. Como $k$ y $q$ son pequeños (un estudiante inscribe de cuatro a cinco asignaturas), el costo está dominado por las búsquedas en el AVL y las operaciones del montículo.
 
@@ -459,6 +481,8 @@ Pila enlazada (\texttt{LinkedStack}) & Grupos del carrito de selección & push, 
 \texttt{reassignSeat} & $O(\log w + k + q\,w)$ si el primer candidato es válido; en el peor caso, $O(w(\log w + k))$ si hay que descartar a toda la espera. \\
 \texttt{leaveWaitlist} & $O(\log n + w + q)$. \\
 \texttt{findStudent}, \texttt{findGroup} & $O(\log n)$. \\
+\texttt{suggest\-Alternatives} & $O(\log n + a\,k)$, con $a$ grupos en la asignatura. \\
+\texttt{topDemand} & $O(g + g \log k)$: recorrido del AVL y montículo de tamaño $k$. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -469,13 +493,13 @@ Pila enlazada (\texttt{LinkedStack}) & Grupos del carrito de selección & push, 
 
 \section{Implementación}
 
-\textbf{Funcionalidades implementadas.} Todas las de la Entrega 1 y, además: el montículo binario como lista de espera; el diccionario sobre árbol AVL para buscar estudiantes y grupos; los horarios por grupo y la detección de cruces al inscribir y al reasignar; el rechazo de un segundo grupo de la misma asignatura; el retiro automático de las demás esperas de la asignatura; la distinción de la fase de solo cancelaciones; y los programas de pruebas y de medición.
+\textbf{Funcionalidades implementadas.} Todas las de la Entrega 1 y, además: el montículo binario como lista de espera; el diccionario sobre árbol AVL para buscar estudiantes y grupos; los horarios por grupo y la detección de cruces al inscribir y al reasignar; el rechazo de un segundo grupo de la misma asignatura; el retiro automático de las demás esperas de la asignatura; la distinción de la fase de solo cancelaciones; la sugerencia de grupos alternativos sin cruce; el reporte de los $k$ grupos con más demanda; el menú interactivo por consola; y los programas de pruebas y de medición.
 
-\textbf{Operaciones principales.} \texttt{addStudent}, \texttt{addGroup}, \texttt{findStudent}, \texttt{findGroup}, \texttt{setPhase}, \texttt{request}, \texttt{cancel} y \texttt{leaveWaitlist} en \texttt{RegistrationSystem}; \texttt{addTimeSlot} y \texttt{clashesWith} en \texttt{CourseGroup}; y \texttt{overlaps} en \texttt{TimeSlot}.
+\textbf{Operaciones principales.} \texttt{addStudent}, \texttt{addGroup}, \texttt{findStudent}, \texttt{findGroup}, \texttt{setPhase}, \texttt{request}, \texttt{cancel}, \texttt{leaveWaitlist}, \texttt{suggestAlternatives} y \texttt{topDemand} en \texttt{RegistrationSystem}; \texttt{addTimeSlot} y \texttt{clashesWith} en \texttt{CourseGroup}; y \texttt{overlaps} en \texttt{TimeSlot}.
 
-\textbf{Decisiones técnicas.} (1) La reasignación pasó de \texttt{CourseGroup} a \texttt{RegistrationSystem}, porque necesita información de varios grupos. (2) Se conservó la lista ordenada como segunda implementación de \texttt{PriorityQueueADT} para compararla con el montículo usando los mismos datos. (3) Cada grupo se identifica por la clave \texttt{código-grupo} (por ejemplo, \texttt{1000004-Gr-1}), que es la llave del AVL. (4) Las entradas inválidas (estudiante o grupo inexistente, cancelar sin estar inscrito, cupo negativo, franja con inicio posterior al fin) lanzan excepciones con un mensaje claro, mientras que las situaciones normales del proceso (cruce, asignatura repetida, fase cerrada) se informan con un valor de \texttt{RequestResult}.
+\textbf{Decisiones técnicas.} (1) La reasignación pasó de \texttt{CourseGroup} a \texttt{RegistrationSystem}, porque necesita información de varios grupos. (2) Se conservó la lista ordenada como segunda implementación de \texttt{PriorityQueueADT} para compararla con el montículo usando los mismos datos. (3) Cada grupo se identifica por la clave \texttt{código-grupo} (por ejemplo, \texttt{1000004-Gr-1}), que es la llave del AVL. (4) Las entradas inválidas (estudiante o grupo inexistente, cancelar sin estar inscrito, cupo negativo, franja con inicio posterior al fin) lanzan excepciones con un mensaje claro, mientras que las situaciones normales del proceso (cruce, asignatura repetida, fase cerrada) se informan con un valor de \texttt{RequestResult}. (5) El menú atrapa esas excepciones y muestra el mensaje, de modo que una entrada equivocada no detiene el programa.
 
-\textbf{Parcialmente implementado o en desarrollo.} La sugerencia de grupos alternativos sin cruce (RF13) ya cuenta con la detección de cruces y la búsqueda de grupos, pero falta la operación que los recorre y los propone. El reporte de los $k$ grupos con más demanda (RF12) y un menú interactivo por consola están en desarrollo por otros integrantes del equipo. La demostración sigue siendo guiada.
+\textbf{Parcialmente implementado.} El reporte de demanda trabaja por grupo; el reporte por asignatura y el conteo de cupos perdidos en la fase de solo cancelaciones quedan para la Entrega 3. El menú usa datos de ejemplo fijos; la carga de datos simulados a escala real también queda para la Entrega 3.
 
 \textbf{Pendiente.} Tabla hash propia, grafo de prerrequisitos con BFS y DFS, generación de 28.700 estudiantes simulados y la simulación completa del calendario (Entrega 3).
 
@@ -491,7 +515,7 @@ javac -encoding UTF-8 -d out src/*.java tests/*.java
 java -cp out TestRunner
 \end{lstlisting}
 
-La Tabla~\ref{tab:pruebas} resume las 42 pruebas. Todas pasaron en la versión entregada.
+La Tabla~\ref{tab:pruebas} resume las 48 pruebas. Todas pasaron en la versión entregada.
 
 \begin{table}[htbp]
 \caption{Pruebas automáticas}
@@ -503,16 +527,16 @@ La Tabla~\ref{tab:pruebas} resume las 42 pruebas. Todas pasaron en la versión e
 \textbf{Componente} & \textbf{N.\textsuperscript{o}} & \textbf{Qué se verifica} \\
 \midrule
 Montículo & 8 & Estructura vacía y sus excepciones; con 1.000 valores aleatorios entrega el mismo orden que la lista ordenada; eliminación de un elemento intermedio. \\
-Árbol AVL & 11 & 1.023 llaves insertadas en orden quedan con altura 10 (óptima); búsqueda de llaves existentes e inexistentes; reemplazo de valor; eliminación de 512 llaves; altura 16 con 10.000 llaves aleatorias; llave nula. \\
+Árbol AVL & 12 & 1.023 llaves insertadas en orden quedan con altura 10 (óptima); búsqueda de llaves existentes e inexistentes; reemplazo de valor; eliminación de 512 llaves; altura 16 con 10.000 llaves aleatorias; recorrido en orden; llave nula. \\
 \texttt{TimeSlot} & 5 & Solapamiento, franjas contiguas, días distintos, franja contenida en otra y franja inválida. \\
-\texttt{Registration\-System} & 18 & Prioridad sobre orden de llegada; asignatura repetida; retiro de otras esperas; rechazo por cruce; salto de un candidato con cruce; fase de solo cancelaciones; estudiante o grupo inexistente; cancelación inválida; cupo negativo. \\
+\texttt{Registration\-System} & 23 & Prioridad sobre orden de llegada; asignatura repetida; retiro de otras esperas; rechazo por cruce; salto de un candidato con cruce; fase de solo cancelaciones; estudiante o grupo inexistente; cancelación inválida; cupo negativo; sugerencias solo con cupo, sin cruce y de la misma asignatura; orden del top-$k$, $k$ mayor que los grupos con espera y $k$ inválido. \\
 \midrule
-\textbf{Total} & \textbf{42} & 42 correctas, 0 fallidas. \\
+\textbf{Total} & \textbf{48} & 48 correctas, 0 fallidas. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Las pruebas cubren casos límite (estructuras vacías, un solo elemento, empates, llaves en orden creciente, que es el peor caso de un árbol sin balancear) y entradas inválidas. Además, \texttt{Main} sirve como prueba de integración del escenario completo.
+Las pruebas cubren casos límite (estructuras vacías, un solo elemento, empates, llaves en orden creciente, que es el peor caso de un árbol sin balancear) y entradas inválidas. Además, \texttt{Main} sirve como prueba de integración del escenario completo, y el menú se probó a mano con entradas válidas e inválidas (grupo inexistente, texto donde se espera un número, opción no válida e inscripción en la fase de solo cancelaciones).
 
 % =========================================================
 % RESULTADOS
@@ -551,9 +575,9 @@ Las pruebas del AVL dan otra evidencia: con 1.023 llaves insertadas en orden cre
 
 \section{Estado actual y trabajo pendiente}
 
-\textbf{Avance.} El equipo considera completado cerca del 65\,\% del proyecto: el núcleo del sistema (lista de espera por prioridad, reasignación automática con control de horario y de fases, y búsqueda por código) está implementado y probado; faltan las sugerencias, los reportes y la evaluación a escala real.
+\textbf{Avance.} El equipo considera completado cerca del 75\,\% del proyecto: los tres componentes de la propuesta (lista de espera con reasignación automática, sugerencia de grupos y reporte de demanda), la búsqueda por código y el menú están implementados y probados; faltan los prerrequisitos, la tabla hash y la evaluación a escala real.
 
-\textbf{Funcionalidades pendientes.} Sugerencia de grupos alternativos (RF13), reporte top-$k$ de demanda (RF12) y menú interactivo, que se completan en esta etapa; validación de prerrequisitos (RF14) y simulación del calendario (RF15) en la Entrega 3.
+\textbf{Funcionalidades pendientes.} Validación de prerrequisitos (RF14), simulación del calendario con 28.700 estudiantes (RF15), reporte de demanda por asignatura con los cupos perdidos y tabla hash propia, en la Entrega 3.
 
 \textbf{Problemas técnicos abiertos.} (1) Sacar a un estudiante de la mitad del montículo cuesta $O(w)$, porque hay que buscar su posición; se puede bajar a $O(\log w)$ guardando la posición de cada estudiante en una tabla hash, lo que se evaluará en la Entrega 3. (2) En el peor caso, la reasignación descarta a toda la espera. (3) Falta confirmar la referencia oficial de la Circular 13 de 2026.
 
