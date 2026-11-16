@@ -1,142 +1,174 @@
-\section{Metodología}
+\section{Metodología y diseño}
 \label{sec:metodologia}
 
 \subsection{Objetivos}
 
 \textbf{Objetivo general.} Diseñar e implementar un sistema que permita
-registrar, priorizar, atender, cancelar y consultar solicitudes de atención
-de forma eficiente, aplicando estructuras de datos apropiadas para cada
-operación.
+registrar, priorizar, atender, cancelar, deshacer y consultar solicitudes
+de atención de forma eficiente, aplicando estructuras de datos apropiadas
+para cada operación.
 
 \textbf{Objetivos específicos.}
 \begin{enumerate}
   \item Implementar una cola de prioridad formada por una cola FIFO por
-    nivel de urgencia, cada una sobre una lista enlazada, para determinar
-    la solicitud a atender en tiempo constante.
+    nivel de urgencia, cada una sobre una lista enlazada, que determine la
+    solicitud a atender en tiempo constante.
   \item Implementar la búsqueda y la cancelación de una solicitud pendiente
-    por su identificador.
+    por su identificador en tiempo constante esperado, mediante un índice
+    hash de implementación propia. \emph{(Ampliado en la Entrega 2: en la
+    Entrega 1 el objetivo no fijaba un costo.)}
   \item Implementar una pila sobre lista enlazada que registre el historial
-    de atenciones y permita, en una entrega posterior, deshacer la más
-    reciente.
-  \item Integrar las estructuras en una interfaz de consola que exponga las
-    operaciones del sistema.
+    de atenciones y permita deshacer la más reciente.
+  \item Integrar las estructuras en una interfaz de consola y verificarlas
+    con pruebas automatizadas y mediciones de desempeño.
 \end{enumerate}
 
 \subsection{Alcance y limitaciones}
 
-El sistema completo contempla: registrar una solicitud con un
-identificador, un nombre y un nivel de urgencia (de 1, más urgente, a 5,
-menos urgente); atender la solicitud de mayor prioridad; buscar y cancelar
-una solicitud pendiente por identificador; consultar el historial de
-atenciones; y deshacer la atención más reciente. Esta primera entrega
-implementa todas estas operaciones excepto deshacer, que queda diseñada y
-se implementará en la siguiente entrega.
+El sistema permite registrar una solicitud con un identificador, un nombre
+y un nivel de urgencia (de 1, más urgente, a 5, menos urgente); atender la
+solicitud de mayor prioridad; consultar la siguiente sin atenderla; buscar
+y cancelar una solicitud pendiente por identificador; deshacer la atención
+más reciente; consultar el historial; y listar las pendientes en orden de
+atención. En esta entrega todas estas operaciones están implementadas.
 
-Quedan explícitamente fuera del alcance del proyecto: persistencia en base
-de datos, interfaz gráfica, acceso concurrente de múltiples usuarios y
-autenticación. Se asume que los identificadores son proporcionados por
-quien registra la solicitud; el sistema rechaza un identificador que ya
-pertenezca a otra solicitud pendiente. Se asume también que la urgencia
-toma solo cinco valores, supuesto del que depende el costo constante de la
-cola de prioridad elegida.
+Quedan fuera del alcance: persistencia en base de datos, interfaz gráfica,
+acceso concurrente de múltiples usuarios y autenticación. Los
+identificadores los proporciona quien registra la solicitud; el sistema
+rechaza un identificador que ya pertenezca a otra solicitud
+\emph{pendiente}, pero permite reutilizar el de una solicitud atendida o
+cancelada. Se asume que la urgencia toma solo cinco valores, como en los
+esquemas de triage vigentes~\cite{minsalud,esi}.
 
-\subsection{Requerimientos principales}
+\subsection{Requerimientos}
 
 \begin{itemize}
-  \item RF1: El sistema debe permitir registrar una solicitud con
-    identificador único entre las pendientes, nombre y nivel de urgencia
-    entre 1 y 5, rechazando valores fuera de ese rango.
-  \item RF2: El sistema debe atender siempre la solicitud pendiente de
-    mayor urgencia; en caso de empate, debe atenderse primero la que llegó
-    antes.
-  \item RF3: El sistema debe permitir buscar una solicitud pendiente por su
-    identificador.
-  \item RF4: El sistema debe permitir cancelar una solicitud pendiente de
-    modo que nunca sea atendida.
-  \item RF5: El sistema debe permitir deshacer la atención más reciente,
-    devolviendo la solicitud correspondiente a la cola de pendientes.
-  \item RF6: El sistema debe permitir consultar el historial de
-    solicitudes atendidas.
+  \item RF1: Registrar una solicitud con identificador único entre las
+    pendientes, nombre no vacío y urgencia entre 1 y 5, rechazando valores
+    inválidos.
+  \item RF2: Atender siempre la solicitud pendiente de mayor urgencia; en
+    caso de empate, la que llegó antes.
+  \item RF3: Buscar una solicitud pendiente por su identificador.
+  \item RF4: Cancelar una solicitud pendiente de modo que nunca sea
+    atendida.
+  \item RF5: Deshacer la atención más reciente, devolviendo la solicitud a
+    pendientes en la posición que ocupaba.
+  \item RF6: Consultar el historial de solicitudes atendidas.
+  \item RF7 \emph{(nuevo)}: Listar las solicitudes pendientes en el orden
+    en que serían atendidas, con el conteo por nivel.
+  \item RNF1: Registrar, atender, buscar, cancelar y deshacer deben costar
+    $O(1)$ (esperado, cuando interviene el índice hash), sin depender del
+    número de pendientes.
 \end{itemize}
 
-\subsection{Diseño de la solución}
+\subsection{Arquitectura}
 
-El sistema se organiza en los siguientes componentes: una clase
-\texttt{Ticket} que representa una solicitud; una cola genérica
-\texttt{LinkedQueue<T>} sobre lista enlazada; una cola de prioridad
-\texttt{LevelPriorityQueue}, formada por un arreglo de cinco
-\texttt{LinkedQueue<Ticket>}, una por nivel de urgencia; una pila genérica
-\texttt{LinkedStack<T>}; y un historial \texttt{ServiceHistory} construido
-sobre esa pila. Una clase fachada, \texttt{TriageSystem}, coordina la cola
-de prioridad y el historial para que cada operación pública los mantenga
-consistentes, y una clase \texttt{Main} ofrece el menú de consola.
+La Fig.~\ref{fig:arquitectura} muestra los componentes. \texttt{Ticket}
+representa una solicitud (inmutable). La fachada \texttt{TriageSystem}
+expone las operaciones y coordina tres estructuras internas: la cola de
+prioridad \texttt{LevelPriorityQueue} (cinco \texttt{LinkedQueue<Ticket>}),
+el índice \texttt{HashTable<String, Node>} y el historial
+\texttt{ServiceHistory} (sobre \texttt{LinkedStack<Ticket>}). \texttt{Main}
+ofrece el menú de consola. La novedad de esta entrega es el índice, cuyos
+valores son nodos de las colas de nivel (flecha punteada).
 
-\begin{figure}[h]
+\begin{figure}[t]
   \centering
-  \fbox{\parbox{0.9\linewidth}{\centering
-    \texttt{Main} (consola) \\[4pt]
-    $\downarrow$ \\[4pt]
-    \texttt{TriageSystem} \\[4pt]
-    $\swarrow$ \hspace{3em} $\searrow$ \\[4pt]
-    \texttt{LevelPriorityQueue} \hspace{1em} \texttt{ServiceHistory} \\[2pt]
-    {\footnotesize 5 $\times$ \texttt{LinkedQueue<Ticket>}} \hspace{2.5em}
-    {\footnotesize \texttt{LinkedStack<Ticket>}}
-  }}
-  \caption{Componentes principales del sistema y la estructura de datos
-  que resuelve cada responsabilidad.}
+  \begin{tikzpicture}[
+      font=\scriptsize,
+      box/.style={draw, rounded corners=2pt, align=center, inner sep=3pt,
+                  minimum height=0.55cm},
+      new/.style={box, fill=gray!15, very thick},
+      arr/.style={-{Stealth[length=4pt]}}]
+    \node[box] (main) {\texttt{Main} (consola)};
+    \node[box, below=0.35cm of main] (sys) {\texttt{TriageSystem} (fachada)};
+    \node[new, below=0.5cm of sys] (idx)
+      {\texttt{HashTable}\\ id $\to$ nodo};
+    \node[box, left=0.22cm of idx] (pq)
+      {\texttt{LevelPriorityQueue}\\ 5 $\times$ \texttt{LinkedQueue}\\
+       (lista doble)};
+    \node[box, right=0.22cm of idx] (hist)
+      {\texttt{ServiceHistory}\\ \texttt{LinkedStack}};
+    \draw[arr] (main) -- (sys);
+    \draw[arr] (sys) -- (pq);
+    \draw[arr] (sys) -- (idx);
+    \draw[arr] (sys) -- (hist);
+    \draw[arr, dashed] (idx.south) -- ++(0,-0.3) -| (pq.south);
+  \end{tikzpicture}
+  \caption{Componentes del sistema. Sombreado: estructura nueva en la
+  Entrega 2. Línea punteada: cada entrada del índice apunta a un nodo de
+  la cola de su nivel.}
   \label{fig:arquitectura}
 \end{figure}
 
-\subsection{Estructuras de datos seleccionadas}
+\textbf{Flujo de información.} Toda operación entra por la fachada, que es
+la única que modifica las estructuras y mantiene el invariante: \emph{un
+identificador está en el índice si y solo si hay una solicitud pendiente
+con ese identificador, y su valor es el nodo de esa solicitud}. Registrar
+encola en el nivel y guarda el nodo devuelto en el índice; atender
+desencola del primer nivel no vacío, borra el identificador del índice y
+apila la solicitud; cancelar retira la entrada del índice y, con el nodo
+obtenido, desenlaza la solicitud de su cola; deshacer desapila, reinserta
+al frente del nivel y vuelve a indexar.
 
-\textbf{Cola de prioridad por niveles.} Representa el conjunto de
-solicitudes pendientes. Está formada por un arreglo de cinco colas FIFO;
-la cola de índice $u-1$ contiene, en orden de llegada, las solicitudes de
-urgencia $u$. Debe soportar insertar una solicitud y extraer la más
-prioritaria. Insertar consiste en encolar al final de la cola de su nivel,
-y extraer consiste en recorrer los niveles desde el más urgente y desencolar
-del primero que no esté vacío (Algoritmo~\ref{alg:atender}). Como el número
-de niveles es la constante $k=5$, ambas operaciones cuestan $O(k)=O(1)$. El
-desempate por orden de llegada (RF2) no requiere comparaciones adicionales:
-lo garantiza el comportamiento FIFO de cada cola. Se descartó una lista
-ordenada por prioridad, cuya inserción cuesta $O(n)$, y no se requiere un
-\emph{heap}, cuyo costo $O(\log n)$ solo se justifica cuando la prioridad
-puede tomar muchos valores distintos.
+\subsection{Estructuras de datos}
 
-\textbf{Cola sobre lista enlazada con referencias a cabeza y cola.} Cada
-nivel es una cola implementada como lista simplemente enlazada que mantiene
-una referencia a la cabeza (frente) y otra al último nodo (final). La
-referencia al final es la que permite encolar en $O(1)$; sin ella, encolar
-requeriría recorrer la lista en $O(n)$. Se prefirió la lista enlazada sobre
-un arreglo circular porque el número de solicitudes por nivel no se conoce
-de antemano y porque la cancelación necesita retirar un elemento
-arbitrario, operación que en una lista enlazada solo exige reenlazar el
-nodo anterior con el siguiente, sin desplazar elementos.
+En los algoritmos, $L[1..5]$ denota el arreglo de colas por nivel, $H$ el
+índice y $S$ la pila del historial; $n$ es el número de pendientes y $h$ el
+de atenciones registradas.
 
-\textbf{Búsqueda y cancelación por identificador.} La cola de prioridad
-resuelve eficientemente ``\textquestiondown{}cuál es la siguiente solicitud a
-atender?'', pero no ``\textquestiondown{}dónde está la solicitud con
-identificador X?''. En esta entrega la búsqueda recorre las colas de los
-cinco niveles, con costo $O(n)$ en el peor caso. La cancelación usa esa
-búsqueda y luego elimina el nodo de la lista enlazada de su nivel en $O(1)$,
-actualizando la referencia al final cuando el nodo eliminado es el último
-(Algoritmo~\ref{alg:cancelar}); su costo total es $O(n)$. La misma búsqueda
-permite rechazar identificadores repetidos al registrar, por lo que el
-registro completo cuesta $O(n)$. Reducir estos costos a $O(1)$ esperado
-mediante un índice por identificador es una de las mejoras previstas para
-las siguientes entregas (Sección~\ref{sec:discusion}).
+\textbf{Cola de prioridad por niveles.} \emph{Representa} las solicitudes
+pendientes: la cola $L[u]$ contiene, en orden de llegada, las de urgencia
+$u$. \emph{Operaciones}: insertar al final o al frente de un nivel, extraer
+la más prioritaria (Algoritmo~\ref{alg:atender}), consultarla sin extraer,
+retirar un nodo dado y recorrer en orden de atención. \emph{Justificación}:
+con $k=5$ niveles, insertar y extraer cuestan $O(k)=O(1)$ y el desempate
+por llegada no requiere comparaciones. Se descartaron la lista ordenada
+(inserción $O(n)$) y el \emph{heap} binario ($O(\log n)$, y además no es
+estable: no conserva por sí solo el orden de llegada entre iguales). La
+Sección~\ref{sec:resultados} compara las tres alternativas.
 
-\textbf{Pila (lista enlazada simple, encabezado único).} Registra las
-solicitudes ya atendidas en orden inverso de atención. Se eligió una pila
-porque la operación prevista, deshacer la atención más reciente (RF5), es
-exactamente el comportamiento LIFO: apilar al atender, en $O(1)$, y
-desapilar al deshacer, en $O(1)$. Se implementó como lista enlazada con
-solo referencia al tope, ya que todas las operaciones ocurren en ese
-extremo. Consultar el historial completo (RF6) recorre la pila en $O(h)$,
-siendo $h$ el número de atenciones.
+\textbf{Lista doblemente enlazada con localizadores (cambio).} Cada nivel
+es una lista con referencias a la cabeza y a la cola, para encolar y
+desencolar en $O(1)$. En la Entrega 1 era simplemente enlazada; para
+eliminar un nodo había que encontrar su anterior recorriendo la lista. En
+esta entrega cada nodo guarda también su anterior, y \texttt{enqueue}
+devuelve el nodo creado como localizador opaco (sus campos son privados).
+Con él, \texttt{remove(nodo)} desenlaza en $O(1)$
+(Algoritmo~\ref{alg:cancelar}). Cada nodo recuerda la cola a la que
+pertenece y se marca al retirarlo, de modo que un localizador viejo o ajeno
+se rechaza con una excepción en lugar de corromper la lista. Se mantiene
+la lista enlazada frente a un arreglo circular porque el tamaño de cada
+nivel no se conoce de antemano y porque retirar un elemento intermedio de
+un arreglo exigiría desplazar los siguientes.
 
-En los algoritmos, $L[1..5]$ denota el arreglo de colas por nivel y $S$ la
-pila del historial.
+\textbf{Índice hash por identificador (nuevo).} \emph{Representa} la
+correspondencia identificador $\to$ nodo de cada solicitud pendiente.
+\emph{Operaciones}: \texttt{put}, \texttt{get}, \texttt{containsKey} y
+\texttt{remove}. Es una tabla de $m$ cubetas con encadenamiento separado:
+cada cubeta es una lista simplemente enlazada de entradas. La capacidad es
+potencia de dos y el índice se calcula como
+$(h \oplus (h \gg 16)) \land (m-1)$, mezclando los bits altos del
+\texttt{hashCode} con los bajos antes de aplicar la máscara. Cuando el
+factor de carga $n/m$ supera $0{,}75$, $m$ se duplica y las entradas se
+redistribuyen. \emph{Costos}: $O(1+\alpha)$ esperado por operación con
+$\alpha \le 0{,}75$, es decir $O(1)$; el redimensionamiento cuesta $O(n)$,
+pero ocurre cada vez que $n$ se duplica, así que su costo amortizado por
+inserción es $O(1)$~\cite{cormen}. El peor caso, con todas las claves en una
+cubeta, es $O(n)$. Se prefirió una tabla hash a un árbol binario de
+búsqueda balanceado ($O(\log n)$) porque no se necesita recorrer los
+identificadores en orden. Se implementó en lugar de usar
+\texttt{java.util.HashMap} para que todas las estructuras del núcleo sean
+propias y analizables.
+
+\textbf{Pila enlazada para el historial.} \emph{Representa} las
+atenciones en orden inverso. Apilar al atender y desapilar al deshacer
+cuestan $O(1)$, y el orden LIFO garantiza que se revierte la más
+reciente~\cite{gof}. En esta entrega se agregó un iterador de solo lectura:
+consultar el historial recorre la pila una vez en $\Theta(h)$, en lugar de
+desapilar todo a una pila auxiliar y reapilarlo, como en la Entrega 1.
+
+\subsection{Algoritmos principales}
 
 \begin{algorithm}[t]
 \caption{Atender la siguiente solicitud}
@@ -146,7 +178,7 @@ pila del historial.
   \For{$u \gets 1$ \textbf{to} $5$}
     \If{$L[u]$ no está vacía}
       \State $t \gets$ \Call{Dequeue}{$L[u]$}
-      \State apilar $t$ en $S$
+      \State \Call{Remove}{$H$, $t.id$}; \Call{Push}{$S$, $t$}
       \State \Return $t$
     \EndIf
   \EndFor
@@ -160,24 +192,79 @@ pila del historial.
 \label{alg:cancelar}
 \begin{algorithmic}[1]
 \Function{CancelRequest}{$id$}
-  \For{$u \gets 1$ \textbf{to} $5$}
-    \State $prev \gets$ \textsc{null}; $cur \gets L[u].head$
-    \While{$cur \neq$ \textsc{null}}
-      \If{$cur.value.id = id$}
-        \If{$prev =$ \textsc{null}}
-          \State $L[u].head \gets cur.next$
-        \Else
-          \State $prev.next \gets cur.next$
-        \EndIf
-        \If{$cur = L[u].tail$}
-          \State $L[u].tail \gets prev$
-        \EndIf
-        \State \Return \textsc{true}
-      \EndIf
-      \State $prev \gets cur$; $cur \gets cur.next$
-    \EndWhile
-  \EndFor
-  \State \Return \textsc{false}
+  \State $x \gets$ \Call{Remove}{$H$, $id$}
+    \Comment{$O(1)$ esperado}
+  \If{$x =$ \textsc{null}} \Return \textsc{false} \EndIf
+  \State $Q \gets L[x.value.urgency]$
+  \If{$x.prev =$ \textsc{null}} $Q.head \gets x.next$
+  \Else\ $x.prev.next \gets x.next$ \EndIf
+  \If{$x.next =$ \textsc{null}} $Q.tail \gets x.prev$
+  \Else\ $x.next.prev \gets x.prev$ \EndIf
+  \State \Return \textsc{true}
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
+
+\begin{algorithm}[t]
+\caption{Deshacer la atención más reciente}
+\label{alg:deshacer}
+\begin{algorithmic}[1]
+\Function{UndoLastService}{}
+  \If{$S$ está vacía} \Return \textsc{null} \EndIf
+  \State $t \gets$ \Call{Peek}{$S$}
+  \If{\Call{Contains}{$H$, $t.id$}}
+    \State \textbf{error}: id reutilizado por otra pendiente
+  \EndIf
+  \State \Call{Pop}{$S$}
+  \State $x \gets$ \Call{EnqueueFront}{$L[t.urgency]$, $t$}
+  \State \Call{Put}{$H$, $t.id$, $x$}
+  \State \Return $t$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Atender} (Algoritmo~\ref{alg:atender}) revisa a lo sumo cinco
+niveles y hace un \texttt{dequeue}, un \texttt{remove} en el índice y un
+\texttt{push}: $O(1)$ esperado.
+
+\textbf{Cancelar} (Algoritmo~\ref{alg:cancelar}) ya no recorre las colas:
+el índice entrega directamente el nodo y la lista doble permite
+desenlazarlo sin conocer su anterior. Costo: $O(1)$ esperado, frente a
+$O(n)$ en la Entrega 1.
+
+\textbf{Deshacer} (Algoritmo~\ref{alg:deshacer}) reinserta la solicitud
+\emph{al frente} de su nivel. Esto es correcto porque, al ser atendida,
+era la cabeza de su nivel: todas las solicitudes que quedaron o llegaron
+después a ese nivel tienen un orden de llegada mayor, y como la pila
+revierte las atenciones en orden inverso, cada solicitud deshecha vuelve
+exactamente a la posición que ocupaba. Si mientras tanto se registró otra
+solicitud pendiente con el mismo identificador, se rechaza la operación sin
+modificar nada, para no romper la unicidad de identificadores. Costo:
+$O(1)$ esperado.
+
+\subsection{Resumen de costos}
+
+La Tabla~\ref{tab:complejidad} resume los costos. La memoria es
+$\Theta(n+h)$: cada pendiente ocupa un \texttt{Ticket}, un nodo de lista y
+una entrada del índice, y cada atención un nodo de pila.
+
+\begin{table}[t]
+  \caption{Costo temporal de las operaciones públicas}
+  \label{tab:complejidad}
+  \centering
+  \footnotesize
+  \begin{tabular}{p{0.38\columnwidth}p{0.20\columnwidth}p{0.28\columnwidth}}
+    \toprule
+    Operación & Entrega 1 & Entrega 2 \\
+    \midrule
+    Registrar (RF1) & $\Theta(n)$ & $O(1)$ esp.\ amort. \\
+    Atender (RF2) & $\Theta(1)$ & $O(1)$ esperado \\
+    Ver siguiente & --- & $\Theta(1)$ \\
+    Buscar por id (RF3) & $\Theta(n)$ & $O(1)$ esperado \\
+    Cancelar (RF4) & $\Theta(n)$ & $O(1)$ esperado \\
+    Deshacer (RF5) & --- & $O(1)$ esperado \\
+    Historial (RF6) & $\Theta(h)$ & $\Theta(h)$ \\
+    Pendientes en orden (RF7) & --- & $\Theta(n)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}

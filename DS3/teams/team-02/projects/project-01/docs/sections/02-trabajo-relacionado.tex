@@ -1,34 +1,50 @@
 \section{Trabajo relacionado}
 \label{sec:relacionado}
 
-El problema de atender elementos según su prioridad se modela con el tipo
-abstracto \emph{cola de prioridad}, cuyas operaciones básicas son insertar
-un elemento y extraer el de mayor prioridad~\cite{cormen,goodrich}. La
-literatura distingue entre el tipo abstracto y su representación: el mismo
-comportamiento puede implementarse con estructuras distintas, y es la
-representación la que determina el costo de cada operación.
+\textbf{Colas de prioridad.} El problema de atender elementos según su
+prioridad se modela con el tipo abstracto \emph{cola de prioridad}, cuyas
+operaciones básicas son insertar un elemento y extraer el de mayor
+prioridad~\cite{cormen,goodrich}. El mismo comportamiento puede
+implementarse con representaciones distintas, y es la representación la que
+determina el costo de cada operación. Una lista ordenada extrae en $O(1)$
+pero inserta en $O(n)$; una lista sin orden inserta en $O(1)$ pero extrae en
+$O(n)$~\cite{goodrich}; y el \emph{heap} binario equilibra ambos costos en
+$O(\log n)$ para prioridades arbitrarias~\cite{cormen}.
 
-Una representación directa es una lista ordenada por prioridad, que permite
-extraer el elemento más prioritario en tiempo constante, pero cuya inserción
-cuesta $O(n)$, pues debe recorrer la lista hasta encontrar la posición
-correcta. En el extremo opuesto, una lista sin orden inserta en tiempo
-constante pero obliga a recorrerla completa, en $O(n)$, cada vez que se
-extrae el elemento más prioritario~\cite{goodrich}. Para prioridades
-arbitrarias, la representación clásica que equilibra ambos costos es el
-\emph{heap} binario, con inserción y extracción en $O(\log n)$~\cite{cormen}.
+\textbf{Colas por cubetas.} Cuando la prioridad toma pocos valores enteros
+existe una alternativa más simple: una cola FIFO por cada valor
+(\emph{bucket queue}). Insertar es encolar en la cubeta correspondiente y
+extraer es revisar las cubetas en orden hasta hallar una no vacía. La idea
+se popularizó con el algoritmo de caminos mínimos de Dial~\cite{dial}, que
+usa una cubeta por cada distancia posible. Con $k$ cubetas, ambas
+operaciones cuestan $O(k)$, que es $O(1)$ si $k$ es una constante, y el
+orden FIFO de cada cubeta resuelve el desempate por orden de llegada.
 
-Cuando la prioridad solo puede tomar un número pequeño y fijo de valores,
-como ocurre en los esquemas de triage que clasifican a cada paciente en
-unos pocos niveles de urgencia, existe una alternativa más simple: mantener
-una cola FIFO independiente por cada nivel. Insertar consiste en encolar en
-el nivel correspondiente, y extraer consiste en revisar los niveles en orden
-de urgencia hasta encontrar uno no vacío. Como el número de niveles es una
-constante, ambas operaciones cuestan $O(1)$, y el orden FIFO de cada cola
-resuelve de forma natural el desempate por orden de llegada. Esta es la
-representación que adopta este proyecto (Sección~\ref{sec:metodologia}).
+\textbf{Triage con niveles fijos.} Los sistemas de triage hospitalario
+clasifican a cada paciente en un número pequeño y fijo de niveles. En
+Colombia, la Resolución 5596 de 2015 obliga a las instituciones a
+implementar un triage de cinco categorías~\cite{minsalud}, y el
+\emph{Emergency Severity Index}, usado en Estados Unidos, también define
+cinco niveles~\cite{esi}. Este supuesto ($k=5$) es el que justifica la cola
+por cubetas del proyecto.
 
-Sistemas reales de mesa de ayuda y de triage hospitalario resuelven un
-problema equivalente: priorizar solicitudes por urgencia y permitir su
-consulta puntual. Este proyecto no pretende replicar un sistema de
-producción, sino aislar y resolver correctamente el núcleo algorítmico
-común a este tipo de sistemas.
+\textbf{Localizadores y tablas hash.} Una cola de prioridad responde
+``¿cuál es el siguiente?'', pero no ``¿dónde está el elemento $x$?''. Las
+colas de prioridad \emph{adaptables} resuelven esto devolviendo, al
+insertar, una referencia a la posición del elemento (un \emph{localizador})
+que permite retirarlo o modificarlo sin buscarlo~\cite{goodrich}. Para
+llegar al localizador a partir de una clave se usa un mapa; la tabla hash
+con encadenamiento separado ofrece búsqueda, inserción y eliminación en
+$O(1)$ esperado bajo la hipótesis de hashing uniforme simple, siempre que
+el factor de carga se mantenga acotado redimensionando la
+tabla~\cite{cormen}.
+
+\textbf{Deshacer con una pila.} Las operaciones de deshacer se implementan
+tradicionalmente apilando un registro de cada acción ejecutada y
+desapilándolo para revertirla (patrón \emph{Command}~\cite{gof}); el orden
+LIFO garantiza que siempre se revierte la acción más reciente.
+
+Este proyecto combina estas ideas conocidas ---cola por cubetas, nodos como
+localizadores, índice hash y pila de acciones--- para aislar y resolver
+correctamente el núcleo algorítmico común a los sistemas de triage y mesas
+de ayuda, sin pretender replicar un sistema de producción.

@@ -1,0 +1,36 @@
+\section{Estado actual y trabajo pendiente}
+\label{sec:estado}
+
+\textbf{Avance.} El equipo estima completado alrededor del 80\,\% del
+proyecto. Están terminados el núcleo algorítmico (las cuatro estructuras y
+los siete requerimientos funcionales), la interfaz de consola, la suite de
+pruebas y una primera medición de desempeño. El 20\,\% restante corresponde
+a las funcionalidades y análisis de la entrega final que se listan abajo.
+
+\textbf{Funcionalidades pendientes para la entrega final.}
+\begin{itemize}
+  \item \emph{Reclasificar la urgencia} de una solicitud pendiente
+    (RF8). Con el localizador, retirarla de su nivel cuesta $O(1)$, pero
+    insertarla en el nuevo nivel respetando su orden de llegada exige
+    encontrar su posición, lo que en una lista cuesta $O(n_u)$.
+  \item \emph{Carga por lotes} de solicitudes desde un archivo de texto,
+    para reproducir escenarios de demostración y de medición.
+  \item \emph{Estadísticas de atención}: tiempo de espera promedio por nivel
+    y número de atenciones deshechas.
+\end{itemize}
+
+\textbf{Problemas técnicos abiertos.}
+\begin{itemize}
+  \item Cómo reclasificar en $O(1)$ sin perder el orden de llegada. Una
+    alternativa en estudio es mantener en cada nivel una estructura
+    ordenada por llegada solo para las solicitudes reclasificadas.
+  \item El benchmark usa urgencias uniformes; falta medir distribuciones
+    sesgadas (por ejemplo, mayoría de urgencias 4 y 5, como en la práctica)
+    y medir en más de un equipo.
+\end{itemize}
+
+\textbf{Actividades para la entrega final.} Implementar y probar RF8 y la
+carga por lotes; ampliar el benchmark con distribuciones de urgencia
+sesgadas y con el peor caso de colisiones del índice; incorporar los
+resultados y la retroalimentación de esta entrega al documento; y preparar
+la demostración final.

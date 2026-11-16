@@ -1,0 +1,73 @@
+\section{Pruebas}
+\label{sec:pruebas}
+
+Las pruebas manuales de la Entrega 1 (\texttt{BasicTests.java}, que
+imprimían el resultado esperado junto al obtenido) se reemplazaron por una
+suite automatizada con aserciones. \texttt{AllTests} ejecuta todas las
+pruebas, imprime el resultado de cada una y termina con código de salida 1
+si alguna falla. La Tabla~\ref{tab:pruebas} resume su cobertura.
+
+\begin{table}[t]
+  \caption{Suite de pruebas automatizadas}
+  \label{tab:pruebas}
+  \centering
+  \footnotesize
+  \begin{tabular}{p{0.30\columnwidth}cp{0.48\columnwidth}}
+    \toprule
+    Grupo & Pruebas & Qué verifica \\
+    \midrule
+    \texttt{LinkedQueue} & 8 & FIFO, frente, \texttt{remove(nodo)} en cabeza/medio/final, localizadores inválidos, iterador \\
+    \texttt{LinkedStack} & 3 & LIFO, vacía, iterador sin modificar \\
+    \texttt{HashTable} & 6 & Reemplazo, eliminación, claves nulas, colisiones, redimensionamiento \\
+    \texttt{LevelPriorityQueue} & 5 & Orden por nivel y llegada, \texttt{insertFront}, urgencia inválida \\
+    Escenario Entrega 1 & 4 & Escenario original con aserciones; reutilizar ids \\
+    Entradas inválidas & 5 & Urgencia, id/nombre vacíos, duplicados, cola vacía \\
+    Deshacer (RF5) & 6 & Posición, LIFO, llegadas posteriores, conflicto de id \\
+    Aleatoria vs.\ modelo & 5 & 20\,000 operaciones por semilla \\
+    \midrule
+    Total & 42 & 285\,173 aserciones \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{Pruebas unitarias.} Cada estructura se prueba de forma aislada,
+incluidos los casos límite: estructura vacía, un solo elemento, eliminar
+la cabeza, el último o un nodo intermedio, y operar sobre un localizador
+ya retirado o de otra cola. La tabla hash se prueba con claves que
+colisionan a propósito (``\texttt{Aa}'' y ``\texttt{BB}'' tienen el mismo
+\texttt{hashCode} en Java) y con 10\,000 inserciones que fuerzan varios
+redimensionamientos; tras ellas se verifica que todas las entradas siguen
+accesibles y que la cadena más larga tiene a lo sumo 8 entradas (en la
+práctica fue de 5).
+
+\textbf{Pruebas diferenciales.} Para las estructuras propias y para el
+sistema completo se ejecutan secuencias aleatorias largas, con semilla fija,
+que se comparan paso a paso contra una implementación de referencia de la
+biblioteca estándar (\texttt{java.util.LinkedList} para la cola,
+\texttt{HashMap} para la tabla hash). Para \texttt{TriageSystem}, el modelo
+usa un \texttt{TreeSet} ordenado por (urgencia, llegada), un
+\texttt{HashMap} y un \texttt{ArrayDeque} como pila. Cada secuencia mezcla
+registros (incluidos urgencias inválidas e identificadores repetidos),
+atenciones, cancelaciones, deshacer y búsquedas sobre un universo de 300
+identificadores, para que las colisiones de identificadores y los
+conflictos al deshacer ocurran con frecuencia. Después de cada paso se
+comparan el resultado y el número de pendientes; al final, el orden
+completo de pendientes, el historial y el invariante cola--índice.
+Este modelo es independiente de la implementación: no reinserta al frente,
+sino que ordena por llegada, por lo que valida también el argumento de
+correctitud de deshacer de la Sección~\ref{sec:metodologia}.
+
+\textbf{Sensibilidad de la suite.} Para comprobar que las pruebas detectan
+errores reales, se introdujo a propósito un defecto: reinsertar al final
+del nivel, en lugar de al frente, al deshacer. Ocho de las 42 pruebas
+fallaron, incluidas las cinco aleatorias, que lo detectaron entre los pasos
+19 y 61 de cada secuencia.
+
+\textbf{Pruebas manuales.} El menú de consola se verificó con entradas
+inválidas (opción inexistente, urgencia no numérica o fuera de rango,
+nombre vacío, cancelar o buscar un identificador inexistente, deshacer con
+el historial vacío); el \texttt{README.md} incluye una sesión de ejemplo
+reproducible.
+
+\textbf{Resultado.} La suite completa se ejecuta en menos de un segundo y
+las 42 pruebas pasan.

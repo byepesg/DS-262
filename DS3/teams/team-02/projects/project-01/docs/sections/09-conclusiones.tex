@@ -1,0 +1,19 @@
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+La segunda entrega llevó el Sistema de Priorización de Atención de una
+implementación inicial a un sistema funcional que cubre todos sus
+requerimientos. La cola de prioridad por niveles se conservó, porque las
+mediciones confirman que con cinco niveles fijos supera tanto a una lista
+ordenada como a un \emph{heap} binario. A ella se agregaron un índice hash
+propio y nodos doblemente enlazados que funcionan como localizadores, con
+lo que buscar, cancelar y verificar duplicados pasaron de $O(n)$ a $O(1)$
+esperado; y la pila del historial ahora permite deshacer la atención más
+reciente en $O(1)$, devolviendo la solicitud a su posición original.
+
+La corrección del sistema se respalda con 42 pruebas automatizadas, entre
+ellas pruebas aleatorias que comparan cada operación con un modelo de
+referencia independiente, y se comprobó que la suite detecta un defecto
+introducido a propósito. Para la entrega final quedan la reclasificación
+de urgencias, la carga por lotes, las estadísticas de atención y un
+análisis experimental más amplio.

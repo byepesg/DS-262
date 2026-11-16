@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Historial de solicitudes atendidas, de la mas reciente a la mas antigua.
+ * Historial de solicitudes atendidas sobre una pila: el tope es la atencion
+ * mas reciente, que es la unica que puede deshacerse.
  */
 public class ServiceHistory {
 
@@ -14,8 +15,23 @@ public class ServiceHistory {
         this.stack = new LinkedStack<>();
     }
 
+    /** Registra una atencion. {@code O(1)}. */
     public void recordService(Ticket t) {
         stack.push(t);
+    }
+
+    /** Atencion mas reciente sin retirarla, o null si no hay. {@code O(1)}. */
+    public Ticket lastServed() {
+        return stack.isEmpty() ? null : stack.peek();
+    }
+
+    /** Retira la atencion mas reciente para deshacerla. {@code O(1)}. */
+    public Ticket removeLast() {
+        return stack.pop();
+    }
+
+    public boolean isEmpty() {
+        return stack.isEmpty();
     }
 
     public int size() {
@@ -23,18 +39,13 @@ public class ServiceHistory {
     }
 
     /**
-     * Devuelve el historial sin modificar la pila.
+     * Historial de la atencion mas reciente a la mas antigua, sin modificar
+     * la pila. {@code O(h)}.
      */
     public List<Ticket> getHistory() {
-        List<Ticket> result = new ArrayList<>();
-        LinkedStack<Ticket> temp = new LinkedStack<>();
-        while (!stack.isEmpty()) {
-            Ticket t = stack.pop();
+        List<Ticket> result = new ArrayList<>(stack.size());
+        for (Ticket t : stack) {
             result.add(t);
-            temp.push(t);
-        }
-        while (!temp.isEmpty()) {
-            stack.push(temp.pop());
         }
         return result;
     }

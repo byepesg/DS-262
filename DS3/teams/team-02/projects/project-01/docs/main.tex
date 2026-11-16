@@ -22,9 +22,14 @@
 \usepackage{listings}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
 \usepackage{hyperref}
 
 \floatname{algorithm}{Algoritmo}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 
 \definecolor{CodeBackground}{HTML}{F4F6F7}
 \definecolor{CodeKeyword}{HTML}{005F73}
@@ -50,12 +55,15 @@
     frame=single,
     breaklines=true,
     showstringspaces=false,
-    tabsize=4
+    tabsize=4,
+    xleftmargin=1.4em,
+    framexleftmargin=0pt
 }
 
 \lstset{
     style=paperstyle,
-    language=Java
+    language=Java,
+    literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1
 }
 
 % =========================================================
@@ -63,8 +71,8 @@
 % =========================================================
 
 \title{
-Sistema de Priorización de Atención: Diseño e Implementación Inicial de una
-Cola de Prioridad por Niveles y una Pila sobre Listas Enlazadas
+Sistema de Priorización de Atención: Cola de Prioridad por Niveles,
+Índice Hash y Pila sobre Listas Enlazadas
 }
 
 \author{
@@ -91,24 +99,29 @@ Bogotá D.C., Colombia\\
 \begin{abstract}
 Los centros de atención que reciben solicitudes de servicio deben atenderlas
 según su nivel de urgencia y no según su orden de llegada, además de poder
-consultar y cancelar solicitudes puntuales y revisar las atenciones
-realizadas. Este documento presenta el diseño e implementación inicial de un
-Sistema de Priorización de Atención (SPA) que resuelve este problema con
-estructuras lineales. Una cola de prioridad formada por una cola FIFO por
-nivel de urgencia, cada una sobre una lista enlazada con referencias a la
-cabeza y a la cola, registra y atiende solicitudes en tiempo constante y
-resuelve el desempate por orden de llegada sin comparaciones adicionales; la
-búsqueda y la cancelación por identificador recorren estas listas en tiempo
-lineal; y una pila enlazada registra el historial de atenciones. La primera
-entrega incluye una implementación funcional con menú de consola que cubre
-el registro, la atención, la búsqueda, la cancelación y la consulta del
-historial, verificada mediante un programa de prueba manual con casos
-borde. Deshacer la última atención y la reducción del costo de la búsqueda
-quedan planteados para las siguientes entregas.
+consultar y cancelar solicitudes puntuales, revisar las atenciones
+realizadas y corregir una atención registrada por error. Este documento
+presenta el Sistema de Priorización de Atención (SPA) en su segunda
+entrega. Una cola de prioridad formada por una cola FIFO por nivel de
+urgencia decide el orden de atención en tiempo constante y resuelve el
+desempate por orden de llegada sin comparaciones; cada cola es ahora una
+lista doblemente enlazada cuyos nodos sirven de localizadores. Un índice
+hash propio, con encadenamiento separado, asocia cada identificador
+pendiente con su nodo, lo que reduce la búsqueda, la cancelación y la
+verificación de duplicados de $O(n)$ a $O(1)$ esperado. Una pila enlazada
+guarda el historial y permite deshacer la atención más reciente en $O(1)$,
+devolviendo la solicitud a la misma posición que ocupaba. Los seis
+requerimientos de la primera entrega y uno nuevo están implementados y se
+verifican con 42 pruebas automatizadas (más de 285\,000 aserciones),
+incluida una prueba aleatoria contra un modelo de referencia. Con un millón
+de solicitudes pendientes, buscar por identificador pasa de 12~ms a 0{,}19~$\mu$s
+y la cola por niveles es unas siete veces más rápida que un \emph{heap}
+binario.
 \end{abstract}
 
 \begin{IEEEkeywords}
-cola de prioridad, cola, lista enlazada, pila, estructuras de datos
+cola de prioridad, lista doblemente enlazada, tabla hash, pila, análisis
+de algoritmos
 \end{IEEEkeywords}
 
 % =========================================================
@@ -118,9 +131,12 @@ cola de prioridad, cola, lista enlazada, pila, estructuras de datos
 \input{sections/01-introduccion}
 \input{sections/02-trabajo-relacionado}
 \input{sections/03-metodologia}
-\input{sections/04-resultados}
-\input{sections/05-discusion}
-\input{sections/06-conclusiones}
+\input{sections/04-implementacion}
+\input{sections/05-pruebas}
+\input{sections/06-resultados}
+\input{sections/07-discusion}
+\input{sections/08-estado}
+\input{sections/09-conclusiones}
 
 % =========================================================
 % AGRADECIMIENTOS
@@ -147,6 +163,29 @@ Cambridge, MA, USA: MIT Press, 2022.
 M. T. Goodrich, R. Tamassia y M. H. Goldwasser,
 \textit{Data Structures and Algorithms in Java}, 6th ed.
 Hoboken, NJ, USA: Wiley, 2014.
+
+\bibitem{dial}
+R. B. Dial, ``Algorithm 360: Shortest-path forest with topological
+ordering,'' \textit{Communications of the ACM}, vol.~12, no.~11,
+pp.~632--633, 1969.
+
+\bibitem{gof}
+E. Gamma, R. Helm, R. Johnson y J. Vlissides,
+\textit{Design Patterns: Elements of Reusable Object-Oriented Software}.
+Reading, MA, USA: Addison-Wesley, 1994.
+
+\bibitem{minsalud}
+Ministerio de Salud y Protección Social, ``Resolución 5596 de 2015, por la
+cual se definen los criterios técnicos para el Sistema de Selección y
+Clasificación de pacientes en los servicios de urgencias `Triage','' Bogotá,
+Colombia, dic. 2015.
+
+\bibitem{esi}
+N. Gilboy, P. Tanabe, D. Travers y A. M. Rosenau,
+\textit{Emergency Severity Index (ESI): A Triage Tool for Emergency
+Department Care, Version 4. Implementation Handbook}, AHRQ Publication
+No. 12-0014. Rockville, MD, USA: Agency for Healthcare Research and
+Quality, 2011.
 
 \end{thebibliography}
 

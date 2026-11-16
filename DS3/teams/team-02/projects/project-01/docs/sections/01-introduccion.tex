@@ -1,37 +1,68 @@
 \section{Introducción}
+\label{sec:introduccion}
 
 Los centros de atención que reciben solicitudes de servicio (salas de
 urgencias, mesas de ayuda técnica, módulos de atención al cliente) enfrentan
 un mismo reto operativo: las solicitudes no deben atenderse en el orden en
 que llegan, sino según su nivel de urgencia, y el personal necesita poder
-consultar o cancelar solicitudes específicas y revisar las atenciones
-realizadas sin tener que reorganizar manualmente toda la fila.
+consultar o cancelar solicitudes específicas, revisar las atenciones
+realizadas y corregir una atención registrada por error, sin tener que
+reorganizar manualmente toda la fila.
 
 Resolver este problema de manera eficiente requiere estructuras de datos que
 soporten, simultáneamente: (i) obtener en todo momento la solicitud más
-urgente sin tener que ordenar repetidamente toda la colección, (ii) respetar
-el orden de llegada entre solicitudes de igual urgencia, (iii) ubicar y
-retirar una solicitud puntual por su identificador, y (iv) registrar las
-atenciones en el orden en que ocurren para poder consultarlas y, en una
-entrega posterior, revertir la más reciente.
+urgente sin ordenar repetidamente toda la colección, (ii) respetar el orden
+de llegada entre solicitudes de igual urgencia, (iii) ubicar y retirar una
+solicitud puntual por su identificador, y (iv) registrar las atenciones en
+el orden en que ocurren para poder consultarlas y revertir la más reciente.
 
-Este documento presenta el diseño e implementación inicial de un
-\emph{Sistema de Priorización de Atención} (SPA), que resuelve el problema
-anterior combinando estructuras lineales estudiadas en la asignatura: colas
-y listas enlazadas para el orden de atención, y una pila para el historial
-de atenciones.
+Este documento presenta la segunda entrega del \emph{Sistema de Priorización
+de Atención} (SPA). La primera entrega resolvió los puntos (i), (ii) y (iv)
+con estructuras lineales ---una cola FIFO por nivel de urgencia y una pila
+para el historial--- y dejó el punto (iii) resuelto con un recorrido lineal.
+Esta entrega completa el sistema: incorpora un índice hash para el punto
+(iii), implementa la operación de deshacer y reemplaza las pruebas manuales
+por una suite automatizada acompañada de mediciones de desempeño.
 
-La contribución de esta primera entrega consiste en: (a) la formulación del
-problema y su alcance, (b) la selección y justificación técnica de las
-estructuras de datos empleadas, y (c) una implementación funcional que
-permite registrar, atender, buscar y cancelar solicitudes, y consultar el
-historial de atenciones.
+\subsection{Cambios respecto de la Entrega 1}
+\label{sec:cambios}
+
+La Tabla~\ref{tab:cambios} resume la evolución. Todos los pendientes
+declarados en la Entrega 1 (deshacer, índice por identificador, pruebas
+automatizadas, validación del nombre y análisis experimental) se
+atendieron. Además se corrigieron dos debilidades detectadas durante el
+desarrollo: el historial se leía desapilando y volviendo a apilar toda la
+pila, y la cancelación necesitaba buscar el nodo anterior al eliminado.
+
+\begin{table}[t]
+  \caption{Evolución entre la Entrega 1 y la Entrega 2}
+  \label{tab:cambios}
+  \centering
+  \footnotesize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{L{0.27\columnwidth}L{0.29\columnwidth}L{0.36\columnwidth}}
+    \toprule
+    Aspecto & Entrega 1 & Entrega 2 \\
+    \midrule
+    Deshacer (RF5) & Pendiente & Implementado, $O(1)$ \\
+    Buscar y cancelar & Recorrido, $O(n)$ & Índice hash, $O(1)$ esperado \\
+    Verificar id repetido & Recorrido, $O(n)$ & Índice hash, $O(1)$ esperado \\
+    Cola de cada nivel & Lista simple & Lista doble con localizadores \\
+    Leer historial & Desapilar y reapilar & Iterador de solo lectura \\
+    Validación & Sin validar nombre & Id y nombre no vacíos \\
+    Listar pendientes & --- & Nuevo (RF7), $O(n)$ \\
+    Pruebas & Programa manual & 42 pruebas automatizadas \\
+    Desempeño & Sin medir & Benchmark con $n$ hasta $10^6$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 El resto del documento se organiza así: la Sección~\ref{sec:relacionado}
-presenta trabajo relacionado; la Sección~\ref{sec:metodologia} describe los
-objetivos, el alcance, los requerimientos y el diseño de la solución,
-incluyendo las estructuras de datos seleccionadas; la
-Sección~\ref{sec:resultados} reporta el estado actual de la implementación;
-la Sección~\ref{sec:discusion} discute las limitaciones conocidas; y la
-Sección~\ref{sec:conclusiones} resume el estado del proyecto y el trabajo
-futuro.
+presenta trabajo relacionado; la Sección~\ref{sec:metodologia} describe
+objetivos, alcance, requerimientos, diseño, estructuras de datos y
+algoritmos; la Sección~\ref{sec:implementacion} reporta el estado de la
+implementación; la Sección~\ref{sec:pruebas} describe las pruebas; la
+Sección~\ref{sec:resultados} presenta resultados preliminares; la
+Sección~\ref{sec:discusion} discute limitaciones; la
+Sección~\ref{sec:estado} detalla el estado actual y el trabajo pendiente; y
+la Sección~\ref{sec:conclusiones} concluye.
