@@ -5,9 +5,11 @@ public class Main
 
         CourseGroup calculo1 = group("1000004", "Cálculo Diferencial", "Gr-1", 2, "LUN", 7, 9);
         CourseGroup calculo2 = group("1000004", "Cálculo Diferencial", "Gr-2", 1, "MAR", 9, 11);
+        CourseGroup calculo3 = group("1000004", "Cálculo Diferencial", "Gr-3", 3, "JUE", 14, 16);
         CourseGroup algebra = group("1000003", "Álgebra Lineal", "Gr-1", 3, "LUN", 8, 10);
         system.addGroup(calculo1);
         system.addGroup(calculo2);
+        system.addGroup(calculo3);
         system.addGroup(algebra);
 
         Student ana    = new Student("2024101", "Ana",    true,  3.8, false, 40.0, 0.0);
@@ -42,6 +44,9 @@ public class Main
         show(daniel, system.request(daniel.getCode(), calculo2.getKey(), true));
         printState(calculo1);
         printState(calculo2);
+        System.out.println("Grupos con más demanda: " + system.topDemand(2));
+        System.out.println("Otros grupos para Felipe en lugar de " + calculo1 + ": "
+                + system.suggestAlternatives(felipe.getCode(), calculo1.getKey()));
 
         title("3. Ana pide " + algebra + ", que se cruza con " + calculo1);
         show(ana, system.request(ana.getCode(), algebra.getKey(), true));
