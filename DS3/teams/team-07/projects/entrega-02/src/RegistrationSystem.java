@@ -93,6 +93,26 @@ public class RegistrationSystem
         return suggestions;
     }
 
+    // Heap de tamaño k cuya raíz es el grupo con menos demanda entre los k guardados: O(g log k).
+    public LinkedList<CourseGroup> topDemand(int k) {
+        if (k <= 0) throw new IllegalArgumentException("k debe ser positivo");
+        PriorityQueueADT<DemandEntry> smallest = new BinaryHeapPriorityQueue<>();
+        for (CourseGroup group : groups.values()) {
+            if (group.getWaitlist().isEmpty()) continue;
+            smallest.insert(new DemandEntry(group));
+            if (smallest.size() > k) smallest.removeHighest();
+        }
+        LinkedStack<CourseGroup> ascending = new LinkedStack<>();
+        while (!smallest.isEmpty()) ascending.push(smallest.removeHighest().group);
+        LinkedList<CourseGroup> result = new LinkedList<>();
+        while (!ascending.isEmpty()) result.addLast(ascending.pop());
+        return result;
+    }
+
+    public LinkedList<CourseGroup> getAllGroups() {
+        return groups.values();
+    }
+
     public LinkedList<CourseGroup> getEnrolledGroups(String studentCode) {
         return enrolledGroups.get(studentCode);
     }
@@ -143,5 +163,22 @@ public class RegistrationSystem
     private static <T> T require(T value, String description) {
         if (value == null) throw new IllegalArgumentException("No existe el " + description);
         return value;
+    }
+
+    private static class DemandEntry implements Comparable<DemandEntry>
+    {
+        private final CourseGroup group;
+        private final int demand;
+
+        DemandEntry(CourseGroup group) {
+            this.group = group;
+            this.demand = group.getWaitlist().size();
+        }
+
+        @Override
+        public int compareTo(DemandEntry other) {
+            if (demand != other.demand) return Integer.compare(demand, other.demand);
+            return other.group.getKey().compareTo(group.getKey());
+        }
     }
 }

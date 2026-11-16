@@ -8,6 +8,7 @@ public class RegistrationSystemTest
         dropOnlyPhase();
         invalidInputs();
         suggestsAlternatives();
+        reportsTopDemand();
     }
 
     private static RegistrationSystem system(CourseGroup... groups) {
@@ -121,5 +122,22 @@ public class RegistrationSystemTest
         LinkedList<CourseGroup> suggestions = system.suggestAlternatives("60", full.getKey());
         TestRunner.check(suggestions.size() == 1 && suggestions.contains(good), "sugiere solo grupos de la asignatura con cupo y sin cruce");
         TestRunner.check(system.suggestAlternatives("60", good.getKey()).isEmpty(), "sin alternativas válidas devuelve una lista vacía");
+    }
+
+    private static void reportsTopDemand() {
+        CourseGroup a = group("800", "Gr-1", 0, "LUN", 7, 9);
+        CourseGroup b = group("801", "Gr-1", 0, "MAR", 7, 9);
+        CourseGroup c = group("802", "Gr-1", 0, "MIE", 7, 9);
+        CourseGroup d = group("803", "Gr-1", 5, "JUE", 7, 9);
+        RegistrationSystem system = system(a, b, c, d);
+        for (int i = 0; i < 6; i++) system.addStudent(student("9" + i, 50, i));
+        for (int i = 0; i < 3; i++) system.request("9" + i, b.getKey(), true);
+        for (int i = 0; i < 5; i++) system.request("9" + i, c.getKey(), true);
+        system.request("90", a.getKey(), true);
+        system.request("95", d.getKey(), true);
+        LinkedList<CourseGroup> top = system.topDemand(2);
+        TestRunner.check(top.toString().equals("[" + c + ", " + b + "]"), "top-2 de demanda en orden: " + top);
+        TestRunner.check(system.topDemand(10).size() == 3, "con k mayor que los grupos con espera devuelve solo esos grupos");
+        TestRunner.checkThrows(() -> system.topDemand(0), "k = 0 lanza excepción");
     }
 }

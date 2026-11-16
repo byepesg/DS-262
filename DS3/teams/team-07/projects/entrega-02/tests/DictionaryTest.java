@@ -26,6 +26,7 @@ public class DictionaryTest
         for (int i = 0; i < 10000; i++) randomTree.put(random.nextInt(), i);
         TestRunner.check(randomTree.height() <= 20, "altura con 10000 llaves aleatorias: " + randomTree.height());
 
+        TestRunner.check(tree.values().size() == 511 && tree.values().toString().startsWith("[v2, v4, v6"), "values recorre las llaves en orden");
         TestRunner.checkThrows(() -> tree.put(null, "x"), "put con llave nula lanza excepción");
     }
 }

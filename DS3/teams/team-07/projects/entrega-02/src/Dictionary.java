@@ -11,4 +11,6 @@ public interface Dictionary<K extends Comparable<K>, V>
     int size();
 
     boolean isEmpty();
+
+    LinkedList<V> values();
 }

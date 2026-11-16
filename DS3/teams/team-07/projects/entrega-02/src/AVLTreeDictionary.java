@@ -57,6 +57,20 @@ public class AVLTreeDictionary<K extends Comparable<K>, V> implements Dictionary
         return size == 0;
     }
 
+    @Override
+    public LinkedList<V> values() {
+        LinkedList<V> result = new LinkedList<>();
+        collect(root, result);
+        return result;
+    }
+
+    private void collect(AVLNode node, LinkedList<V> result) {
+        if (node == null) return;
+        collect(node.left, result);
+        result.addLast(node.value);
+        collect(node.right, result);
+    }
+
     public int height() {
         return height(root);
     }
