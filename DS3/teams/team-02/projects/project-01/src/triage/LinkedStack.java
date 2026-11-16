@@ -1,11 +1,13 @@
 package triage;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Pila generica implementada con una lista enlazada simple.
+ * Pila generica implementada con una lista enlazada simple con referencia
+ * unicamente al tope.
  */
-public class LinkedStack<T> {
+public class LinkedStack<T> implements Iterable<T> {
 
     private static class Node<T> {
 
@@ -54,5 +56,35 @@ public class LinkedStack<T> {
 
     public int size() {
         return size;
+    }
+
+    /**
+     * Recorre la pila del tope al fondo sin modificarla.
+     *
+     * <p>Entrega 1: el historial se leia desapilando todo a una pila
+     * auxiliar y volviendo a apilar (dos pasadas y {@code h} nodos nuevos).
+     * Entrega 2: un iterador de solo lectura hace una sola pasada.</p>
+     */
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+
+            private Node<T> current = top;
+
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
+
+            @Override
+            public T next() {
+                if (current == null) {
+                    throw new NoSuchElementException();
+                }
+                T value = current.value;
+                current = current.next;
+                return value;
+            }
+        };
     }
 }

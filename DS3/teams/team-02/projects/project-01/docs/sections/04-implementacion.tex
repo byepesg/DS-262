@@ -1,0 +1,96 @@
+\section{Implementación}
+\label{sec:implementacion}
+
+El sistema está escrito en Java~17 sin dependencias externas. El código
+fuente está en \texttt{src/triage/}, las pruebas en \texttt{test/triage/} y
+el benchmark en \texttt{bench/triage/}; el \texttt{README.md} del
+repositorio contiene los comandos exactos de compilación y ejecución. La
+Tabla~\ref{tab:estado} resume el estado de cada funcionalidad.
+
+\begin{table}[t]
+  \caption{Estado de las funcionalidades en la segunda entrega}
+  \label{tab:estado}
+  \centering
+  \footnotesize
+  \begin{tabular}{p{0.52\columnwidth}p{0.18\columnwidth}p{0.16\columnwidth}}
+    \toprule
+    Funcionalidad & Entrega 1 & Entrega 2 \\
+    \midrule
+    Registrar solicitud (RF1) & Sí & Sí \\
+    Atender por prioridad (RF2) & Sí & Sí \\
+    Buscar por identificador (RF3) & Sí & Sí \\
+    Cancelar solicitud (RF4) & Sí & Sí \\
+    Deshacer última atención (RF5) & Pendiente & Sí \\
+    Consultar historial (RF6) & Sí & Sí \\
+    Listar pendientes en orden (RF7) & --- & Sí \\
+    Índice por identificador en $O(1)$ & Pendiente & Sí \\
+    Validación de entradas & Parcial & Sí \\
+    Pruebas automatizadas & Parcial & Sí \\
+    Análisis experimental & Pendiente & Preliminar \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{Implementado.} Los siete requerimientos funcionales están
+disponibles en \texttt{TriageSystem}: \texttt{registerRequest},
+\texttt{serveNext}, \texttt{peekNext}, \texttt{findById},
+\texttt{cancelRequest}, \texttt{undoLastService}, \texttt{getHistory} y
+\texttt{getPendingInOrder}. El menú de \texttt{Main} expone todas estas
+operaciones. Las estructuras de soporte (\texttt{LinkedQueue},
+\texttt{LevelPriorityQueue}, \texttt{HashTable} y \texttt{LinkedStack}) son
+de implementación propia; de la biblioteca estándar solo se usa
+\texttt{ArrayList} para devolver listados. El Listado~\ref{lst:undo}
+muestra la operación de deshacer.
+
+\begin{lstlisting}[caption={Deshacer en \texttt{TriageSystem} (mensaje abreviado)},label={lst:undo},float=t]
+public Ticket undoLastService() {
+  Ticket last = history.lastServed();
+  if (last == null) {
+    return null;
+  }
+  String id = last.getId();
+  if (index.containsKey(id)) {
+    throw new IllegalStateException(
+        "No se puede deshacer: " + id);
+  }
+  history.removeLast();
+  index.put(id, queue.insertFront(last));
+  return last;
+}
+\end{lstlisting}
+
+\textbf{Validación de entradas.} Se rechazan, con una excepción
+\texttt{IllegalArgument\-Exception}, los identificadores y nombres nulos,
+vacíos o en blanco, las urgencias fuera de 1--5 y los identificadores
+repetidos entre pendientes; el menú además captura urgencias no numéricas.
+Los identificadores se normalizan quitando espacios iniciales y finales,
+para que ``\texttt{C1}'' y ``\texttt{\ C1\ }'' no se registren como distintos.
+
+\textbf{Decisiones técnicas relevantes.}
+\begin{itemize}
+  \item \emph{El índice vive en la fachada}, no dentro de la cola de
+    prioridad: la cola solo sabe ordenar y la fachada es la única que
+    coordina cola, índice e historial, lo que deja el invariante en un solo
+    lugar. \texttt{TriageSystem} incluye un método de verificación del
+    invariante que usan las pruebas.
+  \item \emph{Localizadores opacos y verificados.} El nodo expuesto por
+    \texttt{LinkedQueue} solo permite leer su valor; retirar un nodo que no
+    pertenece a la cola (o que ya fue retirado) lanza una excepción.
+  \item \emph{Conflicto al deshacer.} Se eligió rechazar la operación en
+    lugar de sobrescribir la solicitud pendiente con el mismo
+    identificador, porque sobrescribir haría perder una solicitud de forma
+    silenciosa.
+  \item \emph{Búsqueda lineal conservada como línea base.} La búsqueda
+    de la Entrega 1 (\texttt{linearFindById} en
+    \texttt{LevelPriorityQueue}) ya no la usa el sistema, pero se conserva para el benchmark y para
+    contrastar el índice en las pruebas.
+  \item \emph{Pruebas sin JUnit.} Se escribió un mini marco de aserciones
+    (\texttt{Check.java}) para que el proyecto compile y se pruebe solo con
+    el JDK, sin descargar dependencias.
+\end{itemize}
+
+\textbf{Parcial o pendiente.} No queda ningún requerimiento funcional sin
+implementar. El análisis experimental es preliminar: se ejecutó en un solo
+equipo y con datos de urgencia uniforme (Sección~\ref{sec:resultados}).
+Las funcionalidades previstas para la entrega final se describen en la
+Sección~\ref{sec:estado}.

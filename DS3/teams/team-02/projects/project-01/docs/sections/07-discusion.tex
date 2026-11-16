@@ -1,0 +1,36 @@
+\section{Discusión}
+\label{sec:discusion}
+
+El diseño mantiene la separación de responsabilidades de la Entrega 1 y la
+completa: la cola por niveles decide el orden de atención, el índice hash
+responde dónde está cada solicitud, la lista doble permite retirarla sin
+recorrer, y la pila registra el historial y permite revertirlo. Ninguna
+estructura resuelve sola todas las operaciones; es su combinación, mantenida
+consistente por la fachada, la que lleva todas las operaciones por
+solicitud a tiempo constante (Tabla~\ref{tab:complejidad}).
+
+La principal limitación de la Entrega 1, el costo lineal de la búsqueda, se
+eliminó, pero a cambio de dos supuestos que conviene hacer explícitos. El
+primero es que el costo $O(1)$ del índice es \emph{esperado}: depende de que
+la función hash reparta bien los identificadores. Con los
+\texttt{hashCode} de \texttt{String} y la mezcla de bits empleada, la cadena
+más larga observada fue de 5 entradas con $10^4$ claves y de 6 con
+$10^6$, pero un
+conjunto de identificadores elegido para colisionar degradaría las
+operaciones a $O(n)$. El segundo es el costo en memoria: cada pendiente
+ocupa ahora un nodo con dos referencias y una entrada en el índice, unos
+97 bytes en total (Sección~\ref{sec:resultados}).
+
+El costo constante de la cola sigue dependiendo de que la urgencia tome
+solo cinco valores. Si la prioridad dependiera de una magnitud continua,
+como el tiempo de espera acumulado, habría que usar otra representación,
+por ejemplo un \emph{heap} indexado con localizadores.
+
+La operación de deshacer tiene una restricción deliberada: solo revierte
+atenciones, no registros ni cancelaciones, y se rechaza si el identificador
+fue reutilizado. Generalizarla a todas las operaciones exigiría apilar un
+registro por cada tipo de acción, como en el patrón
+\emph{Command}~\cite{gof}.
+
+Finalmente, los datos existen solo durante la ejecución, lo cual es
+consistente con el alcance definido.

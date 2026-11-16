@@ -18,4 +18,4 @@
 
 | Actividad | Carpeta |
 | --- | --- |
-| Proyecto semestral — Entrega 1: Sistema de Priorización de Atención (SPA) | [`projects/project-01/`](projects/project-01/) |
+| Proyecto semestral — Entregas 1 y 2: Sistema de Priorización de Atención (SPA) | [`projects/project-01/`](projects/project-01/) |
