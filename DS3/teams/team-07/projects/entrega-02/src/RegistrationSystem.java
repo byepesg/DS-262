@@ -4,6 +4,7 @@ public class RegistrationSystem
     private Dictionary<String, CourseGroup> groups;
     private Dictionary<String, LinkedList<CourseGroup>> enrolledGroups;
     private Dictionary<String, LinkedList<CourseGroup>> waitingGroups;
+    private Dictionary<String, LinkedList<CourseGroup>> groupsByCourse;
     private Phase phase;
 
     public RegistrationSystem() {
@@ -11,6 +12,7 @@ public class RegistrationSystem
         this.groups = new AVLTreeDictionary<>();
         this.enrolledGroups = new AVLTreeDictionary<>();
         this.waitingGroups = new AVLTreeDictionary<>();
+        this.groupsByCourse = new AVLTreeDictionary<>();
         this.phase = Phase.APPOINTMENTS;
     }
 
@@ -22,6 +24,12 @@ public class RegistrationSystem
 
     public void addGroup(CourseGroup group) {
         groups.put(group.getKey(), group);
+        LinkedList<CourseGroup> sameCourse = groupsByCourse.get(group.getCourseCode());
+        if (sameCourse == null) {
+            sameCourse = new LinkedList<>();
+            groupsByCourse.put(group.getCourseCode(), sameCourse);
+        }
+        sameCourse.addLast(group);
     }
 
     public Student findStudent(String code) {
@@ -73,6 +81,16 @@ public class RegistrationSystem
         enrolledGroups.get(studentCode).remove(group);
         if (phase == Phase.DROP_ONLY) return null;
         return reassignSeat(group);
+    }
+
+    public LinkedList<CourseGroup> suggestAlternatives(String studentCode, String groupKey) {
+        Student student = require(students.get(studentCode), "estudiante " + studentCode);
+        CourseGroup group = require(groups.get(groupKey), "grupo " + groupKey);
+        LinkedList<CourseGroup> suggestions = new LinkedList<>();
+        for (CourseGroup other : groupsByCourse.get(group.getCourseCode()))
+            if (other != group && other.hasSeat() && !clashesWithSchedule(student, other))
+                suggestions.addLast(other);
+        return suggestions;
     }
 
     public LinkedList<CourseGroup> getEnrolledGroups(String studentCode) {

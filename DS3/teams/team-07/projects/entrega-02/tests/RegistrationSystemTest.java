@@ -7,6 +7,7 @@ public class RegistrationSystemTest
         skipsCandidateWithClash();
         dropOnlyPhase();
         invalidInputs();
+        suggestsAlternatives();
     }
 
     private static RegistrationSystem system(CourseGroup... groups) {
@@ -106,5 +107,19 @@ public class RegistrationSystemTest
         TestRunner.checkThrows(() -> system.request("50", "no-existe", true), "grupo inexistente lanza excepción");
         TestRunner.checkThrows(() -> system.cancel("50", g.getKey()), "cancelar sin estar inscrito lanza excepción");
         TestRunner.checkThrows(() -> new CourseGroup("1", "x", "Gr-1", -1), "cupo negativo lanza excepción");
+    }
+
+    private static void suggestsAlternatives() {
+        CourseGroup full = group("700", "Gr-1", 0, "LUN", 7, 9);
+        CourseGroup clash = group("700", "Gr-2", 5, "MAR", 7, 9);
+        CourseGroup noSeat = group("700", "Gr-3", 0, "MIE", 7, 9);
+        CourseGroup good = group("700", "Gr-4", 5, "JUE", 7, 9);
+        CourseGroup otherCourse = group("701", "Gr-1", 5, "MAR", 8, 10);
+        RegistrationSystem system = system(full, clash, noSeat, good, otherCourse);
+        system.addStudent(student("60", 50, 5.0));
+        system.request("60", otherCourse.getKey(), true);
+        LinkedList<CourseGroup> suggestions = system.suggestAlternatives("60", full.getKey());
+        TestRunner.check(suggestions.size() == 1 && suggestions.contains(good), "sugiere solo grupos de la asignatura con cupo y sin cruce");
+        TestRunner.check(system.suggestAlternatives("60", good.getKey()).isEmpty(), "sin alternativas válidas devuelve una lista vacía");
     }
 }
