@@ -55,11 +55,9 @@ w = personas en espera; n = estudiantes o grupos registrados.
 
 ## Integrantes
 
-| Usuario de GitHub | Aporte |
-|---|---|
-| [@DfCastilloa](https://github.com/DfCastilloa) | Heap, AVL, horarios, `RegistrationSystem`, sugerencia de grupos, reporte de demanda, menú, pruebas, medición, README y documento. |
-| [@BLlontopSec](https://github.com/BLlontopSec) | Por definir. |
-| [@hoverwars](https://github.com/hoverwars) | Por definir. |
+- [@BLlontopSec](https://github.com/BLlontopSec)
+- [@DfCastilloa](https://github.com/DfCastilloa)
+- [@hoverwars](https://github.com/hoverwars)
 
 ## Cómo ejecutarlo
 
