@@ -1,0 +1,104 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/core/player_hud.gd" id="1_hud"]
+[ext_resource type="FontFile" uid="uid://bge3cdwhwx1l6" path="res://assets/fonts/alagard.ttf" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="panel"]
+content_margin_left = 5.0
+content_margin_top = 4.0
+content_margin_right = 5.0
+content_margin_bottom = 4.0
+bg_color = Color(0.18039216, 0.13333334, 0.18431373, 0.7764706)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9490196, 0.9254902, 0.54509807, 1)
+
+[sub_resource type="StyleBoxFlat" id="bar_bg"]
+bg_color = Color(0.18039216, 0.13333334, 0.18431373, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9490196, 0.9254902, 0.54509807, 1)
+
+[sub_resource type="StyleBoxFlat" id="bar_hp"]
+bg_color = Color(0.9843137, 0.7254902, 0.32941177, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9490196, 0.9254902, 0.54509807, 1)
+
+[sub_resource type="LabelSettings" id="ls_white"]
+font = ExtResource("2_font")
+font_size = 10
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.2)
+
+[sub_resource type="LabelSettings" id="ls_gold"]
+font = ExtResource("2_font")
+font_size = 10
+font_color = Color(0.9490196, 0.9254902, 0.54509807, 1)
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.2)
+
+[node name="PlayerHUD" type="CanvasLayer"]
+process_mode = 3
+layer = 55
+script = ExtResource("1_hud")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -126.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = 50.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("panel")
+
+[node name="NameLabel" type="Label" parent="Panel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = 2.0
+offset_right = 64.0
+offset_bottom = 16.0
+text = "Jugador"
+label_settings = SubResource("ls_white")
+
+[node name="PointsLabel" type="Label" parent="Panel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 60.0
+offset_top = 2.0
+offset_right = 114.0
+offset_bottom = 16.0
+text = "Pts 0"
+label_settings = SubResource("ls_gold")
+horizontal_alignment = 2
+
+[node name="HPBar" type="ProgressBar" parent="Panel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = 18.0
+offset_right = 114.0
+offset_bottom = 27.0
+theme_override_styles/background = SubResource("bar_bg")
+theme_override_styles/fill = SubResource("bar_hp")
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="Panel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = 27.0
+offset_right = 114.0
+offset_bottom = 41.0
+text = "60/60"
+label_settings = SubResource("ls_white")
