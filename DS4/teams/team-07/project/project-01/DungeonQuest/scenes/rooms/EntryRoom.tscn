@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://rurbqkuv562p"]
 
-[ext_resource type="Script" uid="uid://vxwjvw2xhi26" path="res://scripts/room.gd" id="1_ssiyy"]
+[ext_resource type="Script" uid="uid://vxwjvw2xhi26" path="res://scripts/world/room.gd" id="1_ssiyy"]
 [ext_resource type="TileSet" uid="uid://8hu0lr6s6ww4" path="res://assets/sprites/tiles/tiles.tres" id="2_i0p2f"]
 [ext_resource type="PackedScene" uid="uid://c47e65gmaqpxm" path="res://scenes/objects/DoorSlots.tscn" id="2_pewdp"]
 

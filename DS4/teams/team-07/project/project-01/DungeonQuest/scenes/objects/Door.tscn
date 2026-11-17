@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://2h0f1dtasda1"]
 
-[ext_resource type="Script" uid="uid://cvwa2tl08efj2" path="res://scripts/door.gd" id="1_mg2as"]
+[ext_resource type="Script" uid="uid://cvwa2tl08efj2" path="res://scripts/world/door.gd" id="1_mg2as"]
 [ext_resource type="Texture2D" uid="uid://dh2gkim603sgk" path="res://assets/sprites/doors/doors_side.png" id="3_ao1jx"]
 [ext_resource type="Texture2D" uid="uid://rfuyusd680hy" path="res://assets/sprites/doors/doors_front.png" id="3_dfkju"]
 
@@ -202,7 +202,7 @@ walk_distance_back = 8.0
 modulate = Color(1, 1, 1, 0)
 position = Vector2(0, -16)
 sprite_frames = SubResource("SpriteFrames_02sv7")
-animation = &"right"
+animation = &"front"
 
 [node name="DoorBack" type="AnimatedSprite2D" parent="." unique_id=860034957]
 position = Vector2(0, -16)

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c47e65gmaqpxm"]
 
-[ext_resource type="Script" uid="uid://dnwx83g4mqxd2" path="res://scripts/door_slots.gd" id="1_cobpx"]
-[ext_resource type="Script" uid="uid://c8pgjwdmrnwud" path="res://scripts/door_slot.gd" id="1_o45q0"]
+[ext_resource type="Script" uid="uid://dnwx83g4mqxd2" path="res://scripts/world/door_slots.gd" id="1_cobpx"]
+[ext_resource type="Script" uid="uid://c8pgjwdmrnwud" path="res://scripts/world/door_slot.gd" id="1_o45q0"]
 
 [node name="DoorSlots" type="Node2D" unique_id=1664934376]
 script = ExtResource("1_cobpx")
