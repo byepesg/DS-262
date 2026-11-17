@@ -1,43 +1,54 @@
 [gd_scene format=3 uid="uid://oe3j4cbftx5o"]
 
-[ext_resource type="Script" uid="uid://betduiwdus7va" path="res://scripts/victory.gd" id="1_sdctl"]
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_sdctl"]
+[ext_resource type="Script" uid="uid://betduiwdus7va" path="res://scripts/core/victory.gd" id="1_sdctl"]
+[ext_resource type="Texture2D" uid="uid://dwcec0u5cljho" path="res://assets/sprites/backgrounds/VictoryBackGround.png" id="2_5ygf6"]
+[ext_resource type="Texture2D" uid="uid://uwayn76lo5ma" path="res://assets/sprites/backgrounds/Menu_Button.png" id="3_5vt6b"]
+[ext_resource type="Texture2D" uid="uid://bdv6ihta1djp2" path="res://assets/sprites/backgrounds/Menu_Button2.png" id="4_oad13"]
+[ext_resource type="Texture2D" uid="uid://ns5c1kli8grk" path="res://assets/sprites/backgrounds/Menu_Button3.png" id="5_3tcow"]
+[ext_resource type="Texture2D" uid="uid://ddslorl0nheb7" path="res://assets/sprites/backgrounds/Exit_Button.png" id="6_ewdww"]
+[ext_resource type="Texture2D" uid="uid://tyo3vnkc1wy" path="res://assets/sprites/backgrounds/Exit_Button2.png" id="7_nv7vl"]
+[ext_resource type="Texture2D" uid="uid://cb4endsttni38" path="res://assets/sprites/backgrounds/Exit_Button3.png" id="8_tqfpl"]
 
 [node name="Victory" type="Control" unique_id=1421535777]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_sdctl")
 
-[node name="TextureRect" type="TextureRect" parent="." unique_id=1911514851]
+[node name="ColorRect" type="TextureRect" parent="." unique_id=238591139]
 layout_mode = 0
 offset_right = 480.0
 offset_bottom = 272.0
-texture = SubResource("PlaceholderTexture2D_sdctl")
+texture = ExtResource("2_5ygf6")
 
-[node name="RetryButton" type="Button" parent="." unique_id=1203339815]
+[node name="MenuButton" type="TextureButton" parent="." unique_id=1645998738]
 layout_mode = 0
-offset_left = 144.0
-offset_top = 184.0
-offset_right = 249.0
-offset_bottom = 215.0
-text = "REINTENTAR
-"
+offset_left = 56.0
+offset_top = 160.0
+offset_right = 162.0
+offset_bottom = 194.0
+texture_normal = ExtResource("3_5vt6b")
+texture_pressed = ExtResource("4_oad13")
+texture_hover = ExtResource("5_3tcow")
 
-[node name="MenuBotton" type="Button" parent="." unique_id=984203741]
+[node name="ExitButton" type="TextureButton" parent="." unique_id=1819182534]
 layout_mode = 0
-offset_left = 264.0
-offset_top = 184.0
-offset_right = 369.0
-offset_bottom = 215.0
-text = "MENU
+offset_left = 360.0
+offset_top = 160.0
+offset_right = 466.0
+offset_bottom = 194.0
+texture_normal = ExtResource("6_ewdww")
+texture_pressed = ExtResource("7_nv7vl")
+texture_hover = ExtResource("8_tqfpl")
 
-"
+[node name="FadeLayer" type="CanvasLayer" parent="." unique_id=1632716151]
 
-[node name="Label" type="Label" parent="." unique_id=1475586199]
-layout_mode = 0
-offset_left = 200.0
-offset_top = 40.0
-offset_right = 273.0
-offset_bottom = 89.0
-text = "GANASTE"
+[node name="Fade" type="ColorRect" parent="FadeLayer" unique_id=1557358378]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
