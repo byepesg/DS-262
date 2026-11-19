@@ -1,10 +1,10 @@
 [gd_scene format=4 uid="uid://cexctodlul20h"]
 
-[ext_resource type="Script" uid="uid://ceeyog4in2aow" path="res://scripts/Main.gd" id="1_uoooy"]
+[ext_resource type="Script" uid="uid://ceeyog4in2aow" path="res://scripts/core/main.gd" id="1_uoooy"]
 [ext_resource type="Texture2D" uid="uid://cijgoqm5c556" path="res://assets/sprites/tiles/spritesheet.png" id="2_wnfow"]
 [ext_resource type="TileSet" uid="uid://8hu0lr6s6ww4" path="res://assets/sprites/tiles/tiles.tres" id="3_20cwk"]
 [ext_resource type="Texture2D" uid="uid://cnecbv6d1sbiw" path="res://assets/sprites/tiles/wall-01.png" id="4_gujbr"]
-[ext_resource type="PackedScene" uid="uid://cqatvvi4ro6w7" path="res://scenes/player.tscn" id="5_er3eb"]
+[ext_resource type="PackedScene" uid="uid://cqatvvi4ro6w7" path="res://scenes/Player.tscn" id="5_er3eb"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vcsgt"]
 texture = ExtResource("2_wnfow")

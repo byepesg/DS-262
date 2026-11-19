@@ -1,152 +1,228 @@
 # Dungeon Quest
 
+## macOS
+
+### Instalar
+
+El proyecto usa **Godot 4.7** (probado con **4.7.2**) y no necesita complementos.
+
+No necesitas instalar Godot manualmente. El primer uso de `RunScript_Mac` requiere conexión a Internet: descarga Godot 4.7.2 desde la publicación oficial, verifica el SHA-256 e instala la aplicación en `~/Applications`. No requiere permisos de administrador. Si ya hay una copia compatible de Godot 4.7.2 en el sistema, la reutiliza.
+
+### Ejecutar con el script
+
+Abre Terminal en la carpeta `DungeonQuest` y ejecuta:
+
+```bash
+bash ./RunScript_Mac
+```
+
+El script instala Godot si hace falta y luego abre el proyecto de esta carpeta. No necesitas escribir ni arrastrar una ruta. macOS puede pedir autorización la primera vez que se abre la aplicación; confirma el diálogo del sistema. El script no desactiva Gatekeeper.
+
+### Ejecutar las pruebas
+
+El mismo script instala/reutiliza Godot y reenvía los argumentos de prueba. Desde la carpeta raíz `DungeonQuest`, ejecuta:
+
+```bash
+bash ./RunScript_Mac --headless --import || exit $?
+bash ./RunScript_Mac --headless --script res://tests/run_tests.gd || exit $?
+```
+
+La importación solo es necesaria la primera vez o después de cambios en los recursos. Para ver los comandos de prueba de Windows, ve a [Pruebas (Windows)](#pruebas-windows).
+
+La suite se enfoca en las estructuras de datos y algoritmos del proyecto, informa las verificaciones y mediciones de rendimiento y regenera `tests/results.md`. Devuelve código de salida `1` si hay verificaciones fallidas. El script respalda el progreso guardado (`user://dungeon_save.json`) y lo restaura al terminar. Al probar una carga corrupta puede aparecer `ERROR: Parse JSON failed`; es esperado. Godot también puede mostrar avisos de recursos al salir; revisa el total de verificaciones y el código de salida para confirmar el resultado.
+
+## Windows
+
+### Instalación
+
+El proyecto usa **Godot 4.7** y no necesita complementos. Se ha probado con Godot **4.7.2**.
+
+1. Descarga la versión estándar para Windows desde [godotengine.org/download/windows](https://godotengine.org/download/windows/).
+2. Extrae el archivo descargado. Godot se distribuye como aplicación portable; no hace falta ejecutar un instalador.
+3. Indica dónde está `Godot.exe`. El lanzador de Windows busca la ruta en este orden:
+   - El archivo local `.godot-path`, en la carpeta raíz del proyecto.
+   - `godot.exe` disponible en el `PATH`.
+   - Una ruta que puedes escribir cuando el lanzador la solicite.
+
+Para configurar `.godot-path`, abre PowerShell en la carpeta `DungeonQuest` y ejecuta este comando, sustituyendo el ejemplo por la ruta real al ejecutable:
+
+```powershell
+Set-Content -Path .godot-path -Value 'C:\ruta\a\Godot.exe'
+```
+
+El archivo contiene una sola línea con la ruta completa y **sin comillas**. Está excluido de Git, así que cada integrante puede guardar su propia ruta local.
+
+El archivo de Godot para Windows también incluye una versión de consola cuyo nombre termina en `_console.exe`. Se usa para correr pruebas y ver sus resultados en la terminal.
+
+### Ejecutar
+
+#### Lanzador de Windows — recomendado
+
+Haz doble clic en `RunScript_Windows.bat`. También puedes ejecutarlo desde PowerShell, ubicado en la carpeta del proyecto:
+
+```powershell
+.\RunScript_Windows.bat
+```
+
+El lanzador abre este proyecto y deja la ventana de consola disponible para mostrar errores. Si no configuraste `.godot-path` ni tienes Godot en el `PATH`, te pedirá la ruta al ejecutable.
+
+#### Desde el editor de Godot
+
+Abre Godot, importa el archivo `project.godot` de esta carpeta y ejecuta el proyecto con **F6** (escena actual) o **F5** (proyecto).
+
+#### Desde PowerShell
+
+Desde la carpeta del proyecto, usa `.godot-path`:
+
+```powershell
+$godot = (Get-Content .godot-path -Raw).Trim()
+& $godot --path .
+```
+
+Si `godot.exe` ya está en el `PATH`, también puedes ejecutar `godot --path .`.
+
+### Pruebas (Windows)
+
+Las pruebas son automatizadas, se ejecutan sin abrir la ventana del juego y se enfocan en las estructuras de datos y algoritmos del proyecto. Se recomienda ejecutarlas desde PowerShell en la carpeta raíz `DungeonQuest`.
+
+En Windows, ejecuta las pruebas con la versión de consola de Godot, cuyo nombre termina en `_console.exe`. Si `.godot-path` apunta al ejecutable normal, estos comandos localizan la versión de consola que viene junto a él:
+
+```powershell
+$godotExe = (Get-Content .godot-path -Raw).Trim()
+$godotConsole = Join-Path (Split-Path $godotExe) (([IO.Path]::GetFileNameWithoutExtension($godotExe)) + '_console.exe')
+if (-not (Test-Path $godotConsole)) { throw "No se encontró Godot Console: $godotConsole" }
+
+& $godotConsole --headless --path . --import
+if ($LASTEXITCODE -ne 0) { throw "Falló la importación de recursos." }
+
+& $godotConsole --headless --path . --script res://tests/run_tests.gd
+if ($LASTEXITCODE -ne 0) { throw "Fallaron las pruebas." }
+```
+
+Si no configuraste `.godot-path`, asigna `$godotConsole` directamente a la ruta del ejecutable `_console.exe`. También puedes usar el comando `godot` solo si en el `PATH` apunta a la versión de consola:
+
+```powershell
+$godotConsole = 'C:\ruta\a\Godot_v4.7.2-stable_win64_console.exe'
+& $godotConsole --headless --path . --import
+if ($LASTEXITCODE -ne 0) { throw "Falló la importación de recursos." }
+& $godotConsole --headless --path . --script res://tests/run_tests.gd
+if ($LASTEXITCODE -ne 0) { throw "Fallaron las pruebas." }
+```
+
+
 ## Descripción
-Dungeon Quest es un videojuego 2D de exploración de mazmorras hecho en **Godot 4.6**. El mapa se representa con un **grafo no dirigido y no ponderado**: cada sala es un vértice y cada puerta es el extremo de una arista. El grafo se **genera proceduralmente** en cada partida, y el jugador solo puede pasar de una sala a otra a través de las puertas que el grafo permite.
 
-El proyecto tiene fines académicos (curso de Estructuras de Datos) y busca demostrar el uso de grafos, BFS y conjuntos disjuntos (Union-Find) dentro de un juego funcional.
+Dungeon Quest es un videojuego 2D de exploración y combate. Cada partida genera una mazmorra de ocho salas conectadas mediante un grafo no dirigido y no ponderado. El jugador explora las salas, combate enemigos, desbloquea habilidades y busca la salida.
 
-## Qué hace el juego
-- Genera un calabozo de 8 salas con una sala de entrada, una sala de salida y salas intermedias.
-- El jugador aparece en la sala de entrada y se mueve con las flechas del teclado.
-- Cada puerta lleva a otra sala: el jugador camina hacia el arco, la pantalla se oscurece y aparece en la puerta gemela de la sala destino.
-- Cada cruce se valida contra el grafo antes de permitirse.
-- Con la tecla de ayuda, la puerta que sigue la ruta más corta hacia la salida brilla (calculada con BFS).
-- Al cruzar la puerta de victoria de la sala de salida, aparece la pantalla de victoria.
-- Hay pantalla de inicio con las opciones **Jugar** y **Salir**.
+Creado para el curso de Estructuras de Datos, el proyecto aplica grafos, búsqueda BFS, Union-Find, colas, montículos y árboles de prefijos. El [roadmap y las ideas pendientes](docs/README.md) describen el estado de desarrollo y la preparación de las entregas académicas.
 
-## Requisitos
-- Godot 4.6 (usa `@export_tool_button`, disponible desde 4.4).
-- No requiere complementos ni recursos externos.
+## Funcionalidades
 
-## Cómo ejecutar (macOS)
-
-Este proyecto incluye un script de Bash (`ejecutar.sh`) que automatiza por completo la configuración en macOS: descarga e instala **Godot 4.6** de forma automática (si no está instalado), configura los permisos de seguridad del sistema y abre el juego directamente.
-
-### Pasos para iniciar
-
-1. **Dar permisos de ejecución al script**  
-   Abre la Terminal en la raíz del proyecto y ejecuta el siguiente comando (solo es necesario hacerlo la primera vez):
-   ```bash
-   chmod +x ejecutar.sh
-   ```
-
-2. **Lanzar el script**  
-   Inicia el asistente automático con el comando:
-   ```bash
-   ./ejecutar.sh
-   ```
-
-3. **Indicar la ruta del proyecto**  
-   Cuando la Terminal lo solicite, **arrastra la carpeta de este proyecto** directamente a la ventana de la Terminal (o escribe su ruta manualmente) y presiona `Enter`.
-
-El script se encargará de validar tu entorno, solucionar el bloqueo de Gatekeeper de macOS si descarga el motor por primera vez, e iniciará el juego inmediatamente sin necesidad de configurar nada de forma manual.
-
-
-
-## Cómo ejecutar
-1. Abre Godot.
-2. Selecciona **Importar** y elige el archivo `project.godot`.
-3. Abre el proyecto.
-4. Pulsa **F5** para ejecutar.
+- Mazmorra procedural de ocho salas, con entrada, salida y conexiones validadas mediante un grafo.
+- Movimiento con teclado, minimapa y pistas hacia la salida calculadas con BFS.
+- Enemigos colocados en salas intermedias; al encontrarlos comienza un combate por turnos.
+- Árbol de habilidades persistente entre partidas, con poderes que se desbloquean usando puntos.
+- Pantallas de inicio, victoria y derrota.
 
 ## Controles
+
 | Acción | Control |
 |---|---|
-| Moverse | Flechas del teclado |
-| Pista hacia la salida (BFS) | Tecla asignada a la acción `help` |
-| Cruzar una puerta | Caminar hacia el arco |
+| Moverse | Flechas o WASD |
+| Mostrar una pista hacia la salida | H |
+| Abrir/cerrar el árbol de habilidades | K |
+| Atacar durante el combate | Clic en el botón del enemigo |
+| Defenderse | Botón **Defender** |
+| Consultar los combos | Menú desplegable **Combos** (arriba a la izquierda), en tu turno |
+| Iniciar un poder | Botón **Poder** y luego ingresar de memoria la secuencia de flechas |
+| Hacer parry | Espacio, al cerrarse el aro del golpe enemigo |
+| Cancelar el ingreso de un combo | Esc |
+
+En el árbol de habilidades, haz clic en un nodo para desbloquearlo. Usa clic derecho sobre una habilidad desbloqueada para reiniciar esa rama y recuperar sus puntos. Puedes mover la vista con el ratón o las flechas/WASD; la rueda del ratón cambia el zoom y **Home** centra el árbol.
+
+## Combate y enemigos
+
+El combate es por turnos; el orden se determina según la velocidad de cada combatiente. El jugador puede atacar, defenderse o usar poderes. Los enemigos anuncian sus golpes con un indicador: un parry perfecto con Espacio evita el daño y contraataca; un bloqueo a tiempo reduce el daño.
+
+| Enemigo | Vida | Ataque | Velocidad | Golpes por turno |
+|---|---:|---:|---:|---:|
+| Slime | 30 | 4 | 8 | 2 |
+| Esqueleto | 45 | 7 | 9 | 2 |
+| Murciélago | 20 | 5 | 14 | 3 |
+| Bruto | 70 | 10 | 5 | 1 |
+
+La variedad de enemigos posibles aumenta con la distancia de la sala desde la entrada.
+
+## HUD
+
+Durante la exploración, el HUD muestra el nombre del jugador, su vida y sus puntos de habilidad. El minimapa permite orientarse por la mazmorra. En combate se muestran la vida de los combatientes, los puntos de acción (PA), el orden de turnos, los mensajes del combate y los indicadores de combo y parry.
+
+## Combos ocultos
+
+Los poderes se desbloquean en el árbol de habilidades. Los desbloqueados aparecen en el menú desplegable **Combos** (arriba a la izquierda, en tu turno), con su secuencia y su costo; los que no alcanzas por falta de PA salen en gris.
+
+Al pulsar **Poder**, el juego **no muestra la secuencia**: solo ves las flechas que llevas y una barra de tiempo, así que hay que recordarla. Cada tecla debe ingresarse en menos de 2 segundos; si se agota el tiempo, **pierdes el turno**. Una tecla equivocada rompe el combo y **también pierdes el turno**; **Esc** lo cancela sin perderlo. El botón **Poder** se desactiva cuando los PA no alcanzan ni para el poder más barato.
+
+| Poder | Secuencia | Efecto | Costo |
+|---|---|---|---:|
+| Corte | ↓ → | 16 de daño a un enemigo | 2 PA |
+| Llamarada | ↑ ↑ → | 14 de daño a todos los enemigos | 3 PA |
+| Sanación | ↓ ↓ ↑ | Recupera 20 de vida | 3 PA |
+| Tormenta | ← → ← → | 30 de daño a un enemigo | 4 PA |
+
+Las habilidades requieren desbloquear primero su habilidad padre. El árbol incluye las ramas Espada, Luz y Fuego; el progreso se guarda entre partidas.
 
 ## Estructuras de datos y algoritmos
 
-### Grafo (lista de adyacencia)
-Implementado en `scripts/DungeonGraph.gd` con un `Dictionary` que asocia cada sala con un `Array` de vecinas. `add_edge` inserta la conexión en ambos sentidos.
+### Grafo, BFS y generación de la mazmorra
 
-| Operación | Complejidad |
-|---|---|
-| Consultar vecinos | O(1) |
-| ¿Son vecinas `a` y `b`? | O(grado) |
-| Agregar arista | O(grado) |
+`scripts/structures/dungeon_graph.gd` representa las salas como vértices y sus puertas como aristas. `bfs_path(inicio, meta)` busca la ruta más corta en cantidad de conexiones en **O(V + E)**; se utiliza para las pistas y para calcular distancias.
 
-Se eligió lista de adyacencia sobre matriz porque el grafo es disperso (cada sala tiene como máximo 4 vecinas).
+La generación procedural construye un mapa conexo con Union-Find, compresión de caminos y aristas adicionales para ofrecer rutas alternativas. `scripts/world/map_builder.gd` instancia las salas y puertas a partir del grafo.
 
-### BFS (búsqueda en anchura)
-`bfs_path(inicio, meta)` devuelve la ruta con menos conexiones. Usa una cola, un diccionario de visitados y un diccionario de predecesores para reconstruir el camino. Complejidad **O(V + E)**. Se usa para la pista visual de la tecla de ayuda.
+### Estructuras adicionales
 
-### Union-Find (conjuntos disjuntos)
-`generate()` usa Union-Find con **compresión de caminos** para construir un árbol de expansión aleatorio entre las salas intermedias, lo que garantiza que todas las salas sean alcanzables. Después agrega aristas extra para crear ciclos y rutas alternativas.
-
-### Generación procedural
-1. Se crea un árbol de expansión aleatorio entre las salas intermedias (grado máximo 4).
-2. Se agregan aristas extra sin superar el grado máximo.
-3. La entrada (sala 1) se conecta a una sala intermedia y la salida (sala n) a la intermedia más lejana según BFS; ambas son hojas.
-4. Se usa una **semilla** (`RandomNumberGenerator`), que se imprime en consola: la misma semilla produce el mismo mapa.
-
-### Diccionario de puertas
-`Main.gd` guarda las puertas en un `Dictionary` indexado por el par `Vector2i(desde, hacia)`. Al cruzar, la puerta gemela se obtiene con `Vector2i(hacia, desde)`.
-
-## Cómo se construye el mapa
-- Cada sala es una plantilla (`EntryRoom`, `ExitRoom`, `RoomA`, `RoomB`) de 480 × 270 px con **10 posiciones posibles de puerta** (`Slot_0` a `Slot_9`) en los bordes.
-- Cada plantilla indica qué slots están deshabilitados según su forma (`Disabled Slots`).
-- Cada slot tiene una **vista** (frente, atrás, izquierda, derecha) según la pared donde está.
-- Para cada arista del grafo, el código instancia una puerta en cada sala. La puerta de llegada se coloca en la pared opuesta cuando es posible.
-- La sala de salida solo se conecta por un slot fijo y tiene otro slot fijo para la puerta de victoria (`to_room = 0`, que no forma parte del grafo).
-- Las salas se colocan separadas en una cuadrícula; no se conectan caminando, solo por las puertas.
+- `scripts/structures/min_heap.gd`: cola de prioridad para programar el orden de los turnos.
+- `scripts/structures/circular_queue.gd`: cola circular utilizada para los golpes del parry, el búfer de teclas del combo y el recorrido por niveles del árbol de habilidades.
+- `scripts/structures/combo_trie.gd`: trie que identifica los poderes a partir de sus secuencias de flechas.
+- `scripts/skills/skill_tree.gd`: árbol general de habilidades, recorrido por niveles con BFS y guardado de progreso.
 
 ## Estructura del proyecto
+
 ```text
 DungeonQuest/
 ├── project.godot
 ├── README.md
+├── RunScript_Mac
+├── RunScript_Windows.bat
 ├── assets/
-│   ├── README.md
+│   ├── fonts/
 │   └── sprites/
+│       ├── backgrounds/
+│       ├── doors/
+│       ├── player/
+│       └── tiles/
 ├── scenes/
-│   ├── Start.tscn          # pantalla de inicio
-│   ├── Main.tscn           # juego
-│   ├── Victory.tscn        # pantalla de victoria
-│   ├── player.tscn
+│   ├── Start.tscn
+│   ├── Main.tscn
+│   ├── CombatScene.tscn
+│   ├── PlayerHUD.tscn
+│   ├── SkillScreen.tscn
+│   ├── Victory.tscn
+│   ├── GameOver.tscn
+│   ├── Foe.tscn
+│   ├── SkillNodeButton.tscn
+│   ├── SceneController.tscn
 │   ├── objects/
-│   │   ├── Door.tscn
-│   │   └── DoorSlots.tscn
 │   └── rooms/
-│       ├── EntryRoom.tscn
-│       ├── ExitRoom.tscn
-│       ├── RoomA.tscn
-│       └── RoomB.tscn
-└── scripts/
-    ├── Main.gd             # generación del mapa, cruce de puertas, fade, pista
-    ├── DungeonGraph.gd     # grafo, BFS, generación con Union-Find
-    ├── door.gd             # puerta: vistas, colisiones, brillo
-    ├── door_slot.gd        # slot individual (vista editable en el editor)
-    ├── door_slots.gd       # contenedor de slots y slots deshabilitados
-    ├── room.gd             # interfaz de una sala
-    ├── player.gd
-    ├── start.gd
-    └── victory.gd
+├── scripts/
+│   ├── actors/
+│   ├── combat/
+│   ├── core/
+│   ├── skills/
+│   ├── structures/
+│   └── world/
+└── tests/
+    ├── run_tests.gd
+    └── results.md
 ```
-
-## Estado actual
-**Implementado**
-- Movimiento del jugador con animaciones y colisiones.
-- Cámara que sigue al jugador y se limita a la sala actual.
-- Puertas con 4 vistas, colisiones por vista y brillo de pista.
-- Transición al cruzar: paseo hacia el arco, fundido a negro y fundido de entrada.
-- Grafo, BFS y generación procedural con semilla.
-- Validación de cada cruce contra el grafo.
-- Pantallas de inicio y victoria.
-
-**Pendiente**
-- Más plantillas de sala para dar variedad.
-- Elegir la salida como la hoja más lejana de la entrada.
-- Mostrar la ruta completa en pantalla.
-- Pulido visual de los menús.
-
-## Ideas a futuro
-- Pila para una tecla de "volver atrás" (historial de salas).
-- Implementar la cola de BFS con un arreglo circular propio.
-- Tabla hash propia para los datos de cada sala.
-- Puertas con costo y búsqueda de ruta ponderada (Dijkstra).
-- Árbol de habilidades: ver `IDEA_ARBOL_HABILIDADES.md` (requiere añadir combate, que hoy no existe).
-
-## Alcance
-Por ahora no incluye combate, inventario ni enemigos. El objetivo es demostrar que el movimiento entre salas está restringido por un grafo, que BFS calcula la ruta más corta y que Union-Find permite generar mapas siempre conexos.

@@ -1,0 +1,72 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/foe_view.gd" id="1_view"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/enemies/placeholder_frames.tres" id="2_frames"]
+[ext_resource type="LabelSettings" uid="uid://cqs84c65hgjs8" path="res://assets/fonts/label_config.tres" id="3_labels"]
+
+[sub_resource type="StyleBoxFlat" id="bar_bg"]
+bg_color = Color(0.18, 0.13, 0.18, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.93, 0.55, 1)
+
+[sub_resource type="StyleBoxFlat" id="bar_fill"]
+bg_color = Color(0.29, 0.87, 0.5, 1)
+
+[node name="Foe" type="Node2D"]
+script = ExtResource("1_view")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -22)
+scale = Vector2(0.3, 0.3)
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="NameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = -45.0
+offset_top = -60.0
+offset_right = 45.0
+offset_bottom = -46.0
+text = "Enemigo"
+label_settings = ExtResource("3_labels")
+horizontal_alignment = 1
+
+[node name="Arrow" type="Polygon2D" parent="."]
+unique_name_in_owner = true
+visible = false
+color = Color(1, 0.88, 0.4, 1)
+polygon = PackedVector2Array(-4, -70, 4, -70, 0, -63)
+
+[node name="HPBar" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+offset_left = -25.0
+offset_top = 4.0
+offset_right = 25.0
+offset_bottom = 10.0
+theme_override_styles/background = SubResource("bar_bg")
+theme_override_styles/fill = SubResource("bar_fill")
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = -25.0
+offset_top = 11.0
+offset_right = 25.0
+offset_bottom = 25.0
+text = "30/30"
+label_settings = ExtResource("3_labels")
+horizontal_alignment = 1
+
+[node name="AttackButton" type="Button" parent="."]
+unique_name_in_owner = true
+offset_left = -22.0
+offset_top = -44.0
+offset_right = 22.0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true

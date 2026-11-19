@@ -1,48 +1,76 @@
 #!/bin/bash
+set -euo pipefail
 
-# 1. Configuración de variables
-GODOT_VERSION="4.6" 
-# URL oficial corregida para la descarga directa desde los releases de Godot
-GODOT_URL="https://github.com{GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_macos.universal.zip"
-ZIP_NAME="Godot.zip"
-APP_NAME="Godot.app"
-INSTALL_DIR="/Applications"
+GODOT_VERSION="4.7.2"
+GODOT_ARCHIVE="Godot_v${GODOT_VERSION}-stable_macos.universal.zip"
+GODOT_URL="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/${GODOT_ARCHIVE}"
+GODOT_SHA256="c58a24e31d720be9d62f60cb5627c4e695fb72f21b0cfe1bc9ccaa9a3b3ba63e"
 
-# Pedir la ruta del proyecto al usuario
-echo "📁 Por favor, arrastra o escribe la ruta de la carpeta de tu proyecto de Godot y presiona Enter:"
-read -r PROJECT_PATH
-
-# Limpiar comillas o espacios extras de la ruta si se arrastró la carpeta
-PROJECT_PATH=$(echo "$PROJECT_PATH" | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//")
-
-# 2. Verificar o instalar Godot
-if [ ! -d "$INSTALL_DIR/$APP_NAME" ]; then
-    echo "📥 Godot no está instalado en Aplicaciones. Descargando versión ${GODOT_VERSION}..."
-    curl -L -o "$ZIP_NAME" "$GODOT_URL"
-    
-    echo "📦 Descomprimiendo..."
-    unzip -q "$ZIP_NAME"
-    
-    echo "🚀 Moviendo a la carpeta de Aplicaciones..."
-    mv "$APP_NAME" "$INSTALL_DIR/"
-    
-    echo "🧹 Limpiando archivos temporales..."
-    rm "$ZIP_NAME"
-    
-    # Bypass para la seguridad de macOS (Gatekeeper) ya que se descarga por curl
-    echo "🔓 Autorizando la aplicación en macOS..."
-    xattr -dr com.apple.quarantine "$INSTALL_DIR/$APP_NAME"
-    
-    echo "✅ ¡Godot ${GODOT_VERSION} instalado con éxito!"
-else
-    echo "✨ Godot ya está instalado en tu sistema."
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_PATH="$SCRIPT_DIR"
+if [[ $# -gt 0 && "$1" != --* ]]; then
+    PROJECT_PATH="$1"
+    shift
 fi
-
-# 3. Correr el proyecto seleccionado
-if [ -f "$PROJECT_PATH/project.godot" ]; then
-    echo "🎮 Abriendo el proyecto: $PROJECT_PATH"
-    "$INSTALL_DIR/$APP_NAME/Contents/MacOS/Godot" --path "$PROJECT_PATH" &
-else
-    echo "❌ Error: No se encontró un archivo 'project.godot' en la ruta especificada."
+if [[ ! -f "$PROJECT_PATH/project.godot" ]]; then
+    echo "Error: no se encontró project.godot en: $PROJECT_PATH" >&2
     exit 1
 fi
+PROJECT_PATH="$(cd -- "$PROJECT_PATH" && pwd)"
+
+godot_has_expected_version() {
+    local executable="$1"
+    local version
+    [[ -x "$executable" ]] || return 1
+    version="$("$executable" --version 2>/dev/null)" || return 1
+    [[ "$version" == "$GODOT_VERSION"* ]]
+}
+
+GODOT_EXECUTABLE=""
+if [[ -n "${GODOT_BIN:-}" ]]; then
+    if ! godot_has_expected_version "$GODOT_BIN"; then
+        echo "Error: GODOT_BIN debe apuntar a Godot ${GODOT_VERSION}: $GODOT_BIN" >&2
+        exit 1
+    fi
+    GODOT_EXECUTABLE="$GODOT_BIN"
+elif command -v godot >/dev/null 2>&1 && godot_has_expected_version "$(command -v godot)"; then
+    GODOT_EXECUTABLE="$(command -v godot)"
+elif godot_has_expected_version "/Applications/Godot.app/Contents/MacOS/Godot"; then
+    GODOT_EXECUTABLE="/Applications/Godot.app/Contents/MacOS/Godot"
+elif godot_has_expected_version "$HOME/Applications/Godot_v${GODOT_VERSION}-stable.app/Contents/MacOS/Godot"; then
+    GODOT_EXECUTABLE="$HOME/Applications/Godot_v${GODOT_VERSION}-stable.app/Contents/MacOS/Godot"
+else
+    INSTALL_DIR="$HOME/Applications"
+    INSTALL_APP="$INSTALL_DIR/Godot_v${GODOT_VERSION}-stable.app"
+    TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/dungeonquest-godot.XXXXXX")"
+    trap 'rm -rf "$TEMP_DIR"' EXIT
+    ARCHIVE_PATH="$TEMP_DIR/$GODOT_ARCHIVE"
+
+    echo "Godot ${GODOT_VERSION} no está instalado. Descargando la versión oficial para macOS..."
+    curl --fail --location --retry 3 --connect-timeout 20 "$GODOT_URL" --output "$ARCHIVE_PATH"
+
+    ACTUAL_SHA256="$(shasum -a 256 "$ARCHIVE_PATH" | awk '{print $1}')"
+    if [[ "$ACTUAL_SHA256" != "$GODOT_SHA256" ]]; then
+        echo "Error: la verificación SHA-256 de la descarga falló." >&2
+        exit 1
+    fi
+
+    unzip -tq "$ARCHIVE_PATH"
+    unzip -q "$ARCHIVE_PATH" -d "$TEMP_DIR"
+    if [[ ! -x "$TEMP_DIR/Godot.app/Contents/MacOS/Godot" ]]; then
+        echo "Error: el archivo descargado no contiene Godot.app." >&2
+        exit 1
+    fi
+
+    mkdir -p "$INSTALL_DIR"
+    ditto "$TEMP_DIR/Godot.app" "$INSTALL_APP"
+    GODOT_EXECUTABLE="$INSTALL_APP/Contents/MacOS/Godot"
+    if ! godot_has_expected_version "$GODOT_EXECUTABLE"; then
+        echo "Error: Godot no pudo instalarse correctamente en $INSTALL_APP" >&2
+        exit 1
+    fi
+    echo "Godot ${GODOT_VERSION} quedó instalado en $INSTALL_APP."
+fi
+
+echo "Iniciando Dungeon Quest con Godot ${GODOT_VERSION}..."
+exec "$GODOT_EXECUTABLE" --path "$PROJECT_PATH" "$@"

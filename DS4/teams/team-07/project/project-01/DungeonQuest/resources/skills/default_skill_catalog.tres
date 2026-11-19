@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SkillCatalog" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/skills/skill_catalog.gd" id="1_catalog"]
+[ext_resource type="Script" path="res://scripts/skills/skill_definition.gd" id="2_definition"]
+[ext_resource type="Resource" path="res://resources/skills/espada.tres" id="3_espada"]
+[ext_resource type="Resource" path="res://resources/skills/corte.tres" id="4_corte"]
+[ext_resource type="Resource" path="res://resources/skills/tormenta.tres" id="5_tormenta"]
+[ext_resource type="Resource" path="res://resources/skills/luz.tres" id="6_luz"]
+[ext_resource type="Resource" path="res://resources/skills/sanacion.tres" id="7_sanacion"]
+[ext_resource type="Resource" path="res://resources/skills/fuego.tres" id="8_fuego"]
+[ext_resource type="Resource" path="res://resources/skills/llamarada.tres" id="9_llamarada"]
+
+[resource]
+script = ExtResource("1_catalog")
+definitions = Array[ExtResource("2_definition")]([ExtResource("3_espada"), ExtResource("4_corte"), ExtResource("5_tormenta"), ExtResource("6_luz"), ExtResource("7_sanacion"), ExtResource("8_fuego"), ExtResource("9_llamarada")])
