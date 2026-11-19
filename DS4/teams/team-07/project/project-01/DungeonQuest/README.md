@@ -16,10 +16,8 @@ El proyecto, creado para el curso de Estructuras de Datos, aplica grafos, búsqu
 
 ## Requisitos
 
-- **Godot 4.6**. El proyecto declara la serie 4.6 en `project.godot`; el lanzador incluido (`RunScript_Mac`) también configura `GODOT_VERSION="4.6"`. El proyecto se ha probado con Godot 4.6.1.
+- **Godot 4.7**. El proyecto declara la serie 4.7 en `project.godot`; el lanzador de macOS (`RunScript_Mac`) configura `GODOT_VERSION="4.7"`. El proyecto se ha probado con Godot 4.7.1.
 - No requiere complementos adicionales.
-
-> En este checkout el lanzador se llama `RunScript_Mac`; no hay un archivo `ejecutar.sh`.
 
 ## Cómo ejecutar el juego
 
@@ -43,6 +41,10 @@ Si `godot` no está en el `PATH`, usa la ruta completa al ejecutable:
 & "C:\ruta\a\Godot.exe" --path .
 ```
 
+### Desde Windows
+
+Ejecuta `RunScript_Windows.bat` desde el Explorador de archivos o desde una terminal. El script busca `godot.exe` en el `PATH`; si no lo encuentra, solicita la ruta completa a `Godot.exe`. Necesitas tener Godot 4.7 instalado.
+
 ## Controles
 
 | Acción | Control |
@@ -52,7 +54,8 @@ Si `godot` no está en el `PATH`, usa la ruta completa al ejecutable:
 | Abrir/cerrar el árbol de habilidades | K |
 | Atacar durante el combate | Clic en el botón del enemigo |
 | Defenderse | Botón **Defender** |
-| Iniciar un poder | Botón **Poder** y luego ingresar la secuencia de flechas |
+| Consultar los combos | Menú desplegable **Combos** (arriba a la izquierda), en tu turno |
+| Iniciar un poder | Botón **Poder** y luego ingresar de memoria la secuencia de flechas |
 | Hacer parry | Espacio, al cerrarse el aro del golpe enemigo |
 | Cancelar el ingreso de un combo | Esc |
 
@@ -77,7 +80,9 @@ Durante la exploración, el HUD muestra el nombre del jugador, su vida y sus pun
 
 ## Combos ocultos
 
-Los poderes se descubren y desbloquean en el árbol de habilidades. Tras desbloquearlos, aparecen en el menú **Combos** durante el combate; ingresa sus secuencias con las flechas. Cada tecla debe ingresarse dentro del límite de tiempo mostrado.
+Los poderes se desbloquean en el árbol de habilidades. Los desbloqueados aparecen en el menú desplegable **Combos** (arriba a la izquierda, en tu turno), con su secuencia y su costo; los que no alcanzas por falta de PA salen en gris.
+
+Al pulsar **Poder**, el juego **no muestra la secuencia**: solo ves las flechas que llevas y una barra de tiempo, así que hay que recordarla. Cada tecla debe ingresarse en menos de 2 segundos; si se agota el tiempo, **pierdes el turno**. Una tecla equivocada cancela el combo sin perder el turno, y **Esc** lo cancela también. El botón **Poder** se desactiva cuando los PA no alcanzan ni para el poder más barato.
 
 | Poder | Secuencia | Efecto | Costo |
 |---|---|---|---:|
@@ -92,14 +97,14 @@ Las habilidades requieren desbloquear primero su habilidad padre. El árbol incl
 
 ### Grafo, BFS y generación de la mazmorra
 
-`scripts/world/dungeon_graph.gd` representa las salas como vértices y sus puertas como aristas. `bfs_path(inicio, meta)` busca la ruta más corta en cantidad de conexiones en **O(V + E)**; se utiliza para las pistas y para calcular distancias.
+`scripts/structures/dungeon_graph.gd` representa las salas como vértices y sus puertas como aristas. `bfs_path(inicio, meta)` busca la ruta más corta en cantidad de conexiones en **O(V + E)**; se utiliza para las pistas y para calcular distancias.
 
 La generación procedural construye un mapa conexo con Union-Find, compresión de caminos y aristas adicionales para ofrecer rutas alternativas. `scripts/world/map_builder.gd` instancia las salas y puertas a partir del grafo.
 
 ### Estructuras adicionales
 
 - `scripts/structures/min_heap.gd`: cola de prioridad para programar el orden de los turnos.
-- `scripts/structures/circular_queue.gd`: cola circular utilizada en BFS y para administrar los golpes de los enemigos.
+- `scripts/structures/circular_queue.gd`: cola circular utilizada para los golpes del parry, el búfer de teclas del combo y el recorrido por niveles del árbol de habilidades.
 - `scripts/structures/combo_trie.gd`: trie que identifica los poderes a partir de sus secuencias de flechas.
 - `scripts/skills/skill_tree.gd`: árbol general de habilidades, recorrido por niveles con BFS y guardado de progreso.
 
@@ -110,6 +115,7 @@ DungeonQuest/
 ├── project.godot
 ├── README.md
 ├── RunScript_Mac
+├── RunScript_Windows.bat
 ├── assets/
 │   ├── fonts/
 │   └── sprites/
@@ -126,7 +132,8 @@ DungeonQuest/
 │   ├── Victory.tscn
 │   ├── GameOver.tscn
 │   ├── Foe.tscn
-│   ├── FoeRow.tscn
+│   ├── SkillNodeButton.tscn
+│   ├── SceneController.tscn
 │   ├── objects/
 │   └── rooms/
 ├── scripts/
@@ -137,18 +144,26 @@ DungeonQuest/
 │   ├── structures/
 │   └── world/
 └── tests/
-    └── run_tests.gd
+    ├── run_tests.gd
+    ├── run_in_editor.gd
+    └── results.md
 ```
 
 ## Cómo correr las pruebas
 
-Las pruebas se ejecutan sin abrir la ventana del juego. Abre una terminal en la carpeta `DungeonQuest`. La primera vez, importa los recursos del proyecto:
+Las pruebas se ejecutan sin abrir la ventana del juego. Desde PowerShell, abre primero la carpeta raíz del proyecto:
+
+```powershell
+cd "C:\ruta\a\DungeonQuest"
+```
+
+La primera vez, importa los recursos del proyecto:
 
 ```powershell
 godot --headless --path . --import
 ```
 
-Después ejecuta el script de pruebas:
+Después ejecuta el archivo de pruebas actualizado, usando su ruta de recursos de Godot:
 
 ```powershell
 godot --headless --path . --script res://tests/run_tests.gd
@@ -162,4 +177,6 @@ $godot = "C:\ruta\a\Godot.exe"
 & $godot --headless --path . --script res://tests/run_tests.gd
 ```
 
-El script imprime el resultado de las verificaciones, ejecuta mediciones de rendimiento y genera `tests/results.md`. Devuelve código de salida `1` si alguna prueba falla. Antes de probar el guardado de habilidades, respalda y restaura el archivo de progreso del jugador.
+El script imprime el resultado de las verificaciones, ejecuta mediciones de rendimiento y genera `tests/results.md`. Devuelve código de salida `1` si alguna prueba falla. Las pruebas respaldan automáticamente el progreso del jugador (`user://dungeon_save.json`) y lo restauran al terminar.
+
+También se pueden ejecutar desde el editor de Godot, sin terminal: abre `tests/run_in_editor.gd` y elige **Archivo → Ejecutar** (**Ctrl + Mayús + X**). El resultado aparece en el panel **Salida**. Durante la prueba del guardado corrupto aparece un `ERROR: Parse JSON failed`; es esperado y no indica un fallo.

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 1. Configuración de variables
-GODOT_VERSION="4.6" 
+GODOT_VERSION="4.7" 
 # URL oficial corregida para la descarga directa desde los releases de Godot
 GODOT_URL="https://github.com{GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_macos.universal.zip"
 ZIP_NAME="Godot.zip"

@@ -1,6 +1,6 @@
 # Resultados de las pruebas
 
-Generado con `tests/run_tests.gd` (Godot 4.6.1-stable (official)).
+Generado con `tests/run_tests.gd` (Godot 4.7.2-stable (official)).
 
 ## Verificaciones por estructura
 
@@ -33,31 +33,31 @@ Generado con `tests/run_tests.gd` (Godot 4.6.1-stable (official)).
 
 | n | tiempo total (ms) | µs por operación | µs/op ÷ log₂(n) |
 |---|---|---|---|
-| 1000 | 31.5 | 15.73 | 1.578 |
-| 10000 | 314.4 | 15.72 | 1.183 |
-| 100000 | 3623.2 | 18.12 | 1.091 |
+| 1000 | 13.4 | 6.70 | 0.672 |
+| 10000 | 197.9 | 9.89 | 0.745 |
+| 100000 | 2353.5 | 11.77 | 0.708 |
 
 ### CircularQueue: n encolados seguidos de n desencolados
 
 | n | tiempo total (ms) | µs por operación |
 |---|---|---|
-| 1000 | 1.3 | 0.635 |
-| 10000 | 13.4 | 0.669 |
-| 100000 | 127.1 | 0.636 |
+| 1000 | 1.3 | 0.626 |
+| 10000 | 8.7 | 0.435 |
+| 100000 | 84.9 | 0.424 |
 
 ### DungeonGraph: generación (Kruskal + Union-Find) y BFS según el número de salas
 
 | Salas | generación (ms) | aristas | BFS entrada→salida (µs, promedio de 20) | salas en el camino |
 |---|---|---|---|---|
-| 8 | 0.22 | 8 | 11.8 | 5 |
-| 32 | 0.94 | 39 | 48.0 | 10 |
-| 128 | 10.54 | 159 | 194.1 | 25 |
-| 512 | 130.14 | 639 | 788.5 | 46 |
+| 8 | 0.19 | 8 | 8.2 | 5 |
+| 32 | 0.65 | 39 | 31.8 | 10 |
+| 128 | 6.73 | 159 | 125.2 | 25 |
+| 512 | 86.91 | 639 | 500.9 | 46 |
 
 ### SkillTree: n habilidades (cadena de dos ramas)
 
 | n | n inserciones (ms) | find del último (µs) | levels() (ms) |
 |---|---|---|---|
-| 100 | 7.7 | 81 | 0.24 |
-| 500 | 342.0 | 646 | 1.62 |
-| 2000 | 3739.8 | 1953 | 5.87 |
+| 100 | 5.4 | 58 | 0.17 |
+| 500 | 134.8 | 297 | 1.01 |
+| 2000 | 2448.8 | 2448 | 4.12 |
