@@ -1,10 +1,120 @@
 # Dungeon Quest
 
+## macOS
+
+### Instalar
+
+El proyecto usa **Godot 4.7** (probado con **4.7.2**) y no necesita complementos.
+
+No necesitas instalar Godot manualmente. El primer uso de `RunScript_Mac` requiere conexión a Internet: descarga Godot 4.7.2 desde la publicación oficial, verifica el SHA-256 e instala la aplicación en `~/Applications`. No requiere permisos de administrador. Si ya hay una copia compatible de Godot 4.7.2 en el sistema, la reutiliza.
+
+### Ejecutar con el script
+
+Abre Terminal en la carpeta `DungeonQuest` y ejecuta:
+
+```bash
+bash ./RunScript_Mac
+```
+
+El script instala Godot si hace falta y luego abre el proyecto de esta carpeta. No necesitas escribir ni arrastrar una ruta. macOS puede pedir autorización la primera vez que se abre la aplicación; confirma el diálogo del sistema. El script no desactiva Gatekeeper.
+
+### Ejecutar las pruebas
+
+El mismo script instala/reutiliza Godot y reenvía los argumentos de prueba. Desde la carpeta raíz `DungeonQuest`, ejecuta:
+
+```bash
+bash ./RunScript_Mac --headless --import || exit $?
+bash ./RunScript_Mac --headless --script res://tests/run_tests.gd || exit $?
+```
+
+La importación solo es necesaria la primera vez o después de cambios en los recursos. Para ver los comandos de prueba de Windows, ve a [Pruebas (Windows)](#pruebas-windows).
+
+La suite se enfoca en las estructuras de datos y algoritmos del proyecto, informa las verificaciones y mediciones de rendimiento y regenera `tests/results.md`. Devuelve código de salida `1` si hay verificaciones fallidas. El script respalda el progreso guardado (`user://dungeon_save.json`) y lo restaura al terminar. Al probar una carga corrupta puede aparecer `ERROR: Parse JSON failed`; es esperado. Godot también puede mostrar avisos de recursos al salir; revisa el total de verificaciones y el código de salida para confirmar el resultado.
+
+## Windows
+
+### Instalación
+
+El proyecto usa **Godot 4.7** y no necesita complementos. Se ha probado con Godot **4.7.2**.
+
+1. Descarga la versión estándar para Windows desde [godotengine.org/download/windows](https://godotengine.org/download/windows/).
+2. Extrae el archivo descargado. Godot se distribuye como aplicación portable; no hace falta ejecutar un instalador.
+3. Indica dónde está `Godot.exe`. El lanzador de Windows busca la ruta en este orden:
+   - El archivo local `.godot-path`, en la carpeta raíz del proyecto.
+   - `godot.exe` disponible en el `PATH`.
+   - Una ruta que puedes escribir cuando el lanzador la solicite.
+
+Para configurar `.godot-path`, abre PowerShell en la carpeta `DungeonQuest` y ejecuta este comando, sustituyendo el ejemplo por la ruta real al ejecutable:
+
+```powershell
+Set-Content -Path .godot-path -Value 'C:\ruta\a\Godot.exe'
+```
+
+El archivo contiene una sola línea con la ruta completa y **sin comillas**. Está excluido de Git, así que cada integrante puede guardar su propia ruta local.
+
+El archivo de Godot para Windows también incluye una versión de consola cuyo nombre termina en `_console.exe`. Se usa para correr pruebas y ver sus resultados en la terminal.
+
+### Ejecutar
+
+#### Lanzador de Windows — recomendado
+
+Haz doble clic en `RunScript_Windows.bat`. También puedes ejecutarlo desde PowerShell, ubicado en la carpeta del proyecto:
+
+```powershell
+.\RunScript_Windows.bat
+```
+
+El lanzador abre este proyecto y deja la ventana de consola disponible para mostrar errores. Si no configuraste `.godot-path` ni tienes Godot en el `PATH`, te pedirá la ruta al ejecutable.
+
+#### Desde el editor de Godot
+
+Abre Godot, importa el archivo `project.godot` de esta carpeta y ejecuta el proyecto con **F6** (escena actual) o **F5** (proyecto).
+
+#### Desde PowerShell
+
+Desde la carpeta del proyecto, usa `.godot-path`:
+
+```powershell
+$godot = (Get-Content .godot-path -Raw).Trim()
+& $godot --path .
+```
+
+Si `godot.exe` ya está en el `PATH`, también puedes ejecutar `godot --path .`.
+
+### Pruebas (Windows)
+
+Las pruebas son automatizadas, se ejecutan sin abrir la ventana del juego y se enfocan en las estructuras de datos y algoritmos del proyecto. Se recomienda ejecutarlas desde PowerShell en la carpeta raíz `DungeonQuest`.
+
+En Windows, ejecuta las pruebas con la versión de consola de Godot, cuyo nombre termina en `_console.exe`. Si `.godot-path` apunta al ejecutable normal, estos comandos localizan la versión de consola que viene junto a él:
+
+```powershell
+$godotExe = (Get-Content .godot-path -Raw).Trim()
+$godotConsole = Join-Path (Split-Path $godotExe) (([IO.Path]::GetFileNameWithoutExtension($godotExe)) + '_console.exe')
+if (-not (Test-Path $godotConsole)) { throw "No se encontró Godot Console: $godotConsole" }
+
+& $godotConsole --headless --path . --import
+if ($LASTEXITCODE -ne 0) { throw "Falló la importación de recursos." }
+
+& $godotConsole --headless --path . --script res://tests/run_tests.gd
+if ($LASTEXITCODE -ne 0) { throw "Fallaron las pruebas." }
+```
+
+Si no configuraste `.godot-path`, asigna `$godotConsole` directamente a la ruta del ejecutable `_console.exe`. También puedes usar el comando `godot` solo si en el `PATH` apunta a la versión de consola:
+
+```powershell
+$godotConsole = 'C:\ruta\a\Godot_v4.7.2-stable_win64_console.exe'
+& $godotConsole --headless --path . --import
+if ($LASTEXITCODE -ne 0) { throw "Falló la importación de recursos." }
+& $godotConsole --headless --path . --script res://tests/run_tests.gd
+if ($LASTEXITCODE -ne 0) { throw "Fallaron las pruebas." }
+```
+
+
 ## Descripción
 
-Dungeon Quest es un videojuego 2D de exploración y combate hecho con **Godot 4.6**. Cada partida genera una mazmorra de ocho salas conectadas mediante un grafo no dirigido y no ponderado. El jugador explora las salas, combate enemigos, desbloquea habilidades y busca la salida.
+Dungeon Quest es un videojuego 2D de exploración y combate. Cada partida genera una mazmorra de ocho salas conectadas mediante un grafo no dirigido y no ponderado. El jugador explora las salas, combate enemigos, desbloquea habilidades y busca la salida.
 
-El proyecto, creado para el curso de Estructuras de Datos, aplica grafos, búsqueda BFS, Union-Find, colas, montículos y árboles de prefijos en un juego funcional.
+Creado para el curso de Estructuras de Datos, el proyecto aplica grafos, búsqueda BFS, Union-Find, colas, montículos y árboles de prefijos. El [roadmap y las ideas pendientes](docs/README.md) describen el estado de desarrollo y la preparación de las entregas académicas.
 
 ## Funcionalidades
 
@@ -13,37 +123,6 @@ El proyecto, creado para el curso de Estructuras de Datos, aplica grafos, búsqu
 - Enemigos colocados en salas intermedias; al encontrarlos comienza un combate por turnos.
 - Árbol de habilidades persistente entre partidas, con poderes que se desbloquean usando puntos.
 - Pantallas de inicio, victoria y derrota.
-
-## Requisitos
-
-- **Godot 4.7**. El proyecto declara la serie 4.7 en `project.godot`; el lanzador de macOS (`RunScript_Mac`) configura `GODOT_VERSION="4.7"`. El proyecto se ha probado con Godot 4.7.1.
-- No requiere complementos adicionales.
-
-## Cómo ejecutar el juego
-
-### Desde el editor de Godot
-
-1. Abre Godot y selecciona **Importar**.
-2. Selecciona `project.godot` en la carpeta `DungeonQuest`.
-3. Abre el proyecto y pulsa **F6** para ejecutar la escena actual o **F5** para ejecutar el proyecto.
-
-### Desde una terminal
-
-Abre la terminal en la carpeta `DungeonQuest` y ejecuta:
-
-```powershell
-godot --path .
-```
-
-Si `godot` no está en el `PATH`, usa la ruta completa al ejecutable:
-
-```powershell
-& "C:\ruta\a\Godot.exe" --path .
-```
-
-### Desde Windows
-
-Ejecuta `RunScript_Windows.bat` desde el Explorador de archivos o desde una terminal. El script busca `godot.exe` en el `PATH`; si no lo encuentra, solicita la ruta completa a `Godot.exe`. Necesitas tener Godot 4.7 instalado.
 
 ## Controles
 
@@ -82,7 +161,7 @@ Durante la exploración, el HUD muestra el nombre del jugador, su vida y sus pun
 
 Los poderes se desbloquean en el árbol de habilidades. Los desbloqueados aparecen en el menú desplegable **Combos** (arriba a la izquierda, en tu turno), con su secuencia y su costo; los que no alcanzas por falta de PA salen en gris.
 
-Al pulsar **Poder**, el juego **no muestra la secuencia**: solo ves las flechas que llevas y una barra de tiempo, así que hay que recordarla. Cada tecla debe ingresarse en menos de 2 segundos; si se agota el tiempo, **pierdes el turno**. Una tecla equivocada cancela el combo sin perder el turno, y **Esc** lo cancela también. El botón **Poder** se desactiva cuando los PA no alcanzan ni para el poder más barato.
+Al pulsar **Poder**, el juego **no muestra la secuencia**: solo ves las flechas que llevas y una barra de tiempo, así que hay que recordarla. Cada tecla debe ingresarse en menos de 2 segundos; si se agota el tiempo, **pierdes el turno**. Una tecla equivocada rompe el combo y **también pierdes el turno**; **Esc** lo cancela sin perderlo. El botón **Poder** se desactiva cuando los PA no alcanzan ni para el poder más barato.
 
 | Poder | Secuencia | Efecto | Costo |
 |---|---|---|---:|
@@ -145,38 +224,5 @@ DungeonQuest/
 │   └── world/
 └── tests/
     ├── run_tests.gd
-    ├── run_in_editor.gd
     └── results.md
 ```
-
-## Cómo correr las pruebas
-
-Las pruebas se ejecutan sin abrir la ventana del juego. Desde PowerShell, abre primero la carpeta raíz del proyecto:
-
-```powershell
-cd "C:\ruta\a\DungeonQuest"
-```
-
-La primera vez, importa los recursos del proyecto:
-
-```powershell
-godot --headless --path . --import
-```
-
-Después ejecuta el archivo de pruebas actualizado, usando su ruta de recursos de Godot:
-
-```powershell
-godot --headless --path . --script res://tests/run_tests.gd
-```
-
-Si Godot no está en el `PATH`, sustituye `godot` por la ruta completa al ejecutable, por ejemplo:
-
-```powershell
-$godot = "C:\ruta\a\Godot.exe"
-& $godot --headless --path . --import
-& $godot --headless --path . --script res://tests/run_tests.gd
-```
-
-El script imprime el resultado de las verificaciones, ejecuta mediciones de rendimiento y genera `tests/results.md`. Devuelve código de salida `1` si alguna prueba falla. Las pruebas respaldan automáticamente el progreso del jugador (`user://dungeon_save.json`) y lo restauran al terminar.
-
-También se pueden ejecutar desde el editor de Godot, sin terminal: abre `tests/run_in_editor.gd` y elige **Archivo → Ejecutar** (**Ctrl + Mayús + X**). El resultado aparece en el panel **Salida**. Durante la prueba del guardado corrupto aparece un `ERROR: Parse JSON failed`; es esperado y no indica un fallo.

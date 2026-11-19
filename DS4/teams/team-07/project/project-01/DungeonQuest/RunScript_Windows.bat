@@ -9,8 +9,14 @@ if not exist "%PROJECT_DIR%project.godot" (
 )
 
 set "GODOT_EXE="
-where.exe godot.exe >nul 2>nul
-if not errorlevel 1 set "GODOT_EXE=godot.exe"
+if exist "%PROJECT_DIR%.godot-path" (
+    set /p "GODOT_EXE="<"%PROJECT_DIR%.godot-path"
+)
+
+if not defined GODOT_EXE (
+    where.exe godot.exe >nul 2>nul
+    if not errorlevel 1 set "GODOT_EXE=godot.exe"
+)
 
 if not defined GODOT_EXE (
     echo Godot no se encontro en el PATH.
