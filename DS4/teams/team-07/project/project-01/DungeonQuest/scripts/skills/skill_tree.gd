@@ -17,22 +17,7 @@ const SAVE_PATH := "user://dungeon_save.json"
 const START_POINTS := 3
 
 # Definición del árbol (el padre siempre aparece antes que sus hijos)
-const DEFS := [
-	{"id": "espada", "parent": "aventurero", "name": "Espada", "cost": 1, "power": "",
-			"desc": "Rama de combate cuerpo a cuerpo."},
-	{"id": "corte", "parent": "espada", "name": "Corte", "cost": 1, "power": "corte",
-			"desc": "↓ →  ·  16 de daño a un enemigo. Cuesta 2 PA."},
-	{"id": "tormenta", "parent": "corte", "name": "Tormenta", "cost": 3, "power": "tormenta",
-			"desc": "← → ← →  ·  30 de daño a un enemigo. Cuesta 4 PA."},
-	{"id": "luz", "parent": "aventurero", "name": "Luz", "cost": 1, "power": "",
-			"desc": "Rama de apoyo y curación."},
-	{"id": "sanacion", "parent": "luz", "name": "Sanación", "cost": 2, "power": "sanacion",
-			"desc": "↓ ↓ ↑  ·  recupera 20 de vida. Cuesta 3 PA."},
-	{"id": "fuego", "parent": "aventurero", "name": "Fuego", "cost": 1, "power": "",
-			"desc": "Rama de daño en área."},
-	{"id": "llamarada", "parent": "fuego", "name": "Llamarada", "cost": 2, "power": "llamarada",
-			"desc": "↑ ↑ →  ·  14 de daño a todos los enemigos. Cuesta 3 PA."},
-]
+const DEFAULT_CATALOG := preload("res://resources/skills/default_skill_catalog.tres")
 
 var root: SkillNode
 var points: int = START_POINTS
@@ -41,18 +26,24 @@ func _init() -> void:
 	root = SkillNode.new("aventurero", "Aventurero", "Raíz del árbol. Siempre desbloqueada.", 0)
 	root.unlocked = true
 
-func build_default() -> void:
-	for d in DEFS:
-		insert(d["parent"], d["id"], d["name"], d["desc"], d["cost"], d["power"])
+func build_default(catalog: SkillCatalog = DEFAULT_CATALOG) -> void:
+	for definition in catalog.definitions:
+		if not insert(str(definition.parent_id), str(definition.id),
+				definition.display_name, definition.description, definition.cost,
+				str(definition.power_id), definition.icon, definition.use_custom_position,
+				definition.editor_position):
+			push_error("Definición de habilidad inválida o duplicada: %s" % definition.id)
 
 # ---------- Operaciones del árbol ----------
 
 func insert(parent_id: String, id: String, display_name: String, desc: String,
-		cost: int, power: String = "") -> bool:
+		cost: int, power: String = "", icon: Texture2D = null,
+		use_custom_position: bool = false, editor_position: Vector2 = Vector2.ZERO) -> bool:
 	var parent := find(parent_id)
 	if parent == null or find(id) != null:
 		return false
-	var node := SkillNode.new(id, display_name, desc, cost, power)
+	var node := SkillNode.new(id, display_name, desc, cost, power, icon,
+			use_custom_position, editor_position)
 	node.parent = parent
 	parent.children.append(node)
 	return true

@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/combat/foe_view.gd" id="1_view"]
-[ext_resource type="Texture2D" path="res://icon.svg" id="2_icon"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/enemies/placeholder_frames.tres" id="2_frames"]
 [ext_resource type="LabelSettings" uid="uid://cqs84c65hgjs8" path="res://assets/fonts/label_config.tres" id="3_labels"]
 
 [sub_resource type="StyleBoxFlat" id="bar_bg"]
@@ -18,11 +18,13 @@ bg_color = Color(0.29, 0.87, 0.5, 1)
 [node name="Foe" type="Node2D"]
 script = ExtResource("1_view")
 
-[node name="Sprite" type="Sprite2D" parent="."]
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
 unique_name_in_owner = true
 position = Vector2(0, -22)
 scale = Vector2(0.3, 0.3)
-texture = ExtResource("2_icon")
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+autoplay = "idle"
 
 [node name="NameLabel" type="Label" parent="."]
 unique_name_in_owner = true

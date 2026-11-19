@@ -63,7 +63,7 @@ class StrikeEvent extends RefCounted:
 # --- Nodos de la escena (por nombre único) ---
 @onready var turn_label: Label = %TurnLabel
 @onready var foe_slots: Node2D = %FoeSlots
-@onready var player_sprite: Sprite2D = %PlayerSprite
+@onready var player_sprite: AnimatedSprite2D = %PlayerSprite
 @onready var log_label: RichTextLabel = %LogLabel
 @onready var player_bar: ProgressBar = %PlayerBar
 @onready var player_hp_label: Label = %PlayerHPLabel
@@ -114,6 +114,7 @@ func start(player_hp: int, foe_types: Array, unlocked: Array = []) -> void:
 				s["attack"], s["speed"], false)
 		foe.hits = int(s["hits"])
 		foe.set_meta("color", s["color"])
+		foe.set_meta("sprite_frames", s["sprite_frames"])
 		foes.append(foe)
 		
 	# Solo los poderes desbloqueados en el árbol de habilidades entran al trie
@@ -136,6 +137,7 @@ func start(player_hp: int, foe_types: Array, unlocked: Array = []) -> void:
 func _setup_ui() -> void:
 	player_bar.max_value = player.max_hp
 	player_bar.value = player.hp
+	_play_player_animation("idle_right")
 
 	# ESPACIO es el parry: que no pulse botones por accidente
 	defend_button.focus_mode = Control.FOCUS_NONE
@@ -156,7 +158,8 @@ func _setup_ui() -> void:
 		var foe: Combatant = foes[i]
 		var view: FoeView = FOE_VIEW.instantiate()
 		slots[mini(i, slots.size() - 1)].add_child(view)
-		view.setup(foe.display_name, foe.max_hp, foe.hp, foe.get_meta("color", Color.WHITE))
+		view.setup(foe.display_name, foe.max_hp, foe.hp,
+				foe.get_meta("color", Color.WHITE), foe.get_meta("sprite_frames"))
 		view.attack_button.focus_mode = Control.FOCUS_NONE
 		view.attack_button.pressed.connect(_on_attack_pressed.bind(foe))
 		foe_rows[foe] = {"view": view, "button": view.attack_button}
@@ -300,10 +303,12 @@ func _on_attack_pressed(foe: Combatant) -> void:
 	var dmg := _roll(player.attack)
 	foe.take_damage(dmg)
 	_lunge(player_sprite, 16.0)
+	_play_player_animation("attack_right", "move_right")
 	_gain_ap(1)
 	_log("Atacas a %s: %d de daño. (+1 PA)" % [foe.display_name, dmg])
 	_refresh()
 	await get_tree().create_timer(STEP_DELAY).timeout
+	_play_player_animation("idle_right")
 	_next_turn()
 
 func _on_defend_pressed() -> void:
@@ -522,9 +527,18 @@ func _lunge(node: Node2D, dx: float) -> void:
 	t.tween_property(node, "position:x", x0, 0.15)
 
 func _animate_player_hit() -> void:
+	_play_player_animation("hurt_right")
 	var x0 := player_sprite.position.x
 	player_sprite.modulate = Color(2.5, 2.5, 2.5)
 	create_tween().tween_property(player_sprite, "modulate", Color.WHITE, 0.25)
 	var s := create_tween()
 	for dx in [-4.0, 4.0, -3.0, 3.0, 0.0]:
 		s.tween_property(player_sprite, "position:x", x0 + dx, 0.04)
+
+func _play_player_animation(animation_name: String, fallback: String = "idle_right") -> void:
+	if player_sprite.sprite_frames == null:
+		return
+	if player_sprite.sprite_frames.has_animation(animation_name):
+		player_sprite.play(animation_name)
+	elif player_sprite.sprite_frames.has_animation(fallback):
+		player_sprite.play(fallback)

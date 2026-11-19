@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://bnpn0olan2uje" path="res://assets/sprites/player/player_left.png" id="7_f1ej7"]
 [ext_resource type="Texture2D" uid="uid://4mfau16o2ueu" path="res://assets/sprites/player/player_right.png" id="8_oprun"]
 [ext_resource type="Texture2D" uid="uid://c0jy1q75quel7" path="res://assets/sprites/player/player_up.png" id="9_a8ls1"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/player/player_frames.tres" id="10_frames"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qfm1y"]
 atlas = ExtResource("2_ur7pv")
@@ -225,7 +226,7 @@ animations = [{
 size = Vector2(12, 13)
 
 [node name="Player" type="CharacterBody2D" unique_id=36552186 groups=["player"]]
-z_index = 3
+z_index = 0
 collision_layer = 2
 collision_mask = 16
 script = ExtResource("1_g2els")
@@ -233,7 +234,7 @@ script = ExtResource("1_g2els")
 [node name="AnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=963041139]
 position = Vector2(0.04436302, 0)
 scale = Vector2(1.0055454, 1)
-sprite_frames = SubResource("SpriteFrames_lxlsd")
+sprite_frames = ExtResource("10_frames")
 animation = &"idle_up"
 autoplay = "idle_down"
 frame_progress = 0.6561278

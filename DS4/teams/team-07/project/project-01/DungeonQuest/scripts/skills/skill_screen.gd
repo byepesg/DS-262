@@ -69,7 +69,7 @@ var buttons: Dictionary = {}      # SkillNode -> Button
 var positions: Dictionary = {}    # SkillNode -> centro del nodo (en el mundo)
 var lines: Lines
 var _leaf_counter: int = 0
-var _max_depth: int = 0
+var _content_size: Vector2 = Vector2.ZERO
 var _hovered: SkillNode = null
 var _dragging: bool = false
 var standalone: bool = false
@@ -93,6 +93,7 @@ func _ready() -> void:
 	else:
 		_fade_in()   # abierta dentro de la partida
 	_layout(tree.root, 0)
+	_normalize_positions()
 	_build_nodes()
 	center_button.pressed.connect(_center_view)
 	close_button.pressed.connect(_close)
@@ -106,27 +107,43 @@ func _ready() -> void:
 # La fila es la profundidad; las hojas ocupan columnas consecutivas y cada
 # padre queda centrado respecto a sus hijos.
 func _layout(node: SkillNode, depth: int) -> float:
-	_max_depth = maxi(_max_depth, depth)
-	var x: float
+	var center_x: float
 	if node.children.is_empty():
-		x = _leaf_counter * COL_GAP
+		center_x = _leaf_counter * COL_GAP + NODE_SIZE.x / 2.0
 		_leaf_counter += 1
 	else:
 		var total := 0.0
 		for child in node.children:
 			total += _layout(child, depth + 1)
-		x = total / node.children.size()
-	positions[node] = Vector2(x + NODE_SIZE.x / 2.0, depth * ROW_GAP + NODE_SIZE.y / 2.0)
-	return x
+		center_x = total / node.children.size()
+	var center := Vector2(center_x, depth * ROW_GAP + NODE_SIZE.y / 2.0)
+	if node.use_custom_position:
+		center = node.editor_position + NODE_SIZE / 2.0
+	positions[node] = center
+	return center.x
+
+func _normalize_positions() -> void:
+	if positions.is_empty():
+		return
+	var half_size := NODE_SIZE / 2.0
+	var first_position: Vector2 = positions.values()[0]
+	var min_corner := first_position - half_size
+	var max_corner := first_position + half_size
+	for center in positions.values():
+		min_corner.x = minf(min_corner.x, center.x - half_size.x)
+		max_corner.x = maxf(max_corner.x, center.x + half_size.x)
+		min_corner.y = minf(min_corner.y, center.y - half_size.y)
+		max_corner.y = maxf(max_corner.y, center.y + half_size.y)
+	for node in positions:
+		positions[node] -= min_corner
+	_content_size = max_corner - min_corner
 
 func _build_nodes() -> void:
 	lines = Lines.new()
 	lines.positions = positions
 	lines.node_size = NODE_SIZE
 	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	lines.size = Vector2(
-			(_leaf_counter - 1) * COL_GAP + NODE_SIZE.x,
-			_max_depth * ROW_GAP + NODE_SIZE.y)
+	lines.size = _content_size
 	world.add_child(lines)
 	# Desactiva el descarte por área visible
 	RenderingServer.canvas_item_set_custom_rect(
@@ -136,7 +153,7 @@ func _build_nodes() -> void:
 		var button: Button = NODE_BUTTON.instantiate()
 		button.size = NODE_SIZE
 		button.position = positions[node] - NODE_SIZE / 2.0
-		button.icon = ICON_PLACEHOLDER
+		button.icon = node.icon if node.icon != null else ICON_PLACEHOLDER
 		button.expand_icon = true
 		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		button.add_theme_constant_override("icon_max_width", 30)
@@ -223,9 +240,7 @@ func _zoom_at(factor: float) -> void:
 
 # Ajusta el árbol completo al área visible y lo centra horizontalmente
 func _center_view() -> void:
-	var bounds := Vector2(
-			(_leaf_counter - 1) * COL_GAP + NODE_SIZE.x,
-			_max_depth * ROW_GAP + NODE_SIZE.y)
+	var bounds := _content_size
 	var fit: float = minf(view_area.size.x / bounds.x, view_area.size.y / bounds.y)
 	var s: float = clampf(fit, ZOOM_MIN, 1.0)
 	world.scale = Vector2(s, s)

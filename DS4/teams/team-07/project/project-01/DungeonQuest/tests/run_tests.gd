@@ -635,15 +635,15 @@ func test_integration() -> void:
 	_suite = "Integración"
 	# Todo poder del árbol existe en el combate
 	var powers_ok := true
-	for d in SkillTree.DEFS:
-		if d["power"] != "" and not Combat.POWERS.has(d["power"]):
+	for definition in SkillTree.DEFAULT_CATALOG.definitions:
+		if definition.power_id != &"" and not Combat.POWERS.has(str(definition.power_id)):
 			powers_ok = false
 	check(powers_ok, "cada poder del árbol de habilidades existe en Combat.POWERS")
 
 	# Cada poder del combate se puede obtener desde el árbol
 	var in_tree: Dictionary = {}
-	for d in SkillTree.DEFS:
-		in_tree[d["power"]] = true
+	for definition in SkillTree.DEFAULT_CATALOG.definitions:
+		in_tree[str(definition.power_id)] = true
 	var all_reachable := true
 	for id in Combat.POWERS:
 		if not in_tree.has(id):

@@ -1,12 +1,10 @@
 class_name FoeView
 extends Node2D
 
-# Enemigo del combate: sprite parado en el escenario con animaciones.
-# Todo se hace con tweens, así que funciona con cualquier textura.
-# Para animaciones reales, cambia Sprite por AnimatedSprite2D y llama
-# a play() dentro de play_hit / play_attack / play_death.
+# Enemigo del combate. Las animaciones faltantes usan el frame de reposo
+# hasta que cada tipo tenga sus propios SpriteFrames.
 
-@onready var sprite: Sprite2D = %Sprite
+@onready var sprite: AnimatedSprite2D = %Sprite
 @onready var name_label: Label = %NameLabel
 @onready var hp_bar: ProgressBar = %HPBar
 @onready var hp_label: Label = %HPLabel
@@ -24,17 +22,21 @@ func _ready() -> void:
 	attack_button.mouse_entered.connect(func(): arrow.visible = not attack_button.disabled)
 	attack_button.mouse_exited.connect(func(): arrow.visible = false)
 	attack_button.pressed.connect(func(): arrow.visible = false)
+	_play_animation("idle")
 	_start_idle()
 
-func setup(display_name: String, p_max_hp: int, hp: int, color: Color) -> void:
+func setup(display_name: String, p_max_hp: int, hp: int, color: Color,
+		frames: SpriteFrames) -> void:
 	name_label.text = display_name
 	max_hp = p_max_hp
 	last_hp = hp
 	tint = color
+	sprite.sprite_frames = frames
 	sprite.modulate = tint
 	hp_bar.max_value = max_hp
 	hp_bar.value = hp
 	hp_label.text = "%d/%d" % [hp, max_hp]
+	_play_animation("idle")
 
 # Llamar cada vez que cambie la vida: anima solo si bajó
 func update_hp(hp: int) -> void:
@@ -57,6 +59,7 @@ func _start_idle() -> void:
 	t.tween_property(sprite, "position:y", _sprite_base.y + 1.5, 0.45).set_trans(Tween.TRANS_SINE)
 
 func play_hit() -> void:
+	_play_animation("hurt")
 	sprite.modulate = Color(2.5, 2.5, 2.5)
 	create_tween().tween_property(sprite, "modulate", tint, 0.25)
 	var s := create_tween()
@@ -65,6 +68,7 @@ func play_hit() -> void:
 
 # Embestida hacia el jugador (a la izquierda)
 func play_attack() -> void:
+	_play_animation("attack")
 	var x0 := position.x
 	var t := create_tween()
 	t.tween_property(self, "position:x", x0 - 18.0, 0.12).set_trans(Tween.TRANS_QUAD)
@@ -72,6 +76,15 @@ func play_attack() -> void:
 
 func play_death() -> void:
 	alive = false
+	_play_animation("death")
 	var t := create_tween().set_parallel(true)
 	t.tween_property(self, "modulate:a", 0.0, 0.5)
 	t.tween_property(sprite, "position:y", _sprite_base.y + 8.0, 0.5)
+
+func _play_animation(animation_name: String) -> void:
+	if sprite.sprite_frames == null:
+		return
+	if sprite.sprite_frames.has_animation(animation_name):
+		sprite.play(animation_name)
+	elif sprite.sprite_frames.has_animation("idle"):
+		sprite.play("idle")

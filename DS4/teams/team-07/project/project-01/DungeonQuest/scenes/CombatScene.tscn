@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://ct1755k03m5xs" path="res://scripts/combat/combat.gd" id="1_combat"]
 [ext_resource type="Script" uid="uid://u70be8eslwnt" path="res://scripts/combat/parry_view.gd" id="2_parry"]
 [ext_resource type="Texture2D" uid="uid://dr05io2qwgw23" path="res://assets/sprites/backgrounds/BattleBackGround.png" id="2_rx5ct"]
-[ext_resource type="Texture2D" uid="uid://4mfau16o2ueu" path="res://assets/sprites/player/player_right.png" id="3_dyexf"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/player/player_frames.tres" id="3_dyexf"]
 [ext_resource type="LabelSettings" uid="uid://cqs84c65hgjs8" path="res://assets/fonts/label_config.tres" id="3_yi6w0"]
 [ext_resource type="FontFile" uid="uid://bge3cdwhwx1l6" path="res://assets/fonts/alagard.ttf" id="5_42t48"]
 [ext_resource type="FontFile" uid="uid://di0tde5ajycjt" path="res://assets/fonts/ModernDOS8x16.ttf" id="5_id1t6"]
@@ -173,12 +173,13 @@ expand_mode = 3
 
 [node name="Stage" type="Node2D" parent="." unique_id=1109942471]
 
-[node name="PlayerSprite" type="Sprite2D" parent="Stage" unique_id=945625582]
+[node name="PlayerSprite" type="AnimatedSprite2D" parent="Stage" unique_id=945625582]
 unique_name_in_owner = true
 position = Vector2(89, 125.00001)
 scale = Vector2(4.945313, 4.945313)
-texture = ExtResource("3_dyexf")
-hframes = 5
+sprite_frames = ExtResource("3_dyexf")
+animation = &"idle_right"
+autoplay = "idle_right"
 
 [node name="FoeSlots" type="Node2D" parent="Stage" unique_id=626929111]
 unique_name_in_owner = true

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SkillDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/skills/skill_definition.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"llamarada"
+parent_id = &"fuego"
+display_name = "Llamarada"
+description = "↑ ↑ →  ·  14 de daño a todos los enemigos. Cuesta 3 PA."
+cost = 2
+power_id = &"llamarada"

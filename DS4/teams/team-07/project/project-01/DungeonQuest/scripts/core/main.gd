@@ -11,6 +11,8 @@ var builder: MapBuilder
 var spawner: EnemySpawner
 var fx: ScreenFX
 var minimap: Minimap
+@onready var player: PlayerActor = $Player
+@onready var player_camera: Camera2D = $Player/Camera2D
 var skills := SkillTree.new()      # progreso que se mantiene entre partidas
 var skill_screen: SkillScreen
 
@@ -29,7 +31,10 @@ func _ready() -> void:
 	builder = MapBuilder.new(graph, rng)
 	if not builder.generate():
 		return
-	builder.build(self, _on_door_door_crossed)
+	builder.build($Dungeon, _on_door_door_crossed)
+	builder.world.y_sort_enabled = true
+	player.reparent(builder.world)
+	player.z_index = 0
 
 	_place_player_at_start()
 	_create_minimap()
@@ -38,7 +43,7 @@ func _ready() -> void:
 	add_child(hud)
 	hud.setup(Combat.PLAYER_STATS["name"], player_hp,
 			Combat.PLAYER_STATS["max_hp"], skills.points)
-	spawner = EnemySpawner.new(builder.world, builder.rooms, graph, rng, $Player, _on_enemy_caught)
+	spawner = EnemySpawner.new(builder.world, builder.rooms, graph, rng, player, _on_enemy_caught)
 	spawner.spawn()
 
 func _create_minimap() -> void:
@@ -57,14 +62,14 @@ func _place_player_at_start() -> void:
 	if spawn == null:
 		push_error("EntryRoom no tiene PlayerSpawn")
 		return
-	$Player.global_position = spawn.global_position
+	player.global_position = spawn.global_position
 	current_room = 1
 	_set_camera_limits(1)
-	$Player/Camera2D.reset_smoothing()
+	player_camera.reset_smoothing()
 
 func _set_camera_limits(room_id: int) -> void:
 	var room: Node2D = builder.rooms[room_id]
-	var cam: Camera2D = $Player/Camera2D
+	var cam: Camera2D = player_camera
 	cam.limit_left = int(room.position.x)
 	cam.limit_top = int(room.position.y)
 	cam.limit_right = int(room.position.x + GameConfig.ROOM_SIZE.x)
@@ -76,8 +81,8 @@ func _on_enemy_caught(enemy: Enemy) -> void:
 	if transitioning:
 		return
 	transitioning = true
-	$Player.can_move = false
-	$Player.velocity = Vector2.ZERO
+	player.can_move = false
+	player.velocity = Vector2.ZERO
 
 	var group := spawner.group_of(enemy.room_id)
 	spawner.freeze_all()
@@ -97,11 +102,10 @@ func _on_combat_finished(player_won: bool, hp_left: int, group: Array) -> void:
 	if player_won:
 		spawner.remove_group(group)
 		get_tree().paused = false
-		$Player.can_move = true
+		player.can_move = true
 		transitioning = false
 		skills.add_points(group.size())
 		fx.toast("+%d punto(s) de habilidad  (K: árbol de habilidades)" % group.size())
-		skills.add_points(group.size())
 		hud.set_points(skills.points)
 	else:
 		_game_over()
@@ -130,8 +134,7 @@ func _on_door_door_crossed(from_room: int, to_room: int, door: Node2D) -> void:
 		return
 
 	transitioning = true
-	var player = $Player
-	var cam: Camera2D = $Player/Camera2D
+	var cam: Camera2D = player_camera
 	player.can_move = false
 	player.velocity = Vector2.ZERO
 
@@ -175,7 +178,6 @@ func _on_door_door_crossed(from_room: int, to_room: int, door: Node2D) -> void:
 func _win(door: Node2D) -> void:
 	transitioning = true
 	skills.add_points(GameConfig.WIN_POINTS)
-	var player = $Player
 	player.can_move = false
 	player.velocity = Vector2.ZERO
 	var dir: Vector2 = door.get_walk_direction()
