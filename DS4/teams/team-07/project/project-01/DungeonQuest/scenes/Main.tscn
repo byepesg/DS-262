@@ -11,5 +11,5 @@ y_sort_enabled = true
 
 [node name="Player" parent="." unique_id=36552186 instance=ExtResource("3_0bbpv")]
 y_sort_enabled = true
-position = Vector2(424, 248)
+position = Vector2(242, 202)
 collision_mask = 15

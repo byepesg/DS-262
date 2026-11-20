@@ -36,7 +36,6 @@ var _spawn_direction: Vector2 = Vector2.RIGHT
 @onready var vision_cone: VisionCone = $VisionCone
 
 var type: String = "slime"
-var base_color: Color = Color.WHITE
 
 func _ready() -> void:
 	collision_layer = LAYER_ENEMY
@@ -57,10 +56,9 @@ func setup(room: int, player: Node2D, pos: Vector2, enemy_type: String = "slime"
 	_spawn_direction = direction.normalized() if not direction.is_zero_approx() else Vector2.RIGHT
 	facing_direction = _spawn_direction
 	var stats: Dictionary = EnemyTypes.get_stats(type)
-	base_color = stats["color"]
 	if stats.has("sprite_frames"):
 		sprite.sprite_frames = stats["sprite_frames"]
-	sprite.modulate = base_color
+	sprite.modulate = Color.WHITE
 	vision_cone.configure(sight_radius, vision_angle_degrees, facing_direction)
 	add_to_group("enemies_room_%d" % room_id)
 
@@ -74,7 +72,7 @@ func reset() -> void:
 	velocity = Vector2.ZERO
 	global_position = home
 	facing_direction = _spawn_direction
-	sprite.modulate = base_color
+	sprite.modulate = Color.WHITE
 	alert_mark.visible = false
 	vision_cone.visible = true
 	vision_cone.configure(sight_radius, vision_angle_degrees, facing_direction)
@@ -118,7 +116,6 @@ func alert() -> void:
 		if not direction.is_zero_approx():
 			facing_direction = direction.normalized()
 	vision_cone.visible = false
-	sprite.modulate = Color(1.0, 0.4, 0.4)
 	alert_mark.visible = true
 	_play_animation("move")
 

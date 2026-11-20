@@ -2,7 +2,7 @@
 
 Documento de seguimiento de decisiones y trabajo futuro. Para el estado de entregas y prioridades, consultar [ROADMAP.md](ROADMAP.md).
 
-Última actualización: 19 de noviembre de 2026.
+Última actualización: 20 de noviembre de 2026.
 
 Leyenda: ✅ implementado · 🟡 parcial o por verificar · ⬜ pendiente · ⏸️ en espera · ❌ descartado
 
@@ -30,6 +30,9 @@ Leyenda: ✅ implementado · 🟡 parcial o por verificar · ⬜ pendiente · �
 - Trie para reconocer combos ocultos y cola circular como búfer de teclas.
 - Los poderes cuestan puntos de acción; no usan enfriamientos con heap.
 - 🟡 El jugador reutiliza sus animaciones de exploración; los enemigos usan `AnimatedSprite2D` con un placeholder de un solo frame hasta que existan sprites propios.
+- 🟡 Transiciones clásicas de combate con franjas, ataques exagerados con squash/stretch, sacudida, daño y muerte procedural; los enemigos usan solo idle sin rebote constante. Falta verificar y ajustar visualmente.
+- 🟡 Parry con zona perfecta legible y resultado animado como impacto; combos con flechas geométricas grandes, una sola barra de tiempo y el nombre del poder en un impacto coloreado por su efecto. Falta comprobar legibilidad al jugar.
+- 🟡 El árbol revela nodos por niveles y anima el desbloqueo con una descarga sobre la conexión y el nodo; falta revisión visual en ejecución.
 
 ### Progresión e interfaz
 

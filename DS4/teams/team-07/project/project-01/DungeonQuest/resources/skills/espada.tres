@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="SkillDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://dgsj6dhhrdpxt"]
 
-[ext_resource type="Script" path="res://scripts/skills/skill_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://jxx7p3ntkvk2" path="res://assets/sprites/skills/espada.png" id="1_5lidc"]
+[ext_resource type="Script" uid="uid://xou088vmd1b7" path="res://scripts/skills/skill_definition.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")
@@ -9,4 +10,4 @@ parent_id = &"aventurero"
 display_name = "Espada"
 description = "Rama de combate cuerpo a cuerpo."
 cost = 1
-power_id = &""
+icon = ExtResource("1_5lidc")

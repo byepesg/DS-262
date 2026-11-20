@@ -13,14 +13,15 @@ extends CanvasLayer
 #   - Dictionary (tabla hash): datos de cada poder por id.
 #
 # Nodos que DEBE tener CombatScene.tscn (con "Acceder como nombre único"):
-#   %TurnLabel  %FoeList  %PlayerBar  %PlayerHPLabel  %APLabel
-#   %DefendButton  %PowerButton  %ParryView  %ComboBox  %ComboLabel
+#   %TurnLabel  %FoeSlots  %PlayerBar  %PlayerHPLabel  %APLabel
+#   %DefendButton  %PowerButton  %ParryView  %ComboBox  %ComboView
 #   %ComboBar  %LogLabel
 # Y FoeRow.tscn: %NameLabel  %HPBar  %AttackButton
 
 signal finished(player_won: bool, player_hp: int)
 
 const FOE_VIEW := preload("res://scenes/Foe.tscn")
+const COMBO_ARROW_SCRIPT := preload("res://scripts/combat/combo_arrows.gd")
 
 const PLAYER_STATS := {"name": "Jugador", "max_hp": 60, "attack": 10, "speed": 10.0}
 
@@ -33,14 +34,16 @@ const MAX_AP := 6
 
 # Poderes: secuencia de flechas, costo, tipo y valor
 const POWERS := {
-	"corte": {"name": "Corte", "seq": ["down", "right"], "cost": 2, "kind": "single", "value": 16},
-	"llamarada": {"name": "Llamarada", "seq": ["up", "up", "right"], "cost": 3, "kind": "all", "value": 14},
-	"sanacion": {"name": "Sanación", "seq": ["down", "down", "up"], "cost": 3, "kind": "heal", "value": 20},
-	"tormenta": {"name": "Tormenta", "seq": ["left", "right", "left", "right"], "cost": 4, "kind": "single", "value": 30},
+	"corte": {"name": "Corte", "seq": ["down", "right"], "cost": 2, "kind": "single", "value": 16, "effect": "physical"},
+	"llamarada": {"name": "Llamarada", "seq": ["up", "up", "right"], "cost": 3, "kind": "all", "value": 14, "effect": "fire"},
+	"sanacion": {"name": "Sanación", "seq": ["down", "down", "up"], "cost": 3, "kind": "heal", "value": 20, "effect": "healing"},
+	"tormenta": {"name": "Tormenta", "seq": ["left", "right", "left", "right"], "cost": 4, "kind": "single", "value": 30, "effect": "lightning"},
 }
 const KEY_TIME_LIMIT := 2.0      # segundos máximos entre teclas del combo
 const ARROWS := {"up": "↑", "down": "↓", "left": "←", "right": "→"}
 const KEY_MAP := {KEY_UP: "up", KEY_DOWN: "down", KEY_LEFT: "left", KEY_RIGHT: "right"}
+const IMPACT_FONT := preload("res://assets/fonts/alagard.ttf")
+const COMBO_BREAK_COLOR := Color("ff657b")
 
 # Parry
 const PARRY_KEY := KEY_SPACE
@@ -72,8 +75,9 @@ class StrikeEvent extends RefCounted:
 @onready var power_button: Button = %PowerButton
 @onready var parry_view: ParryView = %ParryView
 @onready var combo_box: Control = %ComboBox
-@onready var combo_label: RichTextLabel = %ComboLabel
+@onready var combo_view: Control = %ComboView
 @onready var combo_bar: ProgressBar = %ComboBar
+@onready var battle_effects: BattleEffects = $Stage/BattleEffects
 
 var player: Combatant
 var foes: Array = []
@@ -98,6 +102,7 @@ var combo_buffer := CircularQueue.new()
 
 var foe_rows: Dictionary = {}     # Combatant -> {"bar": ProgressBar, "button": Button}
 var log_lines: Array = []
+var _player_idle_tween: Tween
 
 func _init() -> void:
 	layer = 60
@@ -113,7 +118,6 @@ func start(player_hp: int, foe_types: Array, unlocked: Array = []) -> void:
 		var foe := Combatant.new("%s %d" % [s["name"], i + 1], s["hp"],
 				s["attack"], s["speed"], false)
 		foe.hits = int(s["hits"])
-		foe.set_meta("color", s["color"])
 		foe.set_meta("sprite_frames", s["sprite_frames"])
 		foes.append(foe)
 		
@@ -138,19 +142,28 @@ func _setup_ui() -> void:
 	player_bar.max_value = player.max_hp
 	player_bar.value = player.hp
 	_play_player_animation("idle_right")
+	var turn_settings := turn_label.label_settings.duplicate() as LabelSettings
+	turn_settings.font_size = 8
+	turn_label.label_settings = turn_settings
 
 	# ESPACIO es el parry: que no pulse botones por accidente
 	defend_button.focus_mode = Control.FOCUS_NONE
 	power_button.focus_mode = Control.FOCUS_NONE
 	defend_button.pressed.connect(_on_defend_pressed)
 	power_button.pressed.connect(_on_power_pressed)
+	combo_box.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	if available_powers.is_empty():
-		power_button.text = "Poder (sin habilidades)"
+		power_button.text = "Poder"
 
 	parry_view.lead = STRIKE_GAP
 	parry_view.perfect = PERFECT_WINDOW
+	parry_view.visible = false
 	combo_bar.max_value = KEY_TIME_LIMIT
 	combo_box.visible = false
+	combo_box.pivot_offset = combo_box.size / 2.0
+	_setup_button_motion(defend_button)
+	_setup_button_motion(power_button)
+	_setup_button_motion(combo_menu)
 
 	# Una fila por enemigo, creada desde FoeRow.tscn
 	var slots := foe_slots.get_children()
@@ -159,12 +172,13 @@ func _setup_ui() -> void:
 		var view: FoeView = FOE_VIEW.instantiate()
 		slots[mini(i, slots.size() - 1)].add_child(view)
 		view.setup(foe.display_name, foe.max_hp, foe.hp,
-				foe.get_meta("color", Color.WHITE), foe.get_meta("sprite_frames"))
+				foe.get_meta("sprite_frames"), battle_effects)
 		view.attack_button.focus_mode = Control.FOCUS_NONE
 		view.attack_button.pressed.connect(_on_attack_pressed.bind(foe))
+		_setup_button_motion(view.attack_button)
 		foe_rows[foe] = {"view": view, "button": view.attack_button}
 	log_label.get_v_scroll_bar().modulate.a = 0.0   # oculta la barra de scroll
-	_idle_bob(player_sprite)
+	_player_idle_tween = _idle_bob(player_sprite)
 	combo_menu.focus_mode = Control.FOCUS_NONE
 	var popup := combo_menu.get_popup()
 	popup.add_theme_font_override("font", MENU_FONT)
@@ -189,9 +203,18 @@ func _min_cost() -> int:
 	return best
 
 # Pierdes el turno (tiempo agotado o combo roto)
-func _lose_combo_turn(reason: String) -> void:
-	_close_combo_panel()
+func _lose_combo_turn(reason: String, failure_label: String = "ROTO",
+		failure_color: Color = COMBO_BREAK_COLOR) -> void:
+	combo_mode = false
+	combo_box.visible = true
+	combo_view.call("show_failure", combo_buffer.to_array(), failure_label, failure_color)
 	_log(reason)
+	var origin := combo_box.position
+	var shake := create_tween()
+	for offset in [Vector2(-8, 0), Vector2(8, 0), Vector2(-6, 0), Vector2(0, 0)]:
+		shake.tween_property(combo_box, "position", origin + offset, 0.045)
+	await shake.finished
+	_close_combo_panel()
 	await get_tree().create_timer(STEP_DELAY).timeout
 	_next_turn()
 	
@@ -201,9 +224,6 @@ func _refresh() -> void:
 	ap_label.text = "PA %d/%d" % [ap, MAX_AP]
 	for foe in foes:
 		foe_rows[foe]["view"].update_hp(foe.hp)
-	if _last_player_hp >= 0 and player.hp < _last_player_hp:
-		_animate_player_hit()
-	_last_player_hp = player.hp
 	_refresh_combo_menu()
 
 func _set_actions(enabled: bool) -> void:
@@ -212,11 +232,11 @@ func _set_actions(enabled: bool) -> void:
 	var no_ap := ap < _min_cost()
 	power_button.disabled = (not enabled) or no_powers or no_ap
 	if no_powers:
-		power_button.text = "Poder (sin habilidades)"
+		power_button.text = "Poder"
 	elif no_ap:
-		power_button.text = "Poder (sin PA)"
+		power_button.text = "Poder"
 	else:
-		power_button.text = "Poder (combo)"
+		power_button.text = "Poder"
 	combo_menu.disabled = (not enabled) or no_powers
 	for foe in foes:
 		foe_rows[foe]["button"].disabled = (not enabled) or (not foe.is_alive())
@@ -301,7 +321,7 @@ func _on_attack_pressed(foe: Combatant) -> void:
 		return
 	_set_actions(false)
 	var dmg := _roll(player.attack)
-	foe.take_damage(dmg)
+	_damage_foe(foe, dmg)
 	_lunge(player_sprite, 16.0)
 	_play_player_animation("attack_right", "move_right")
 	_gain_ap(1)
@@ -334,13 +354,15 @@ func _on_power_pressed() -> void:
 	combo_buffer.clear()
 	parry_view.visible = false
 	combo_box.visible = true
+	combo_bar.value = KEY_TIME_LIMIT
+	_set_combo_bar_color(Color("f5bd4b"))
 	_update_combo_view()
 
 func _close_combo_panel() -> void:
 	combo_mode = false
 	combo_buffer.clear()
 	combo_box.visible = false
-	parry_view.visible = true
+	parry_view.visible = attacking
 
 # Cancelar no gasta el turno
 func _cancel_combo(reason: String) -> void:
@@ -366,40 +388,146 @@ func _combo_key(key: String) -> void:
 		_update_combo_view()
 
 func _update_combo_view() -> void:
-	var typed := PackedStringArray()
-	for k in combo_buffer.to_array():
-		typed.append(ARROWS[k])
-	var typed_text: String = " ".join(typed) if typed.size() > 0 else "…"
-	combo_label.text = "[center]Combo\n\n%s\n\n[color=#888888]Esc: cancelar[/color][/center]" % typed_text
+	combo_view.call("show_input", combo_buffer.to_array())
+
+func _effect_color(effect: String) -> Color:
+	return COMBO_ARROW_SCRIPT.COLORS.get(effect, Color("fff0bc"))
+
+func _set_combo_bar_color(color: Color) -> void:
+	var fill := combo_bar.get_theme_stylebox("fill").duplicate() as StyleBoxFlat
+	if fill == null:
+		return
+	fill.bg_color = color
+	combo_bar.add_theme_stylebox_override("fill", fill)
 	
 func _cast_power(id: String) -> void:
 	var p: Dictionary = POWERS[id]
 	var cost: int = int(p["cost"])
 	var value: int = int(p["value"])
-	_close_combo_panel()
 
 	if ap < cost:
-		_log("No tienes PA para %s." % p["name"])
-		_set_actions(true)
+		await _lose_combo_turn("¡SIN PA! Pierdes el turno.",
+				"SIN PA", Color("bd86ff"))
 		return
+
+	combo_mode = false
+	combo_bar.value = KEY_TIME_LIMIT
+	var effect_color := _effect_color(str(p["effect"]))
+	_set_combo_bar_color(effect_color)
+	combo_view.call("show_result", combo_buffer.to_array(), effect_color)
+	_show_combo_impact(str(p["name"]), effect_color)
+	var panel_tween := create_tween()
+	panel_tween.tween_property(combo_view, "scale", Vector2(1.12, 1.12), 0.1) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	await panel_tween.finished
+	var settle := create_tween()
+	settle.tween_property(combo_view, "scale", Vector2.ONE, 0.12)
+	await settle.finished
+	_close_combo_panel()
 
 	ap -= cost
 	match p["kind"]:
 		"single":
+			_play_player_animation("cast_right", "attack_right")
 			var foe := _first_alive_foe()
-			foe.take_damage(value)
+			_damage_foe(foe, value, StringName(p["effect"]))
 			_log("%s: %d de daño a %s." % [p["name"], value, foe.display_name])
 		"all":
+			_play_player_animation("cast_right", "attack_right")
 			for f in foes:
 				if f.is_alive():
-					f.take_damage(value)
+					_damage_foe(f, value, StringName(p["effect"]))
 			_log("%s: %d de daño a todos." % [p["name"], value])
 		"heal":
-			player.hp = mini(player.max_hp, player.hp + value)
-			_log("%s: recuperas %d de vida." % [p["name"], value])
+			var restored := _heal_player(value)
+			_log("%s: recuperas %d de vida." % [p["name"], restored])
 	_refresh()
 	await get_tree().create_timer(STEP_DELAY).timeout
+	_play_player_animation("idle_right")
 	_next_turn()
+
+func _show_combo_impact(power_name: String, color: Color) -> void:
+	var ui := combo_box.get_parent() as Control
+	var viewport_size := get_viewport().get_visible_rect().size
+	var center := viewport_size / 2.0
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.z_index = 20
+	ui.add_child(overlay)
+
+	var flash := ColorRect.new()
+	flash.color = Color(color, 0.34)
+	flash.position = Vector2.ZERO
+	flash.size = viewport_size
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(flash)
+
+	var burst := Polygon2D.new()
+	burst.position = center
+	burst.polygon = _star_polygon(106.0, 62.0, 12)
+	burst.color = Color(color, 0.8)
+	burst.scale = Vector2(0.25, 0.25)
+	overlay.add_child(burst)
+
+	var ring := Line2D.new()
+	for i in 33:
+		ring.add_point(Vector2.from_angle(TAU * float(i) / 32.0) * 54.0)
+	ring.width = 3.0
+	ring.default_color = Color(color, 0.95)
+	ring.position = center
+	ring.scale = Vector2(0.2, 0.2)
+	overlay.add_child(ring)
+
+	var title := Label.new()
+	title.text = power_name.to_upper()
+	title.set_anchors_preset(Control.PRESET_CENTER)
+	title.offset_left = -220.0
+	title.offset_top = -36.0
+	title.offset_right = 220.0
+	title.offset_bottom = 36.0
+	title.pivot_offset = Vector2(220.0, 36.0)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title.add_theme_font_override("font", IMPACT_FONT)
+	title.add_theme_font_size_override("font_size", 30)
+	title.add_theme_color_override("font_color", color)
+	title.add_theme_color_override("font_outline_color", Color("160d22"))
+	title.add_theme_constant_override("outline_size", 6)
+	title.add_theme_color_override("font_shadow_color", Color(color, 0.9))
+	title.add_theme_constant_override("shadow_offset_x", 2)
+	title.add_theme_constant_override("shadow_offset_y", 3)
+	title.scale = Vector2(0.65, 0.65)
+	title.modulate.a = 0.0
+	overlay.add_child(title)
+
+	var flash_tween := create_tween()
+	flash_tween.tween_property(flash, "modulate:a", 0.0, 0.16)
+
+	var burst_tween := create_tween().set_parallel(true)
+	burst_tween.tween_property(burst, "scale", Vector2(1.45, 1.45), 0.42) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	burst_tween.tween_property(burst, "modulate:a", 0.0, 0.42)
+	burst_tween.tween_property(ring, "scale", Vector2(1.7, 1.7), 0.4) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	burst_tween.tween_property(ring, "modulate:a", 0.0, 0.4)
+
+	var title_tween := create_tween()
+	title_tween.set_parallel(true)
+	title_tween.tween_property(title, "scale", Vector2(1.08, 1.08), 0.14) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	title_tween.tween_property(title, "modulate:a", 1.0, 0.07)
+	title_tween.chain().tween_interval(0.55)
+	title_tween.chain().tween_property(title, "modulate:a", 0.0, 0.3)
+	title_tween.finished.connect(overlay.queue_free)
+
+func _star_polygon(outer_radius: float, inner_radius: float,
+		point_count: int) -> PackedVector2Array:
+	var polygon := PackedVector2Array()
+	for i in point_count * 2:
+		var radius := outer_radius if i % 2 == 0 else inner_radius
+		polygon.append(Vector2.from_angle(TAU * float(i) / (point_count * 2)) * radius)
+	return polygon
 
 # ---------- Ataque enemigo con parry ----------
 
@@ -414,6 +542,8 @@ func _enemy_attack(foe: Combatant) -> void:
 		strikes.enqueue(StrikeEvent.new(STRIKE_START + i * STRIKE_GAP))
 	phase_time = 0.0
 	attacking = true
+	parry_view.visible = true
+	parry_view.active = true
 	_log("%s ataca: ¡ESPACIO cuando el aro se cierre!" % foe.display_name)
 
 func _process(delta: float) -> void:
@@ -432,6 +562,7 @@ func _process(delta: float) -> void:
 		if parry_view.active:
 			parry_view.active = false
 			parry_view.queue_redraw()
+		parry_view.visible = false
 		return
 
 	phase_time += delta
@@ -480,13 +611,14 @@ func _input(event: InputEvent) -> void:
 
 # Resuelve el golpe de la cabeza de la cola según la respuesta
 func _apply_strike(grade: String) -> void:
+	parry_view.show_result(grade)
 	var dmg: int = _roll(attacker.attack)
 	if player.defending:
 		dmg = ceili(dmg / 2.0)
 	match grade:
 		"perfect":
 			dmg = 0
-			attacker.take_damage(PARRY_COUNTER)
+			_damage_foe(attacker, PARRY_COUNTER, &"parry")
 			_log("¡PARRY perfecto! Contraatacas por %d." % PARRY_COUNTER)
 		"good":
 			dmg = ceili(dmg / 2.0)
@@ -494,7 +626,7 @@ func _apply_strike(grade: String) -> void:
 		_:
 			_log("%s te golpea: %d de daño." % [attacker.display_name, dmg])
 	if dmg > 0:
-		player.take_damage(dmg)
+		_damage_player(dmg)
 	_refresh()
 	# Si alguien cae, se cancelan los golpes que faltan
 	if not player.is_alive() or not attacker.is_alive():
@@ -505,35 +637,143 @@ func _end_enemy_phase() -> void:
 	_next_turn()
 
 func _finish(won: bool) -> void:
+	if over:
+		return
 	over = true
 	_set_actions(false)
+	attacking = false
+	parry_view.active = false
+	parry_view.visible = false
 	_log("¡Victoria!" if won else "Has caído...")
-	await get_tree().create_timer(1.0).timeout
+	if won:
+		await get_tree().create_timer(1.0).timeout
+	else:
+		await _animate_player_death()
 	finished.emit(won, player.hp)
 	queue_free()
 
-var _last_player_hp: int = -1
+var _player_hit_stopped: bool = false
 
-func _idle_bob(node: Node2D) -> void:
+func _setup_button_motion(button: BaseButton) -> void:
+	button.pivot_offset = button.size / 2.0
+	button.mouse_entered.connect(func():
+		if button.disabled:
+			return
+		_animate_button(button, Vector2(1.055, 1.055))
+	)
+	button.mouse_exited.connect(func():
+		_animate_button(button, Vector2.ONE)
+	)
+	button.button_down.connect(func():
+		_animate_button(button, Vector2(0.96, 0.96))
+	)
+	button.button_up.connect(func():
+		_animate_button(button, Vector2.ONE)
+	)
+
+func _animate_button(button: BaseButton, target: Vector2) -> void:
+	var tween := create_tween()
+	tween.tween_property(button, "scale", target, 0.09) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+func _idle_bob(node: Node2D) -> Tween:
 	var base := node.position.y
 	var t := create_tween().set_loops()
 	t.tween_property(node, "position:y", base - 1.5, 0.5).set_trans(Tween.TRANS_SINE)
 	t.tween_property(node, "position:y", base + 1.5, 0.5).set_trans(Tween.TRANS_SINE)
+	return t
+
+func _animate_player_death() -> void:
+	if _player_idle_tween != null and _player_idle_tween.is_running():
+		_player_idle_tween.kill()
+	var origin := player_sprite.position
+	var base_scale := player_sprite.scale
+	player_sprite.stop()
+	player_sprite.modulate = Color.WHITE
+	battle_effects.death(player_sprite.global_position)
+
+	var collapse := create_tween()
+	collapse.tween_property(player_sprite, "modulate", Color(2.2, 0.35, 0.4), 0.07)
+	collapse.tween_property(player_sprite, "modulate", Color(1.0, 0.16, 0.24), 0.12)
+	collapse.tween_property(player_sprite, "position", origin + Vector2(-5.0, 7.0), 0.18) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	collapse.parallel().tween_property(player_sprite, "scale",
+			base_scale * Vector2(1.3, 0.55), 0.18)
+	collapse.parallel().tween_property(player_sprite, "rotation", deg_to_rad(-24.0), 0.18)
+	collapse.tween_interval(0.12)
+	collapse.tween_property(player_sprite, "position", origin + Vector2(8.0, 14.0), 0.55) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	collapse.parallel().tween_property(player_sprite, "scale",
+			base_scale * Vector2(1.4, 0.28), 0.55)
+	collapse.parallel().tween_property(player_sprite, "rotation", deg_to_rad(82.0), 0.55)
+	collapse.parallel().tween_property(player_sprite, "modulate",
+			Color(0.35, 0.22, 0.33, 0.0), 0.48).set_delay(0.07)
+	await collapse.finished
 
 func _lunge(node: Node2D, dx: float) -> void:
 	var x0 := node.position.x
+	var base_scale := node.scale
 	var t := create_tween()
-	t.tween_property(node, "position:x", x0 + dx, 0.1)
-	t.tween_property(node, "position:x", x0, 0.15)
+	t.tween_property(node, "position:x", x0 + dx, 0.09).set_trans(Tween.TRANS_BACK)
+	t.parallel().tween_property(node, "scale", base_scale * Vector2(1.35, 0.76), 0.09)
+	t.tween_property(node, "position:x", x0 - 4.0, 0.06).set_trans(Tween.TRANS_BACK)
+	t.parallel().tween_property(node, "scale", base_scale * Vector2(0.82, 1.25), 0.06)
+	t.tween_property(node, "position:x", x0, 0.16).set_trans(Tween.TRANS_ELASTIC)
+	t.parallel().tween_property(node, "scale", base_scale, 0.16).set_trans(Tween.TRANS_ELASTIC)
 
-func _animate_player_hit() -> void:
-	_play_player_animation("hurt_right")
+func _damage_foe(foe: Combatant, amount: int, effect: StringName = &"physical") -> void:
+	if not foe.is_alive() or amount <= 0:
+		return
+	foe.take_damage(amount)
+	var view: FoeView = foe_rows[foe]["view"]
+	view.play_damage(amount, effect, not foe.is_alive())
+
+func _damage_player(amount: int) -> void:
+	if amount <= 0 or not player.is_alive():
+		return
+	player.take_damage(amount)
+	_animate_player_hit(amount)
+
+func _heal_player(amount: int) -> int:
+	var restored: int = mini(amount, player.max_hp - player.hp)
+	if restored <= 0:
+		return 0
+	player.hp += restored
+	battle_effects.heal(player_sprite.global_position, restored)
+	_play_player_animation("heal_right", "idle_right")
+	return restored
+
+func _animate_player_hit(amount: int) -> void:
+	_play_player_animation("hurt_right", "idle_right")
+	battle_effects.damage(player_sprite.global_position, amount)
 	var x0 := player_sprite.position.x
+	var base_scale := player_sprite.scale
 	player_sprite.modulate = Color(2.5, 2.5, 2.5)
-	create_tween().tween_property(player_sprite, "modulate", Color.WHITE, 0.25)
+	var flash := create_tween()
+	flash.tween_property(player_sprite, "modulate", Color(1.0, 0.18, 0.16), 0.05)
+	flash.tween_property(player_sprite, "modulate", Color.WHITE, 0.24)
 	var s := create_tween()
 	for dx in [-4.0, 4.0, -3.0, 3.0, 0.0]:
 		s.tween_property(player_sprite, "position:x", x0 + dx, 0.04)
+	var squash := create_tween()
+	squash.tween_property(player_sprite, "scale", base_scale * Vector2(1.35, 0.72), 0.07)
+	squash.tween_property(player_sprite, "scale", base_scale * Vector2(0.78, 1.35), 0.08)
+	squash.tween_property(player_sprite, "scale", base_scale, 0.16) \
+			.set_trans(Tween.TRANS_ELASTIC)
+	var tilt := create_tween()
+	tilt.tween_property(player_sprite, "rotation", deg_to_rad(-12.0), 0.07)
+	tilt.tween_property(player_sprite, "rotation", deg_to_rad(8.0), 0.08)
+	tilt.tween_property(player_sprite, "rotation", 0.0, 0.16)
+	if not _player_hit_stopped and player_sprite.is_playing():
+		_player_hit_stopped = true
+		player_sprite.pause()
+		_resume_player_after_hitstop()
+
+func _resume_player_after_hitstop() -> void:
+	await get_tree().create_timer(0.045, true).timeout
+	_player_hit_stopped = false
+	if is_instance_valid(player_sprite):
+		player_sprite.play()
 
 func _play_player_animation(animation_name: String, fallback: String = "idle_right") -> void:
 	if player_sprite.sprite_frames == null:
@@ -542,3 +782,5 @@ func _play_player_animation(animation_name: String, fallback: String = "idle_rig
 		player_sprite.play(animation_name)
 	elif player_sprite.sprite_frames.has_animation(fallback):
 		player_sprite.play(fallback)
+	elif player_sprite.sprite_frames.has_animation("idle_right"):
+		player_sprite.play("idle_right")

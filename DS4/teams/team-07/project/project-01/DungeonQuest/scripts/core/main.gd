@@ -62,10 +62,14 @@ func _place_player_at_start() -> void:
 	if spawn == null:
 		push_error("EntryRoom no tiene PlayerSpawn")
 		return
+	player_camera.position_smoothing_enabled = false
 	player.global_position = spawn.global_position
 	current_room = 1
 	_set_camera_limits(1)
+	player_camera.make_current()
 	player_camera.reset_smoothing()
+	player_camera.force_update_scroll()
+	player_camera.position_smoothing_enabled = true
 
 func _set_camera_limits(room_id: int) -> void:
 	var room: Node2D = builder.rooms[room_id]
@@ -87,6 +91,7 @@ func _on_enemy_caught(enemy: Enemy) -> void:
 	var group := spawner.group_of(enemy.room_id)
 	spawner.freeze_all()
 
+	await fx.close_transition(0.4, 0.024, 0.18)
 	get_tree().paused = true
 	var combat: Combat = COMBAT_SCENE.instantiate()
 	add_child(combat)
@@ -95,27 +100,27 @@ func _on_enemy_caught(enemy: Enemy) -> void:
 	for e in group:
 		types.append(e.type)
 	combat.start(player_hp, types, skills.unlocked_powers())
+	await fx.open_transition(0.38, 0.02, 0.18)
 
 func _on_combat_finished(player_won: bool, hp_left: int, group: Array) -> void:
 	player_hp = hp_left
 	hud.set_hp(player_hp)
 	if player_won:
+		await fx.close_transition()
 		spawner.remove_group(group)
 		get_tree().paused = false
+		skills.add_points(group.size())
+		hud.set_points(skills.points)
+		await fx.open_transition()
 		player.can_move = true
 		transitioning = false
-		skills.add_points(group.size())
 		fx.toast("+%d punto(s) de habilidad  (K: árbol de habilidades)" % group.size())
-		hud.set_points(skills.points)
 	else:
 		_game_over()
 
 func _game_over() -> void:
 	get_tree().paused = false
-	var t := create_tween()
-	t.tween_property(fx.fade, "modulate:a", 1.0, 0.8)
-	await t.finished
-	get_tree().change_scene_to_file("res://scenes/GameOver.tscn")
+	_transition_to_scene("res://scenes/GameOver.tscn", true)
 
 # ---------- Cruce de puertas ----------
 
@@ -146,13 +151,12 @@ func _on_door_door_crossed(from_room: int, to_room: int, door: Node2D) -> void:
 	var dir: Vector2 = door.get_walk_direction()
 	var target: Vector2 = player.global_position + dir * door.get_walk_distance()
 	player.play_walk(dir)
-
-	var tween := create_tween().set_parallel(true)
-	tween.tween_property(player, "global_position", target, 1.0)
-	tween.tween_property(player.animated_sprite, "modulate:a", 0.0, 0.5).set_delay(0.5)
-	tween.tween_property(fx.fade, "modulate:a", 1.0, 1.0)
+	var tween := create_tween()
+	tween.tween_property(player, "global_position", target, 0.42)
+	tween.parallel().tween_property(player.animated_sprite, "modulate:a", 0.0, 0.14).set_delay(0.2)
 	await tween.finished
-	await get_tree().create_timer(0.1).timeout
+	await fx.close_transition(0.16, 0.008)
+	await get_tree().create_timer(0.04).timeout
 
 	player.global_position = twin.get_arrival_position()
 	player.animated_sprite.modulate.a = 1.0
@@ -167,10 +171,11 @@ func _on_door_door_crossed(from_room: int, to_room: int, door: Node2D) -> void:
 
 	player.play_walk(-twin.get_walk_direction())
 	player.update_animation('idle')
-
-	var t2 := create_tween()
-	t2.tween_property(fx.fade, "modulate:a", 0.0, 0.3)
-	await t2.finished
+	player.animated_sprite.modulate.a = 0.0
+	var reveal := create_tween()
+	reveal.tween_property(player.animated_sprite, "modulate:a", 1.0, 0.08)
+	await reveal.finished
+	await fx.open_transition(0.16, 0.006)
 	spawner.set_room_active(to_room, true)
 	player.can_move = true
 	transitioning = false
@@ -183,12 +188,11 @@ func _win(door: Node2D) -> void:
 	var dir: Vector2 = door.get_walk_direction()
 	var target: Vector2 = player.global_position + dir * door.get_walk_distance()
 	player.play_walk(dir)
-	var tween := create_tween().set_parallel(true)
-	tween.tween_property(player, "global_position", target, 1.0)
-	tween.tween_property(player.animated_sprite, "modulate:a", 0.0, 0.5).set_delay(0.5)
-	tween.tween_property(fx.fade, "modulate:a", 1.0, 1.0)
+	var tween := create_tween()
+	tween.tween_property(player, "global_position", target, 0.42)
+	tween.parallel().tween_property(player.animated_sprite, "modulate:a", 0.0, 0.14).set_delay(0.2)
 	await tween.finished
-	get_tree().change_scene_to_file("res://scenes/Victory.tscn")
+	_transition_to_scene("res://scenes/Victory.tscn")
 
 # ---------- Entrada, habilidades y pista ----------
 
@@ -202,14 +206,32 @@ func _unhandled_input(event: InputEvent) -> void:
 func _open_skills() -> void:
 	if transitioning or skill_screen != null:
 		return
+	transitioning = true
 	get_tree().paused = true
+	await fx.close_transition()
 	skill_screen = SkillScreen.open(self, skills)
 	skill_screen.closed.connect(_on_skills_closed)
+	await fx.open_transition()
 
 func _on_skills_closed() -> void:
+	transitioning = true
+	var closing_screen := skill_screen
 	skill_screen = null
 	hud.set_points(skills.points)   # por si gastaste puntos
+	await fx.close_transition()
+	if is_instance_valid(closing_screen):
+		closing_screen.queue_free()
 	get_tree().paused = false
+	await fx.open_transition()
+	transitioning = false
+
+func _transition_to_scene(scene_path: String, use_fade: bool = false) -> void:
+	get_tree().paused = false
+	var controller = load("res://scenes/SceneController.tscn").instantiate()
+	controller.proxima_escena = scene_path
+	controller.fade_transition = use_fade
+	controller.animate_from_current = not use_fade
+	get_tree().root.add_child(controller)
 
 func _show_hint() -> void:
 	if current_room == exit_room:

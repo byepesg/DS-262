@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="SkillDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://b5gw676xje0ec"]
 
-[ext_resource type="Script" path="res://scripts/skills/skill_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dhrehni4ik58q" path="res://assets/sprites/skills/corte.png" id="1_8qr1x"]
+[ext_resource type="Script" uid="uid://xou088vmd1b7" path="res://scripts/skills/skill_definition.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")
@@ -10,3 +11,4 @@ display_name = "Corte"
 description = "↓ →  ·  16 de daño a un enemigo. Cuesta 2 PA."
 cost = 1
 power_id = &"corte"
+icon = ExtResource("1_8qr1x")
