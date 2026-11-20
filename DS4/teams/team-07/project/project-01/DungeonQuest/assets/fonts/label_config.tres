@@ -1,0 +1,9 @@
+[gd_resource type="LabelSettings" format=3 uid="uid://cqs84c65hgjs8"]
+
+[ext_resource type="FontFile" uid="uid://bge3cdwhwx1l6" path="res://assets/fonts/alagard.ttf" id="1_h45dc"]
+
+[resource]
+font = ExtResource("1_h45dc")
+font_size = 14
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.20392157)
