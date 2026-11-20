@@ -123,6 +123,7 @@ Creado para el curso de Estructuras de Datos, el proyecto aplica grafos, búsque
 - Enemigos colocados en salas intermedias; al encontrarlos comienza un combate por turnos.
 - Árbol de habilidades persistente entre partidas, con poderes que se desbloquean usando puntos.
 - Pantallas de inicio, victoria y derrota.
+- Transiciones de combate y feedback de impacto para parries y combos, con colores asociados al resultado o al tipo de poder.
 
 ## Controles
 
@@ -142,7 +143,7 @@ En el árbol de habilidades, haz clic en un nodo para desbloquearlo. Usa clic de
 
 ## Combate y enemigos
 
-El combate es por turnos; el orden se determina según la velocidad de cada combatiente. El jugador puede atacar, defenderse o usar poderes. Los enemigos anuncian sus golpes con un indicador: un parry perfecto con Espacio evita el daño y contraataca; un bloqueo a tiempo reduce el daño.
+El combate es por turnos; el orden se determina según la velocidad de cada combatiente. El jugador puede atacar, defenderse o usar poderes. Los enemigos anuncian sus golpes con un indicador: un parry perfecto con Espacio evita el daño y contraataca; un bloqueo a tiempo reduce el daño. El resultado del parry aparece con un efecto de impacto, y los cambios de escena usan transiciones visuales.
 
 | Enemigo | Vida | Ataque | Velocidad | Golpes por turno |
 |---|---:|---:|---:|---:|
@@ -161,7 +162,9 @@ Durante la exploración, el HUD muestra el nombre del jugador, su vida y sus pun
 
 Los poderes se desbloquean en el árbol de habilidades. Los desbloqueados aparecen en el menú desplegable **Combos** (arriba a la izquierda, en tu turno), con su secuencia y su costo; los que no alcanzas por falta de PA salen en gris.
 
-Al pulsar **Poder**, el juego **no muestra la secuencia**: solo ves las flechas que llevas y una barra de tiempo, así que hay que recordarla. Cada tecla debe ingresarse en menos de 2 segundos; si se agota el tiempo, **pierdes el turno**. Una tecla equivocada rompe el combo y **también pierdes el turno**; **Esc** lo cancela sin perderlo. El botón **Poder** se desactiva cuando los PA no alcanzan ni para el poder más barato.
+Al pulsar **Poder**, el juego **no muestra la secuencia**: solo ves las flechas que llevas y una barra de tiempo, así que hay que recordarla. Cada tecla debe ingresarse en menos de 2 segundos; si se agota el tiempo, **pierdes el turno**. Una tecla equivocada rompe el combo y **también pierdes el turno**; **Esc** lo cancela sin perderlo. Completar un poder sin los PA necesarios muestra **SIN PA** y también consume el turno. El botón **Poder** se desactiva cuando los PA no alcanzan ni para el poder más barato.
+
+Al completar un combo, el nombre del poder se presenta en un impacto visual de su color y permanece en pantalla alrededor de un segundo. Las flechas completadas también toman el color del tipo de poder.
 
 | Poder | Secuencia | Efecto | Costo |
 |---|---|---|---:|
