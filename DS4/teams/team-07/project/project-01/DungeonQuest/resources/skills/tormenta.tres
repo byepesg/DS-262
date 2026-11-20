@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="SkillDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://ba010qu3r40be"]
 
-[ext_resource type="Script" path="res://scripts/skills/skill_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cfjhfsah1ekxw" path="res://assets/sprites/skills/tormenta.png" id="1_oepaq"]
+[ext_resource type="Script" uid="uid://xou088vmd1b7" path="res://scripts/skills/skill_definition.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")
@@ -10,3 +11,4 @@ display_name = "Tormenta"
 description = "← → ← →  ·  30 de daño a un enemigo. Cuesta 4 PA."
 cost = 3
 power_id = &"tormenta"
+icon = ExtResource("1_oepaq")

@@ -23,7 +23,7 @@ var root: SkillNode
 var points: int = START_POINTS
 
 func _init() -> void:
-	root = SkillNode.new("aventurero", "Aventurero", "Raíz del árbol. Siempre desbloqueada.", 0)
+	root = SkillNode.new("aventurero", "Aventurero", "Raíz del árbol. Siempre desbloqueada.", 0, "-1", load("res://assets/sprites/skills/aventurero.png"))
 	root.unlocked = true
 
 func build_default(catalog: SkillCatalog = DEFAULT_CATALOG) -> void:

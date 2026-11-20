@@ -156,7 +156,7 @@ func _build_nodes() -> void:
 		button.icon = node.icon if node.icon != null else ICON_PLACEHOLDER
 		button.expand_icon = true
 		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		button.add_theme_constant_override("icon_max_width", 30)
+		button.add_theme_constant_override("icon_max_width", 32)
 		button.pressed.connect(_on_node_pressed.bind(node))
 		button.gui_input.connect(_on_node_gui_input.bind(node))
 		button.mouse_entered.connect(_on_node_hover.bind(node))
