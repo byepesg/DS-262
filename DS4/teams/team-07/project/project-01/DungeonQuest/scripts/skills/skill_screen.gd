@@ -27,9 +27,9 @@ const ZOOM_MAX := 2.0
 const ZOOM_STEP := 1.12
 const PAN_SPEED := 500.0
 
-const NODE_SIZE := Vector2(44, 44)
-const COL_GAP := 64.0
-const ROW_GAP := 70.0
+const NODE_SIZE := Vector2(50, 50)
+const COL_GAP := 76.0
+const ROW_GAP := 82.0
 
 const ICON_PLACEHOLDER := preload("res://icon.svg")
 
@@ -44,18 +44,35 @@ var _closing: bool = false
 class Lines extends Control:
 	var positions: Dictionary = {}
 	var node_size := Vector2.ZERO
+	var flash_child: SkillNode
+	var flash_alpha: float = 0.0:
+		set(value):
+			flash_alpha = value
+			queue_redraw()
+	var flash_color := Color("fff3a7")
 
 	func _draw() -> void:
 		for node in positions:
 			for child in node.children:
-				var col := Color(0.35, 0.38, 0.45)
+				var col := Color("65566f")
 				if child.unlocked:
-					col = Color(0.4, 0.9, 0.5)
+					col = Color("b9ff9d")
+				elif node.unlocked:
+					col = Color("d6a85b")
 				var a: Vector2 = positions[node] + Vector2(0, node_size.y / 2.0)
 				var b: Vector2 = positions[child] - Vector2(0, node_size.y / 2.0)
 				var mid: float = (a.y + b.y) / 2.0
-				draw_polyline(PackedVector2Array(
-						[a, Vector2(a.x, mid), Vector2(b.x, mid), b]), col, 2.0)
+				var path := PackedVector2Array([a, Vector2(a.x, mid), Vector2(b.x, mid), b])
+				draw_polyline(path, Color(0.025, 0.02, 0.04, 0.85), 5.0, true)
+				draw_polyline(path, Color(col, 0.88), 2.5, true)
+		if flash_child != null and flash_child.parent != null and flash_alpha > 0.01:
+			var start: Vector2 = positions[flash_child.parent] + Vector2(0, node_size.y / 2.0)
+			var end: Vector2 = positions[flash_child] - Vector2(0, node_size.y / 2.0)
+			var mid_y := (start.y + end.y) / 2.0
+			var flash_path := PackedVector2Array([
+				start, Vector2(start.x, mid_y), Vector2(end.x, mid_y), end,
+			])
+			draw_polyline(flash_path, Color(flash_color, flash_alpha), 5.0, true)
 
 @onready var points_label: Label = %PointsLabel
 @onready var center_button: Button = %CenterButton
@@ -100,7 +117,10 @@ func _ready() -> void:
 	_refresh()
 	# El tamaño del área se conoce un fotograma después
 	await get_tree().process_frame
+	_setup_button_motion(center_button)
+	_setup_button_motion(close_button)
 	_center_view()
+	_reveal_nodes()
 
 # ---------- Posiciones (árbol vertical que crece hacia abajo) ----------
 
@@ -153,16 +173,39 @@ func _build_nodes() -> void:
 		var button: Button = NODE_BUTTON.instantiate()
 		button.size = NODE_SIZE
 		button.position = positions[node] - NODE_SIZE / 2.0
+		button.pivot_offset = button.size / 2.0
+		button.scale = Vector2(0.72, 0.72)
+		button.modulate.a = 0.0
 		button.icon = node.icon if node.icon != null else ICON_PLACEHOLDER
 		button.expand_icon = true
 		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		button.add_theme_constant_override("icon_max_width", 32)
+		button.add_theme_constant_override("icon_max_width", 40)
 		button.pressed.connect(_on_node_pressed.bind(node))
 		button.gui_input.connect(_on_node_gui_input.bind(node))
 		button.mouse_entered.connect(_on_node_hover.bind(node))
+		button.mouse_entered.connect(_animate_node_hover.bind(button, true))
 		button.mouse_exited.connect(_on_node_unhover)
+		button.mouse_exited.connect(_animate_node_hover.bind(button, false))
 		world.add_child(button)
 		buttons[node] = button
+
+func _setup_button_motion(button: BaseButton) -> void:
+	button.pivot_offset = button.size / 2.0
+	button.mouse_entered.connect(_animate_button.bind(button, Vector2(1.06, 1.06)))
+	button.mouse_exited.connect(_animate_button.bind(button, Vector2.ONE))
+	button.button_down.connect(_animate_button.bind(button, Vector2(0.96, 0.96)))
+	button.button_up.connect(_animate_button.bind(button, Vector2.ONE))
+
+func _animate_button(button: BaseButton, target: Vector2) -> void:
+	var tween := create_tween()
+	tween.tween_property(button, "scale", target, 0.09) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+func _animate_node_hover(button: Button, hovered: bool) -> void:
+	var target := Vector2(1.09, 1.09) if hovered else Vector2.ONE
+	var tween := create_tween()
+	tween.tween_property(button, "scale", target, 0.10) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _refresh() -> void:
 	points_label.text = "Puntos de habilidad: %d" % tree.points
@@ -170,22 +213,40 @@ func _refresh() -> void:
 		var button: Button = buttons[node]
 		button.text = ""   # el nombre y el costo salen en el panel de información
 		if node.unlocked:
-			_set_border(button, BORDER_UNLOCKED)
+			_set_node_style(button, BORDER_UNLOCKED, Color("26372c"), 3)
 			button.modulate = Color.WHITE
 		elif tree.can_unlock(node):
-			_set_border(button, BORDER_AVAILABLE)
+			_set_node_style(button, BORDER_AVAILABLE, Color("34283b"), 2)
 			button.modulate = Color.WHITE
 		else:
-			_set_border(button, BORDER_LOCKED)
+			_set_node_style(button, BORDER_LOCKED, Color("17151f"), 1)
 			button.modulate = TINT_LOCKED
 	lines.queue_redraw()
 
-func _set_border(button: Button, color: Color) -> void:
+func _set_node_style(button: Button, color: Color, fill: Color, width: int) -> void:
 	var style := button.get_theme_stylebox("normal").duplicate() as StyleBoxFlat
 	if style == null:
 		return
 	style.border_color = color
+	style.border_width_left = width
+	style.border_width_top = width
+	style.border_width_right = width
+	style.border_width_bottom = width
+	style.bg_color = fill
 	button.add_theme_stylebox_override("normal", style)
+
+func _reveal_nodes() -> void:
+	for node in buttons:
+		var button: Button = buttons[node]
+		var depth := int(round(positions[node].y / ROW_GAP))
+		var delay := minf(0.32, depth * 0.06)
+		var target_alpha := 0.65 if not node.unlocked and not tree.can_unlock(node) else 1.0
+		button.modulate.a = 0.0
+		var tween := create_tween()
+		tween.tween_interval(delay)
+		tween.tween_property(button, "scale", Vector2.ONE, 0.2) \
+				.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.parallel().tween_property(button, "modulate:a", target_alpha, 0.14)
 
 # ---------- Información y acciones sobre los nodos ----------
 
@@ -208,9 +269,64 @@ func _on_node_pressed(node: SkillNode) -> void:
 		return
 	if tree.unlock(node.id):
 		info_label.text = "Desbloqueaste %s." % node.display_name
+		_refresh()
+		_animate_unlock(node)
 	else:
 		info_label.text = tree.why_not(node)
-	_refresh()
+		_refresh()
+
+func _animate_unlock(node: SkillNode) -> void:
+	var button: Button = buttons[node]
+	var branch_color := _branch_color(node)
+	button.scale = Vector2(0.82, 0.82)
+	var tween := create_tween()
+	tween.tween_property(button, "scale", Vector2(1.34, 1.34), 0.1) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(button, "scale", Vector2.ONE, 0.2) \
+			.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(button, "modulate", branch_color, 0.08)
+	tween.tween_property(button, "modulate", Color.WHITE, 0.2)
+
+	lines.flash_child = node
+	lines.flash_alpha = 1.0
+	lines.flash_color = branch_color
+	var line_tween := create_tween()
+	line_tween.tween_property(lines, "flash_alpha", 0.0, 0.42)
+
+	var burst := Polygon2D.new()
+	burst.polygon = _star_polygon(18.0, 7.0, 8)
+	burst.position = positions[node]
+	burst.color = branch_color
+	burst.z_index = 5
+	burst.scale = Vector2(0.15, 0.15)
+	world.add_child(burst)
+	var burst_tween := create_tween().set_parallel(true)
+	burst_tween.tween_property(burst, "scale", Vector2(1.7, 1.7), 0.34) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	burst_tween.tween_property(burst, "rotation", PI / 5.0, 0.34)
+	burst_tween.tween_property(burst, "modulate:a", 0.0, 0.34)
+	burst_tween.finished.connect(burst.queue_free)
+
+func _branch_color(node: SkillNode) -> Color:
+	var branch := node
+	while branch.parent != null and branch.parent.parent != null:
+		branch = branch.parent
+	match branch.id:
+		"espada":
+			return Color("d18bff")
+		"fuego":
+			return Color("ff9b43")
+		"luz":
+			return Color("adff9b")
+		_:
+			return Color("f5bd4b")
+
+func _star_polygon(outer_radius: float, inner_radius: float, points: int) -> PackedVector2Array:
+	var polygon := PackedVector2Array()
+	for i in points * 2:
+		var radius := outer_radius if i % 2 == 0 else inner_radius
+		polygon.append(Vector2.from_angle(TAU * i / (points * 2)) * radius)
+	return polygon
 
 func _on_node_gui_input(event: InputEvent, node: SkillNode) -> void:
 	var mouse := event as InputEventMouseButton
@@ -290,21 +406,27 @@ func _close() -> void:
 	if _closing:
 		return
 	_closing = true
-	var t := create_tween().set_parallel(true)
-	t.tween_property($UI, "modulate:a", 0.0, 0.25)
-	if not standalone:
-		t.tween_property($Dim, "modulate:a", 0.0, 0.25)
-	await t.finished
+	set_process_input(false)
+	close_button.disabled = true
+	center_button.disabled = true
+	for button in buttons.values():
+		button.disabled = true
 	closed.emit()
 	if standalone:
-		get_tree().change_scene_to_file("res://scenes/Start.tscn")
-	else:
-		queue_free()
+		var controller = load("res://scenes/SceneController.tscn").instantiate()
+		controller.proxima_escena = "res://scenes/Start.tscn"
+		controller.animate_from_current = true
+		get_tree().root.add_child(controller)
 
 func _fade_in() -> void:
 	var ui: Control = $UI
 	ui.modulate.a = 0.0
+	ui.pivot_offset = get_viewport().get_visible_rect().size / 2.0
+	ui.scale = Vector2(1.025, 1.025)
+	$Dim.visible = true
 	$Dim.modulate.a = 0.0
 	var t := create_tween().set_parallel(true)
-	t.tween_property(ui, "modulate:a", 1.0, 0.25)
-	t.tween_property($Dim, "modulate:a", 1.0, 0.25)
+	t.tween_property(ui, "modulate:a", 1.0, 0.3)
+	t.tween_property(ui, "scale", Vector2.ONE, 0.38) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	t.tween_property($Dim, "modulate:a", 1.0, 0.28)

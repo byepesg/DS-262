@@ -633,6 +633,12 @@ func test_skill_tree_persistence() -> void:
 
 func test_integration() -> void:
 	_suite = "Integración"
+	var effects_ok := true
+	for id in Combat.POWERS:
+		if not BattleEffects.COLORS.has(Combat.POWERS[id].get("effect", "")):
+			effects_ok = false
+	check(effects_ok, "cada poder de combate tiene un efecto visual definido")
+
 	# Todo poder del árbol existe en el combate
 	var powers_ok := true
 	for definition in SkillTree.DEFAULT_CATALOG.definitions:
@@ -671,10 +677,10 @@ func test_integration() -> void:
 
 	# Salas -> turnos: el heap ordena a los enemigos por velocidad
 	var order := MinHeap.new()
-	var speeds := {"slime": 8.0, "skeleton": 9.0, "bat": 14.0, "brute": 5.0}
+	var speeds := {"slime": 8.0, "Serpiente": 9.0, "rata": 14.0, "buho": 5.0}
 	for k in speeds:
 		order.push(k, 1.0 / speeds[k])
-	check(order.pop() == "bat" and order.pop() == "skeleton", "murciélago y esqueleto actúan antes que slime y bruto")
+	check(order.pop() == "rata" and order.pop() == "Serpiente", "rata y serpiente actúan antes que slime y buho")
 
 # ---------- Mediciones ----------
 
