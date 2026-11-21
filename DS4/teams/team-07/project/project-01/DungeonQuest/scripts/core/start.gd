@@ -32,14 +32,14 @@ func _animate_button(button: TextureButton, target: Vector2) -> void:
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _on_play_pressed() -> void:
-	var cargador = load("res://scenes/SceneController.tscn").instantiate()
-	cargador.proxima_escena = "res://scenes/Main.tscn"
+	var cargador = load("res://scenes/game/scene_controller.tscn").instantiate()
+	cargador.proxima_escena = "res://scenes/game/dungeon.tscn"
 	cargador.animate_from_current = true
 	get_tree().root.add_child(cargador)
 	
 func _on_skill_pressed() -> void:
-	var cargador = load("res://scenes/SceneController.tscn").instantiate()
-	cargador.proxima_escena = "res://scenes/SkillScreen.tscn"
+	var cargador = load("res://scenes/game/scene_controller.tscn").instantiate()
+	cargador.proxima_escena = "res://scenes/ui/screens/skill_tree.tscn"
 	cargador.animate_from_current = true
 	get_tree().root.add_child(cargador)
 

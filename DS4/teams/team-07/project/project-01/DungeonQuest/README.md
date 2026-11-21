@@ -6,14 +6,14 @@
 
 El proyecto usa **Godot 4.7** (probado con **4.7.2**) y no necesita complementos.
 
-No necesitas instalar Godot manualmente. El primer uso de `RunScript_Mac` requiere conexión a Internet: descarga Godot 4.7.2 desde la publicación oficial, verifica el SHA-256 e instala la aplicación en `~/Applications`. No requiere permisos de administrador. Si ya hay una copia compatible de Godot 4.7.2 en el sistema, la reutiliza.
+No necesitas instalar Godot manualmente. El primer uso de `run_project_macos.sh` requiere conexión a Internet: descarga Godot 4.7.2 desde la publicación oficial, verifica el SHA-256 e instala la aplicación en `~/Applications`. No requiere permisos de administrador. Si ya hay una copia compatible de Godot 4.7.2 en el sistema, la reutiliza.
 
 ### Ejecutar con el script
 
 Abre Terminal en la carpeta `DungeonQuest` y ejecuta:
 
 ```bash
-bash ./RunScript_Mac
+bash ./run_project_macos.sh
 ```
 
 El script instala Godot si hace falta y luego abre el proyecto de esta carpeta. No necesitas escribir ni arrastrar una ruta. macOS puede pedir autorización la primera vez que se abre la aplicación; confirma el diálogo del sistema. El script no desactiva Gatekeeper.
@@ -23,8 +23,8 @@ El script instala Godot si hace falta y luego abre el proyecto de esta carpeta. 
 El mismo script instala/reutiliza Godot y reenvía los argumentos de prueba. Desde la carpeta raíz `DungeonQuest`, ejecuta:
 
 ```bash
-bash ./RunScript_Mac --headless --import || exit $?
-bash ./RunScript_Mac --headless --script res://tests/run_tests.gd || exit $?
+bash ./run_project_macos.sh --headless --import || exit $?
+bash ./run_project_macos.sh --headless --script res://tests/run_tests.gd || exit $?
 ```
 
 La importación solo es necesaria la primera vez o después de cambios en los recursos. Para ver los comandos de prueba de Windows, ve a [Pruebas (Windows)](#pruebas-windows).
@@ -58,10 +58,10 @@ El archivo de Godot para Windows también incluye una versión de consola cuyo n
 
 #### Lanzador de Windows — recomendado
 
-Haz doble clic en `RunScript_Windows.bat`. También puedes ejecutarlo desde PowerShell, ubicado en la carpeta del proyecto:
+Haz doble clic en `run_project_windows.bat`. También puedes ejecutarlo desde PowerShell, ubicado en la carpeta del proyecto:
 
 ```powershell
-.\RunScript_Windows.bat
+.\run_project_windows.bat
 ```
 
 El lanzador abre este proyecto y deja la ventana de consola disponible para mostrar errores. Si no configuraste `.godot-path` ni tienes Godot en el `PATH`, te pedirá la ruta al ejecutable.
@@ -196,28 +196,35 @@ La generación procedural construye un mapa conexo con Union-Find, compresión d
 DungeonQuest/
 ├── project.godot
 ├── README.md
-├── RunScript_Mac
-├── RunScript_Windows.bat
+├── run_project_macos.sh
+├── run_project_windows.bat
+├── archive/
+│   └── legacy/
+│       └── duplicate_scenes/  # Copias antiguas preservadas, fuera de las escenas activas
 ├── assets/
 │   ├── fonts/
+│   ├── source/
+│   │   └── aseprite/           # Fuentes editables
 │   └── sprites/
-│       ├── backgrounds/
-│       ├── doors/
-│       ├── player/
-│       └── tiles/
+│       ├── characters/
+│       │   ├── enemies/
+│       │   └── player/
+│       ├── environment/
+│       │   ├── doors/
+│       │   └── tiles/
+│       ├── skills/
+│       └── ui/
+│           ├── backgrounds/
+│           └── buttons/
 ├── scenes/
-│   ├── Start.tscn
-│   ├── Main.tscn
-│   ├── CombatScene.tscn
-│   ├── PlayerHUD.tscn
-│   ├── SkillScreen.tscn
-│   ├── Victory.tscn
-│   ├── GameOver.tscn
-│   ├── Foe.tscn
-│   ├── SkillNodeButton.tscn
-│   ├── SceneController.tscn
+│   ├── actors/
+│   ├── game/
 │   ├── objects/
-│   └── rooms/
+│   ├── rooms/
+│   └── ui/
+│       ├── components/
+│       └── screens/
+├── docs/                       # Roadmap y documentación del proyecto
 ├── scripts/
 │   ├── actors/
 │   ├── combat/

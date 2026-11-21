@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://dy1yty1v2uc8b"]
+
+[ext_resource type="Script" uid="uid://ceeyog4in2aow" path="res://scripts/core/main.gd" id="1_vcsgt"]
+[ext_resource type="PackedScene" uid="uid://b01mu4deuyogo" path="res://scenes/Player.tscn" id="3_0bbpv"]
+
+[node name="Main" type="Node2D" unique_id=1356449522]
+script = ExtResource("1_vcsgt")
+
+[node name="Dungeon" type="Node2D" parent="." unique_id=1571734088]
+y_sort_enabled = true
+
+[node name="Player" parent="." unique_id=36552186 instance=ExtResource("3_0bbpv")]
+y_sort_enabled = true
+position = Vector2(242, 202)
+collision_mask = 15

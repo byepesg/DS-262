@@ -1,0 +1,179 @@
+[gd_scene format=3 uid="uid://mbaa7gdebms8"]
+
+[ext_resource type="Script" uid="uid://5iepf6enqevi" path="res://scripts/skills/skill_screen.gd" id="1_screen"]
+[ext_resource type="FontFile" uid="uid://bge3cdwhwx1l6" path="res://assets/fonts/alagard.ttf" id="2_font"]
+[ext_resource type="StyleBox" uid="uid://bq1pkk72px4od" path="res://assets/fonts/tree_labels.tres" id="3_akgk2"]
+[ext_resource type="Texture2D" uid="uid://c7y2800igto0s" path="res://assets/sprites/ui/backgrounds/skill_tree_background.png" id="3_namco"]
+[ext_resource type="StyleBox" uid="uid://h821nv0bc655" path="res://assets/fonts/tree_button.tres" id="4_qnnly"]
+[ext_resource type="StyleBox" uid="uid://d36q20kgjxpau" path="res://assets/fonts/tree_button_press.tres" id="5_fmg5k"]
+[ext_resource type="StyleBox" uid="uid://y3pqvxcdqxhy" path="res://assets/fonts/tree_button_hover.tres" id="6_namco"]
+
+[sub_resource type="Theme" id="theme_ui"]
+default_font = ExtResource("2_font")
+default_font_size = 10
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_4widi"]
+texture = ExtResource("3_namco")
+
+[node name="SkillScreen" type="CanvasLayer" unique_id=992170657]
+process_mode = 3
+layer = 70
+script = ExtResource("1_screen")
+
+[node name="Dim" type="ColorRect" parent="." unique_id=140757335]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.07, 0.97)
+
+[node name="UI" type="Control" parent="." unique_id=1573672714]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("theme_ui")
+
+[node name="ViewArea" type="Panel" parent="UI" unique_id=1191385791]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_4widi")
+
+[node name="World" type="Control" parent="UI/ViewArea" unique_id=823502555]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Banner" type="Panel" parent="UI" unique_id=620443011]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -80.0
+offset_top = 2.0
+offset_right = 80.0
+offset_bottom = 18.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("3_akgk2")
+
+[node name="Title" type="Label" parent="UI/Banner" unique_id=1254488095]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.95, 0.93, 0.55, 1)
+text = "ÁRBOL DE HABILIDADES"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PointsLabel" type="Label" parent="UI" unique_id=72957764]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 14.0
+offset_top = 24.0
+offset_right = 200.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(0.95, 0.93, 0.55, 1)
+text = "Puntos de habilidad: 0"
+
+[node name="CenterButton" type="Button" parent="UI" unique_id=1123957918]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_top = 22.0
+offset_right = -82.0
+offset_bottom = 38.0
+grow_horizontal = 0
+focus_mode = 0
+theme_override_font_sizes/font_size = 8
+theme_override_styles/normal = ExtResource("4_qnnly")
+theme_override_styles/pressed = ExtResource("5_fmg5k")
+theme_override_styles/hover = ExtResource("6_namco")
+text = "Centrar"
+
+[node name="CloseButton" type="Button" parent="UI" unique_id=273576266]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -76.0
+offset_top = 22.0
+offset_right = -14.0
+offset_bottom = 38.0
+grow_horizontal = 0
+focus_mode = 0
+theme_override_font_sizes/font_size = 8
+theme_override_styles/normal = ExtResource("4_qnnly")
+theme_override_styles/pressed = ExtResource("5_fmg5k")
+theme_override_styles/hover = ExtResource("6_namco")
+text = "Cerrar"
+
+[node name="InfoPanel" type="Panel" parent="UI" unique_id=1871112242]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = -62.0
+offset_right = -14.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("3_akgk2")
+
+[node name="InfoLabel" type="Label" parent="UI/InfoPanel" unique_id=1650745599]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 3.0
+offset_right = -6.0
+offset_bottom = -3.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 8
+text = "Pasa el ratón sobre una habilidad."
+vertical_alignment = 1
+autowrap_mode = 3
+clip_text = true
+
+[node name="Hint" type="Label" parent="UI" unique_id=1470335567]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -19.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.6, 0.57, 0.7, 1)
+theme_override_font_sizes/font_size = 7
+text = "Rueda: zoom · Arrastrar: mover · Clic: desbloquear · Clic derecho: reiniciar · Esc/K: cerrar"
+horizontal_alignment = 1

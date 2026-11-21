@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://r8acj6nj1w3k"]
+
+[ext_resource type="Script" uid="uid://cvre6unvwalmv" path="res://scripts/actors/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" uid="uid://bi3hxvu3cxhda" path="res://scripts/actors/vision_cone.gd" id="2_vision"]
+[ext_resource type="SpriteFrames" uid="uid://cr0uvue3txsdq" path="res://assets/sprites/characters/enemies/placeholder_frames.tres" id="3_frames"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 6.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_contact"]
+
+[node name="Enemy" type="CharacterBody2D" unique_id=1021123827]
+collision_layer = 16
+collision_mask = 5
+script = ExtResource("1_enemy")
+
+[node name="VisionCone" type="Node2D" parent="." unique_id=1492462098]
+script = ExtResource("2_vision")
+
+[node name="AnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=1323960124]
+scale = Vector2(0.25, 0.25)
+sprite_frames = ExtResource("3_frames")
+animation = &"idle"
+autoplay = "idle"
+speed_scale = 2.0
+
+[node name="BodyShape" type="CollisionShape2D" parent="." unique_id=434595239]
+shape = SubResource("CircleShape2D_body")
+
+[node name="ContactArea" type="Area2D" parent="." unique_id=438771233]
+collision_layer = 0
+collision_mask = 2
+
+[node name="ContactShape" type="CollisionShape2D" parent="ContactArea" unique_id=562250235]
+shape = SubResource("CircleShape2D_contact")
+
+[node name="AlertMark" type="Label" parent="." unique_id=678350514]
+visible = false
+offset_left = -3.0
+offset_top = -27.0
+offset_right = 7.0
+offset_bottom = -13.0
+text = "!"

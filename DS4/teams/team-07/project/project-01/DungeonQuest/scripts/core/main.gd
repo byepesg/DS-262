@@ -1,8 +1,8 @@
 extends Node2D
 
 const TOAST_FONT := preload("res://assets/fonts/alagard.ttf")
-const COMBAT_SCENE := preload("res://scenes/CombatScene.tscn")
-const HUD_SCENE := preload("res://scenes/PlayerHUD.tscn")
+const COMBAT_SCENE := preload("res://scenes/game/combat.tscn")
+const HUD_SCENE := preload("res://scenes/ui/components/player_hud.tscn")
 
 var hud: PlayerHUD
 var graph := DungeonGraph.new()
@@ -95,18 +95,20 @@ func _on_enemy_caught(enemy: Enemy) -> void:
 	get_tree().paused = true
 	var combat: Combat = COMBAT_SCENE.instantiate()
 	add_child(combat)
-	combat.finished.connect(_on_combat_finished.bind(group))
+	combat.finished.connect(_on_combat_finished.bind(group, combat))
 	var types: Array = []
 	for e in group:
 		types.append(e.type)
 	combat.start(player_hp, types, skills.unlocked_powers())
 	await fx.open_transition(0.38, 0.02, 0.18)
 
-func _on_combat_finished(player_won: bool, hp_left: int, group: Array) -> void:
+func _on_combat_finished(player_won: bool, hp_left: int, group: Array,
+		combat: Combat) -> void:
 	player_hp = hp_left
 	hud.set_hp(player_hp)
 	if player_won:
 		await fx.close_transition()
+		combat.queue_free()
 		spawner.remove_group(group)
 		get_tree().paused = false
 		skills.add_points(group.size())
@@ -120,7 +122,7 @@ func _on_combat_finished(player_won: bool, hp_left: int, group: Array) -> void:
 
 func _game_over() -> void:
 	get_tree().paused = false
-	_transition_to_scene("res://scenes/GameOver.tscn", true)
+	_transition_to_scene("res://scenes/ui/screens/game_over.tscn", true)
 
 # ---------- Cruce de puertas ----------
 
@@ -192,7 +194,7 @@ func _win(door: Node2D) -> void:
 	tween.tween_property(player, "global_position", target, 0.42)
 	tween.parallel().tween_property(player.animated_sprite, "modulate:a", 0.0, 0.14).set_delay(0.2)
 	await tween.finished
-	_transition_to_scene("res://scenes/Victory.tscn")
+	_transition_to_scene("res://scenes/ui/screens/victory.tscn")
 
 # ---------- Entrada, habilidades y pista ----------
 
@@ -227,7 +229,7 @@ func _on_skills_closed() -> void:
 
 func _transition_to_scene(scene_path: String, use_fade: bool = false) -> void:
 	get_tree().paused = false
-	var controller = load("res://scenes/SceneController.tscn").instantiate()
+	var controller = load("res://scenes/game/scene_controller.tscn").instantiate()
 	controller.proxima_escena = scene_path
 	controller.fade_transition = use_fade
 	controller.animate_from_current = not use_fade
