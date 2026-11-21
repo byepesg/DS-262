@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b84kowykv6gay"
-path="res://.godot/imported/snakeLeftWalk.png-83b32fc13bbb34aa4de00c32d4239d1c.ctex"
+uid="uid://bqondwjr3b7bm"
+path="res://.godot/imported/SnakeWalkUp.png-de7bada7edc6dbaf93870345c7b344b0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/enemies/snake/snakeLeftWalk.png"
-dest_files=["res://.godot/imported/snakeLeftWalk.png-83b32fc13bbb34aa4de00c32d4239d1c.ctex"]
+source_file="res://assets/sprites/characters/enemies/snake/SnakeWalkUp.png"
+dest_files=["res://.godot/imported/SnakeWalkUp.png-de7bada7edc6dbaf93870345c7b344b0.ctex"]
 
 [params]
 

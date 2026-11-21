@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://31wgjtlltttq"
-path="res://.godot/imported/snake.png-ea9289dc7ce9b038ac6e283831e15ab1.ctex"
+uid="uid://bc8xkdc42i8sh"
+path="res://.godot/imported/SnakeStandUp.png-a6a51bcd8b34e6e0329799b5de463ae8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/enemies/snake/snake.png"
-dest_files=["res://.godot/imported/snake.png-ea9289dc7ce9b038ac6e283831e15ab1.ctex"]
+source_file="res://assets/sprites/characters/enemies/snake/SnakeStandUp.png"
+dest_files=["res://.godot/imported/SnakeStandUp.png-a6a51bcd8b34e6e0329799b5de463ae8.ctex"]
 
 [params]
 

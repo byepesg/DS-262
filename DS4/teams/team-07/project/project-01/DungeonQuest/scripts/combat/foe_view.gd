@@ -10,7 +10,7 @@ extends Node2D
 @onready var attack_button: Button = %AttackButton
 @onready var arrow: Polygon2D = %Arrow
 
-const COMBAT_SCALE := 4.945   
+const COMBAT_SCALE := 4.945
 
 var max_hp: int = 1
 var alive: bool = true
@@ -36,6 +36,7 @@ func setup(display_name: String, p_max_hp: int, hp: int, frames: SpriteFrames,
 	battle_effects = effects
 	sprite.sprite_frames = frames
 	_fit_sprite()
+	_sprite_scale = sprite.scale
 	sprite.modulate = Color.WHITE
 	hp_bar.max_value = max_hp
 	hp_bar.value = hp
@@ -45,10 +46,7 @@ func setup(display_name: String, p_max_hp: int, hp: int, frames: SpriteFrames,
 func _fit_sprite() -> void:
 	if sprite.sprite_frames == null:
 		return
-	var tex := sprite.sprite_frames.get_frame_texture("idle", 0)
-	if tex != null:
-		var s := COMBAT_SCALE * 16.0 / float(tex.get_width())
-		sprite.scale = Vector2(s, s)
+	sprite.scale = Vector2(COMBAT_SCALE, COMBAT_SCALE)
 		
 func update_hp(hp: int) -> void:
 	hp = maxi(hp, 0)
@@ -115,6 +113,8 @@ func play_attack() -> void:
 	t.tween_property(self, "position:x", x0, 0.16).set_trans(Tween.TRANS_ELASTIC)
 	t.parallel().tween_property(sprite, "scale", attack_scale, 0.16).set_trans(Tween.TRANS_ELASTIC)
 	await t.finished
+	if sprite.animation == "attack" and sprite.is_playing():
+		await sprite.animation_finished
 	_play_idle()
 
 func play_death() -> void:

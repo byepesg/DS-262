@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c23ksxvxa5ecf"
-path="res://.godot/imported/owl_walk_up.png-020462bb352da7012ff03c75e0e4bad8.ctex"
+uid="uid://cdw8xl33t1cp1"
+path="res://.godot/imported/snakeLeft.png-4676520d9cf7b1016a39a33bf64b9f34.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/characters/enemies/owl/owl_walk_up.png"
-dest_files=["res://.godot/imported/owl_walk_up.png-020462bb352da7012ff03c75e0e4bad8.ctex"]
+source_file="res://assets/sprites/characters/enemies/snake/snakeLeft.png"
+dest_files=["res://.godot/imported/snakeLeft.png-4676520d9cf7b1016a39a33bf64b9f34.ctex"]
 
 [params]
 

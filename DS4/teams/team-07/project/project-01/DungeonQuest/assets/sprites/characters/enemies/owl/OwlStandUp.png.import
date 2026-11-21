@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://jkalrtwi8a5j"
-path="res://.godot/imported/owl_walk_down.png-104e18c0f80bf820175f157c844621c4.ctex"
+uid="uid://bjdy3jjdvgfvo"
+path="res://.godot/imported/OwlStandUp.png-7edb405bbb3b257980ea46051bb7f265.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/characters/enemies/owl/owl_walk_down.png"
-dest_files=["res://.godot/imported/owl_walk_down.png-104e18c0f80bf820175f157c844621c4.ctex"]
+source_file="res://assets/sprites/characters/enemies/owl/OwlStandUp.png"
+dest_files=["res://.godot/imported/OwlStandUp.png-7edb405bbb3b257980ea46051bb7f265.ctex"]
 
 [params]
 

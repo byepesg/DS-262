@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjwamti1mecj3"
-path="res://.godot/imported/OwlRight.png-290de79f9a2c9fa80bc38b123742661d.ctex"
+uid="uid://706jjnpfdnib"
+path="res://.godot/imported/OwlLeftWalk.png-c41a23c1799d5a0776cf67de2aa56e74.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/enemies/owl/OwlRight.png"
-dest_files=["res://.godot/imported/OwlRight.png-290de79f9a2c9fa80bc38b123742661d.ctex"]
+source_file="res://assets/sprites/characters/enemies/owl/OwlLeftWalk.png"
+dest_files=["res://.godot/imported/OwlLeftWalk.png-c41a23c1799d5a0776cf67de2aa56e74.ctex"]
 
 [params]
 

@@ -4,7 +4,7 @@
 
 - `sprites/characters/player/player_frames.tres` contiene los frames actuales del jugador para exploración y combate. Las animaciones de combate pueden añadirse como animaciones adicionales o reemplazarse por un recurso dedicado en `../scenes/game/combat.tscn`.
 - El código de combate busca `attack_right`, `cast_right`, `hurt_right` y `heal_right`, y vuelve a una animación disponible si todavía no existen.
-- `EnemyTypes` construye y cachea las animaciones de búho a partir de los sprites fuente en `sprites/characters/enemies/owl/`, conservando el tamaño nativo de cada tira. El búho es el enemigo predeterminado y fallback; rata y serpiente usan sus tiras propias cuando están disponibles. En combate, `combatant_view.tscn` aplica una escala común 2× sin modificar las texturas.
+- `EnemyTypes` construye y cachea las animaciones nativas de búho y serpiente, incluyendo sus direcciones, caminatas y ataques. Las referencias conservan los tamaños originales de cada tira; la exploración las ajusta a 32 px y `FoeView` aplica una escala común de combate sin redimensionar las texturas. El búho es el enemigo predeterminado y fallback; rata usa su tira propia cuando está disponible.
 - Las animaciones del búho incluyen reposo y movimiento por dirección, además del ataque. Los enemigos en combate reproducen `attack` cuando existe y conservan la animación `idle` como fallback.
 - En batalla, los enemigos conservan `idle` sin movimiento automático. `hurt` y `death` se representan con animaciones procedurales de deformación, retroceso, giro y desvanecimiento, así que funcionan aunque el sprite solo tenga un frame.
 

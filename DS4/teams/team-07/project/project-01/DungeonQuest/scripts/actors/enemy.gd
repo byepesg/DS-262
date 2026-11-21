@@ -22,7 +22,7 @@ const MASK_WALLS := 1          # capa 1: paredes del TileMap
 const MASK_DOORS := 4          # capa 3: pilares de las puertas
 const MASK_PLAYER := 2         # capa 2: jugador
 const BODY_RADIUS := 6.0
-const WORLD_SPRITE_PX := 16.0   # mismo tamaño que el jugador
+const WORLD_SPRITE_PX := 32.0
 
 
 var room_id: int = 0
