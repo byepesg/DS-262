@@ -18,11 +18,11 @@ script = ExtResource("1_enemy")
 script = ExtResource("2_vision")
 
 [node name="AnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=1323960124]
-scale = Vector2(0.25, 0.25)
+scale = Vector2(1, 1)
 sprite_frames = ExtResource("3_frames")
 animation = &"idle"
 autoplay = "idle"
-speed_scale = 2.0
+speed_scale = 1.0
 
 [node name="BodyShape" type="CollisionShape2D" parent="." unique_id=434595239]
 shape = SubResource("CircleShape2D_body")

@@ -101,19 +101,25 @@ func _animate_hurt() -> void:
 
 # Embestida hacia el jugador (a la izquierda)
 func play_attack() -> void:
-	if sprite.sprite_frames != null and sprite.sprite_frames.has_animation("attack"):
+	var has_attack := sprite.sprite_frames != null \
+			and sprite.sprite_frames.has_animation("attack")
+	if has_attack:
 		sprite.play("attack")
 	else:
 		_play_idle()
 	var x0 := position.x
+	# El sheet se redujo a 16x16; compensa el remuestreo para conservar el tamaño visible.
+	var attack_scale := _sprite_scale * (2.0 if has_attack else 1.0)
+	sprite.scale = attack_scale
 	var t := create_tween()
 	t.tween_property(self, "position:x", x0 - 30.0, 0.1).set_trans(Tween.TRANS_BACK)
-	t.parallel().tween_property(sprite, "scale", _sprite_scale * Vector2(1.45, 0.72), 0.1)
+	t.parallel().tween_property(sprite, "scale", attack_scale * Vector2(1.45, 0.72), 0.1)
 	t.tween_property(self, "position:x", x0 + 8.0, 0.07).set_trans(Tween.TRANS_BACK)
-	t.parallel().tween_property(sprite, "scale", _sprite_scale * Vector2(0.72, 1.38), 0.07)
+	t.parallel().tween_property(sprite, "scale", attack_scale * Vector2(0.72, 1.38), 0.07)
 	t.tween_property(self, "position:x", x0, 0.16).set_trans(Tween.TRANS_ELASTIC)
-	t.parallel().tween_property(sprite, "scale", _sprite_scale, 0.16).set_trans(Tween.TRANS_ELASTIC)
+	t.parallel().tween_property(sprite, "scale", attack_scale, 0.16).set_trans(Tween.TRANS_ELASTIC)
 	await t.finished
+	sprite.scale = _sprite_scale
 	_play_idle()
 
 func play_death() -> void:

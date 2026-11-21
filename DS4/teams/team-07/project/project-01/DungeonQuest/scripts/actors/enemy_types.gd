@@ -63,7 +63,7 @@ static func _build_owl_frames() -> SpriteFrames:
 		["move_up", "owl_walk_up.png", 8, Vector2i(16, 16), 12.0],
 		["move_left", "owl_left_walk.png", 10, Vector2i(16, 16), 12.0],
 		["move_right", "owl_right_walk.png", 10, Vector2i(16, 16), 12.0],
-		["attack", "owl_attack.png", 8, Vector2i(32, 32), 24.0],
+		["attack", "owl_attack_16.png", 8, Vector2i(16, 16), 24.0],
 	]
 	for strip in strips:
 		if not _add_strip(frames, strip[0], root + strip[1], strip[2], strip[3], strip[4],

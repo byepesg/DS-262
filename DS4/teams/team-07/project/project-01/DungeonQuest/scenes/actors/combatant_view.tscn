@@ -20,19 +20,19 @@ script = ExtResource("1_view")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="." unique_id=1579901051]
 unique_name_in_owner = true
-position = Vector2(0, -22)
-scale = Vector2(0.3, 0.3)
+position = Vector2(0, -26)
+scale = Vector2(3.5, 3.5)
 sprite_frames = ExtResource("2_frames")
 animation = &"idle"
 autoplay = "idle"
-speed_scale = 4.0
+speed_scale = 1.0
 
 [node name="NameLabel" type="Label" parent="." unique_id=978992056]
 unique_name_in_owner = true
 offset_left = -45.0
-offset_top = -60.0
+offset_top = -74.0
 offset_right = 45.0
-offset_bottom = -46.0
+offset_bottom = -60.0
 text = "Enemigo"
 label_settings = ExtResource("3_labels")
 horizontal_alignment = 1
@@ -41,7 +41,7 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 visible = false
 color = Color(1, 0.88, 0.4, 1)
-polygon = PackedVector2Array(-4, -70, 4, -70, 0, -63)
+polygon = PackedVector2Array(-4, -90, 4, -90, 0, -83)
 
 [node name="HPBar" type="ProgressBar" parent="." unique_id=1959032048]
 unique_name_in_owner = true
