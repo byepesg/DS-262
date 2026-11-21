@@ -1,7 +1,7 @@
 class_name EnemySpawner
 extends RefCounted
 
-const ENEMY_SCENE := preload("res://scenes/Enemy.tscn")
+const ENEMY_SCENE := preload("res://scenes/actors/exploration_enemy.tscn")
 const SPAWN_CLEARANCE := 8.0
 const MIN_SPAWN_SEPARATION := 24.0
 const SPAWN_BLOCKERS := Enemy.MASK_WALLS | Enemy.MASK_DOORS | Enemy.MASK_PLAYER | Enemy.LAYER_ENEMY
@@ -50,7 +50,7 @@ func spawn() -> void:
 			var marker: Marker2D = candidates.pop_at(marker_index)
 			var enemy := ENEMY_SCENE.instantiate() as Enemy
 			if enemy == null:
-				push_error("Enemy.tscn no contiene un nodo Enemy")
+				push_error("exploration_enemy.tscn no contiene un nodo Enemy")
 				return
 			_world.add_child(enemy)
 			enemy.setup(id, _player, marker.global_position,

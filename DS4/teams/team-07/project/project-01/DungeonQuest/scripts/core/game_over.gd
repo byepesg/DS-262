@@ -5,8 +5,8 @@ func _ready() -> void:
 	$ExitButton.pressed.connect(_on_quit_pressed)
 
 func _on_play_pressed() -> void:
-	var cargador = load("res://scenes/SceneController.tscn").instantiate()
-	cargador.proxima_escena = "res://scenes/Start.tscn"
+	var cargador = load("res://scenes/game/scene_controller.tscn").instantiate()
+	cargador.proxima_escena = "res://scenes/ui/screens/start_menu.tscn"
 	cargador.animate_from_current = true
 	get_tree().root.add_child(cargador)
 

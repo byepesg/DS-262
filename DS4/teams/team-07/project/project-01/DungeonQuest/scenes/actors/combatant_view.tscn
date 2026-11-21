@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://n5xbpk73v5yo"]
+
+[ext_resource type="Script" uid="uid://btu7o4s1dh4u5" path="res://scripts/combat/foe_view.gd" id="1_view"]
+[ext_resource type="SpriteFrames" uid="uid://cr0uvue3txsdq" path="res://assets/sprites/characters/enemies/placeholder_frames.tres" id="2_frames"]
+[ext_resource type="LabelSettings" uid="uid://cqs84c65hgjs8" path="res://assets/fonts/label_config.tres" id="3_labels"]
+
+[sub_resource type="StyleBoxFlat" id="bar_bg"]
+bg_color = Color(0.18, 0.13, 0.18, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.93, 0.55, 1)
+
+[sub_resource type="StyleBoxFlat" id="bar_fill"]
+bg_color = Color(0.29, 0.87, 0.5, 1)
+
+[node name="Foe" type="Node2D" unique_id=1510868806]
+script = ExtResource("1_view")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="." unique_id=1579901051]
+unique_name_in_owner = true
+position = Vector2(0, -26)
+scale = Vector2(3.5, 3.5)
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+autoplay = "idle"
+speed_scale = 1.0
+
+[node name="NameLabel" type="Label" parent="." unique_id=978992056]
+unique_name_in_owner = true
+offset_left = -45.0
+offset_top = -74.0
+offset_right = 45.0
+offset_bottom = -60.0
+text = "Enemigo"
+label_settings = ExtResource("3_labels")
+horizontal_alignment = 1
+
+[node name="Arrow" type="Polygon2D" parent="." unique_id=957042640]
+unique_name_in_owner = true
+visible = false
+color = Color(1, 0.88, 0.4, 1)
+polygon = PackedVector2Array(-4, -90, 4, -90, 0, -83)
+
+[node name="HPBar" type="ProgressBar" parent="." unique_id=1959032048]
+unique_name_in_owner = true
+offset_left = -25.0
+offset_top = 4.0
+offset_right = 25.0
+offset_bottom = 10.0
+theme_override_styles/background = SubResource("bar_bg")
+theme_override_styles/fill = SubResource("bar_fill")
+show_percentage = false
+
+[node name="HPLabel" type="Label" parent="." unique_id=484292639]
+unique_name_in_owner = true
+offset_left = -25.0
+offset_top = 11.0
+offset_right = 25.0
+offset_bottom = 25.0
+text = "30/30"
+label_settings = ExtResource("3_labels")
+horizontal_alignment = 1
+
+[node name="AttackButton" type="Button" parent="." unique_id=1803377649]
+unique_name_in_owner = true
+offset_left = -22.0
+offset_top = -44.0
+offset_right = 22.0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true

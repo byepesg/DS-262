@@ -1,7 +1,7 @@
 class_name Combat
 extends CanvasLayer
 
-# LÓGICA del combate por turnos. La interfaz está en scenes/CombatScene.tscn
+# LÓGICA del combate por turnos. La interfaz está en scenes/game/combat.tscn
 # (se diseña en el editor); este script solo busca sus nodos por nombre único.
 # Se instancia ENCIMA de Main, así que el mapa, el grafo y el minimapa no se tocan.
 #
@@ -12,15 +12,15 @@ extends CanvasLayer
 #   - ComboTrie (trie): cada poder es una secuencia de flechas.
 #   - Dictionary (tabla hash): datos de cada poder por id.
 #
-# Nodos que DEBE tener CombatScene.tscn (con "Acceder como nombre único"):
+# Nodos que DEBE tener scenes/game/combat.tscn (con "Acceder como nombre único"):
 #   %TurnLabel  %FoeSlots  %PlayerBar  %PlayerHPLabel  %APLabel
 #   %DefendButton  %PowerButton  %ParryView  %ComboBox  %ComboView
 #   %ComboBar  %LogLabel
-# Y FoeRow.tscn: %NameLabel  %HPBar  %AttackButton
+# Y scenes/actors/combatant_row.tscn: %NameLabel  %HPBar  %AttackButton
 
 signal finished(player_won: bool, player_hp: int)
 
-const FOE_VIEW := preload("res://scenes/Foe.tscn")
+const FOE_VIEW := preload("res://scenes/actors/combatant_view.tscn")
 const COMBO_ARROW_SCRIPT := preload("res://scripts/combat/combo_arrows.gd")
 
 const PLAYER_STATS := {"name": "Jugador", "max_hp": 60, "attack": 10, "speed": 10.0}
@@ -53,7 +53,7 @@ const PERFECT_WINDOW := 0.12
 const GOOD_WINDOW := 0.25
 const PARRY_COUNTER := 4         # daño al atacante con un parry perfecto
 const END_DELAY := 0.6
-const MENU_FONT := preload("res://assets/fonts/ModernDOS8x16.ttf")
+const MENU_FONT := preload("res://assets/fonts/modern_dos_8x16.ttf")
 const BREAK_LOSES_TURN := true   # true: equivocarte de flecha también cuesta el turno
 
 @onready var combo_menu: MenuButton = %ComboMenu
@@ -165,7 +165,7 @@ func _setup_ui() -> void:
 	_setup_button_motion(power_button)
 	_setup_button_motion(combo_menu)
 
-	# Una fila por enemigo, creada desde FoeRow.tscn
+	# Una fila por enemigo, creada desde combatant_row.tscn
 	var slots := foe_slots.get_children()
 	for i in foes.size():
 		var foe: Combatant = foes[i]
@@ -650,7 +650,6 @@ func _finish(won: bool) -> void:
 	else:
 		await _animate_player_death()
 	finished.emit(won, player.hp)
-	queue_free()
 
 var _player_hit_stopped: bool = false
 

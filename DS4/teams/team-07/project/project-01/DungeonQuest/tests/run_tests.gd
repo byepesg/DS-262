@@ -677,10 +677,10 @@ func test_integration() -> void:
 
 	# Salas -> turnos: el heap ordena a los enemigos por velocidad
 	var order := MinHeap.new()
-	var speeds := {"slime": 8.0, "Serpiente": 9.0, "rata": 14.0, "buho": 5.0}
+	var speeds := {"pollito": 8.0, "Serpiente": 9.0, "rata": 14.0, "buho": 5.0}
 	for k in speeds:
 		order.push(k, 1.0 / speeds[k])
-	check(order.pop() == "rata" and order.pop() == "Serpiente", "rata y serpiente actúan antes que slime y buho")
+	check(order.pop() == "rata" and order.pop() == "Serpiente", "rata y serpiente actúan antes que pollito y buho")
 
 # ---------- Mediciones ----------
 

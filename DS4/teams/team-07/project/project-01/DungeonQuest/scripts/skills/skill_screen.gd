@@ -1,7 +1,7 @@
 class_name SkillScreen
 extends CanvasLayer
 
-# Pantalla del árbol de habilidades. La interfaz está en scenes/SkillScreen.tscn
+# Pantalla del árbol de habilidades. La interfaz está en scenes/ui/screens/skill_tree.tscn
 # (se diseña en el editor); este script solo pone los nodos del árbol, las líneas
 # y maneja el movimiento de la vista.
 #
@@ -12,15 +12,15 @@ extends CanvasLayer
 #   Clic en nodo ....... desbloquear · Clic derecho: reiniciar rama
 #   Esc o K ............ cerrar
 #
-# Nodos que DEBE tener SkillScreen.tscn (con "Acceder como nombre único"):
+# Nodos que DEBE tener scenes/ui/screens/skill_tree.tscn (con "Acceder como nombre único"):
 #   %PointsLabel  %CenterButton  %CloseButton  %ViewArea  %World  %InfoLabel
 #
 # Uso:  SkillScreen.open(self, skill_tree)
 
 signal closed
 
-const SCENE_PATH := "res://scenes/SkillScreen.tscn"
-const NODE_BUTTON := preload("res://scenes/SkillNodeButton.tscn")
+const SCENE_PATH := "res://scenes/ui/screens/skill_tree.tscn"
+const NODE_BUTTON := preload("res://scenes/ui/components/skill_node_button.tscn")
 
 const ZOOM_MIN := 0.35
 const ZOOM_MAX := 2.0
@@ -413,8 +413,8 @@ func _close() -> void:
 		button.disabled = true
 	closed.emit()
 	if standalone:
-		var controller = load("res://scenes/SceneController.tscn").instantiate()
-		controller.proxima_escena = "res://scenes/Start.tscn"
+		var controller = load("res://scenes/game/scene_controller.tscn").instantiate()
+		controller.proxima_escena = "res://scenes/ui/screens/start_menu.tscn"
 		controller.animate_from_current = true
 		get_tree().root.add_child(controller)
 

@@ -1,14 +1,14 @@
 class_name MapBuilder
 extends RefCounted
 
-const DOOR_SCENE := preload("res://scenes/objects/Door.tscn")
-const ENTRY_SCENE := preload("res://scenes/rooms/EntryRoom.tscn")
-const EXIT_SCENE := preload("res://scenes/rooms/ExitRoom.tscn")
+const DOOR_SCENE := preload("res://scenes/objects/door.tscn")
+const ENTRY_SCENE := preload("res://scenes/rooms/entry_room.tscn")
+const EXIT_SCENE := preload("res://scenes/rooms/exit_room.tscn")
 const NORMAL_SCENES := [
-	preload("res://scenes/rooms/RoomA.tscn"),
-	preload("res://scenes/rooms/RoomB.tscn"),
-	preload("res://scenes/rooms/RoomC.tscn"),
-	preload("res://scenes/rooms/RoomD.tscn"),
+	preload("res://scenes/rooms/room_a.tscn"),
+	preload("res://scenes/rooms/room_b.tscn"),
+	preload("res://scenes/rooms/room_c.tscn"),
+	preload("res://scenes/rooms/room_d.tscn"),
 ]
 
 var graph: DungeonGraph

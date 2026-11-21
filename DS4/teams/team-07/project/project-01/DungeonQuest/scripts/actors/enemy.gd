@@ -22,6 +22,8 @@ const MASK_WALLS := 1          # capa 1: paredes del TileMap
 const MASK_DOORS := 4          # capa 3: pilares de las puertas
 const MASK_PLAYER := 2         # capa 2: jugador
 const BODY_RADIUS := 6.0
+const WORLD_SPRITE_PX := 16.0   # mismo tamaño que el jugador
+
 
 var room_id: int = 0
 var home: Vector2 = Vector2.ZERO
@@ -35,7 +37,7 @@ var _spawn_direction: Vector2 = Vector2.RIGHT
 @onready var alert_mark: Label = $AlertMark
 @onready var vision_cone: VisionCone = $VisionCone
 
-var type: String = "slime"
+var type: String = "buho"
 
 func _ready() -> void:
 	collision_layer = LAYER_ENEMY
@@ -46,7 +48,7 @@ func _ready() -> void:
 	_play_animation("idle")
 
 # Llamar DESPUÉS de add_child
-func setup(room: int, player: Node2D, pos: Vector2, enemy_type: String = "slime",
+func setup(room: int, player: Node2D, pos: Vector2, enemy_type: String = "buho",
 		direction: Vector2 = Vector2.RIGHT) -> void:
 	room_id = room
 	target = player
@@ -58,10 +60,20 @@ func setup(room: int, player: Node2D, pos: Vector2, enemy_type: String = "slime"
 	var stats: Dictionary = EnemyTypes.get_stats(type)
 	if stats.has("sprite_frames"):
 		sprite.sprite_frames = stats["sprite_frames"]
+		_fit_sprite()
+	_play_animation("idle")
 	sprite.modulate = Color.WHITE
 	vision_cone.configure(sight_radius, vision_angle_degrees, facing_direction)
 	add_to_group("enemies_room_%d" % room_id)
 
+func _fit_sprite() -> void:
+	if sprite.sprite_frames == null:
+		return
+	var tex := sprite.sprite_frames.get_frame_texture("idle", 0)
+	if tex != null:
+		var s := WORLD_SPRITE_PX / float(tex.get_width())
+		sprite.scale = Vector2(s, s)
+		
 func set_active(value: bool) -> void:
 	active = value
 	if not value:
@@ -90,6 +102,7 @@ func _physics_process(_delta: float) -> void:
 			var dir := (target.global_position - global_position).normalized()
 			if not dir.is_zero_approx():
 				facing_direction = dir
+			_play_animation("move")
 			velocity = dir * chase_speed
 			move_and_slide()
 
@@ -126,7 +139,18 @@ func _on_body_entered(body: Node2D) -> void:
 func _play_animation(animation_name: String) -> void:
 	if sprite.sprite_frames == null:
 		return
-	if sprite.sprite_frames.has_animation(animation_name):
-		sprite.play(animation_name)
-	elif sprite.sprite_frames.has_animation("idle"):
-		sprite.play("idle")
+	var selected_animation := animation_name
+	if animation_name == "idle" or animation_name == "move":
+		var direction := "right"
+		if absf(facing_direction.x) >= absf(facing_direction.y):
+			direction = "right" if facing_direction.x >= 0.0 else "left"
+		else:
+			direction = "down" if facing_direction.y >= 0.0 else "up"
+		var directional_animation := "%s_%s" % [animation_name, direction]
+		if sprite.sprite_frames.has_animation(directional_animation):
+			selected_animation = directional_animation
+	if not sprite.sprite_frames.has_animation(selected_animation):
+		selected_animation = "idle"
+	if sprite.sprite_frames.has_animation(selected_animation) and (
+			sprite.animation != selected_animation or not sprite.is_playing()):
+		sprite.play(selected_animation)
