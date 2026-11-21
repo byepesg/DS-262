@@ -20,12 +20,10 @@ script = ExtResource("1_view")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="." unique_id=1579901051]
 unique_name_in_owner = true
-position = Vector2(0, -26)
-scale = Vector2(3.5, 3.5)
+position = Vector2(0, -28)
+scale = Vector2(2, 2)
 sprite_frames = ExtResource("2_frames")
 animation = &"idle"
-autoplay = "idle"
-speed_scale = 1.0
 
 [node name="NameLabel" type="Label" parent="." unique_id=978992056]
 unique_name_in_owner = true
