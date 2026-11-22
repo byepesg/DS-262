@@ -1,0 +1,54 @@
+# Compila el APK de Parchapp en una máquina x86 de GitHub.
+# Este archivo vive solo en el fork del equipo: no se incluye en el pull request al repositorio del curso.
+name: Parchapp APK
+
+on:
+  push:
+    paths:
+      - 'DS4/teams/team-01/Parchapp/**'
+      - '.github/workflows/parchapp-apk.yml'
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: DS4/teams/team-01/Parchapp
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # Llave de firma fija: así cada APK nuevo se instala encima del anterior sin desinstalar.
+      # Si el secret no existe, Gradle crea una llave temporal y habrá que desinstalar antes de actualizar.
+      - name: Restaurar llave de firma de depuración
+        env:
+          LLAVE: ${{ secrets.PARCHAPP_DEBUG_KEYSTORE }}
+        run: |
+          if [ -n "$LLAVE" ]; then
+            mkdir -p ~/.android
+            echo "$LLAVE" | base64 --decode > ~/.android/debug.keystore
+          else
+            echo "::warning::Falta el secret PARCHAPP_DEBUG_KEYSTORE; se usará una llave temporal."
+          fi
+
+      - name: Pruebas del núcleo
+        run: ./gradlew --no-daemon :core:check
+
+      - name: Compilar APK
+        run: ./gradlew --no-daemon :app:assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parchapp-apk
+          path: DS4/teams/team-01/Parchapp/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
