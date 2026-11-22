@@ -102,8 +102,6 @@ var combo_buffer := CircularQueue.new()
 
 var foe_rows: Dictionary = {}     # Combatant -> {"bar": ProgressBar, "button": Button}
 var log_lines: Array = []
-var _player_idle_tween: Tween
-
 func _init() -> void:
 	layer = 60
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -178,7 +176,6 @@ func _setup_ui() -> void:
 		_setup_button_motion(view.attack_button)
 		foe_rows[foe] = {"view": view, "button": view.attack_button}
 	log_label.get_v_scroll_bar().modulate.a = 0.0   # oculta la barra de scroll
-	_player_idle_tween = _idle_bob(player_sprite)
 	combo_menu.focus_mode = Control.FOCUS_NONE
 	var popup := combo_menu.get_popup()
 	popup.add_theme_font_override("font", MENU_FONT)
@@ -675,16 +672,7 @@ func _animate_button(button: BaseButton, target: Vector2) -> void:
 	tween.tween_property(button, "scale", target, 0.09) \
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
-func _idle_bob(node: Node2D) -> Tween:
-	var base := node.position.y
-	var t := create_tween().set_loops()
-	t.tween_property(node, "position:y", base - 1.5, 0.5).set_trans(Tween.TRANS_SINE)
-	t.tween_property(node, "position:y", base + 1.5, 0.5).set_trans(Tween.TRANS_SINE)
-	return t
-
 func _animate_player_death() -> void:
-	if _player_idle_tween != null and _player_idle_tween.is_running():
-		_player_idle_tween.kill()
 	var origin := player_sprite.position
 	var base_scale := player_sprite.scale
 	player_sprite.stop()

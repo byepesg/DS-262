@@ -2,16 +2,26 @@
 
 importer="texture"
 type="CompressedTexture2D"
+<<<<<<< Updated upstream:DS4/teams/team-07/project/project-01/DungeonQuest/assets/sprites/characters/enemies/owl/OwlAss.png.import
 uid="uid://b0m3gv0alt6hp"
 path="res://.godot/imported/OwlAss.png-7d9038957e3cc5140082ad25c99b872e.ctex"
+=======
+uid="uid://dob1ipgrq6afj"
+path="res://.godot/imported/RatAttc.png-38845a8b35bd2fafb02280bd98f0f247.ctex"
+>>>>>>> Stashed changes:DS4/teams/team-07/project/project-01/DungeonQuest/assets/sprites/characters/enemies/rat/ratAttc.png.import
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
+<<<<<<< Updated upstream:DS4/teams/team-07/project/project-01/DungeonQuest/assets/sprites/characters/enemies/owl/OwlAss.png.import
 source_file="res://assets/sprites/characters/enemies/owl/OwlAss.png"
 dest_files=["res://.godot/imported/OwlAss.png-7d9038957e3cc5140082ad25c99b872e.ctex"]
+=======
+source_file="res://assets/sprites/characters/enemies/rat/RatAttc.png"
+dest_files=["res://.godot/imported/RatAttc.png-38845a8b35bd2fafb02280bd98f0f247.ctex"]
+>>>>>>> Stashed changes:DS4/teams/team-07/project/project-01/DungeonQuest/assets/sprites/characters/enemies/rat/ratAttc.png.import
 
 [params]
 

@@ -164,8 +164,8 @@ script = ExtResource("1_combat")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -30.0
-offset_bottom = -40.0
+offset_top = -32.0
+offset_bottom = -42.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -179,8 +179,8 @@ script = ExtResource("8_effects")
 
 [node name="PlayerSprite" type="AnimatedSprite2D" parent="Stage" unique_id=945625582]
 unique_name_in_owner = true
-position = Vector2(89, 125.00001)
-scale = Vector2(4.945313, 4.945313)
+position = Vector2(83.71875, 130.28127)
+scale = Vector2(4.2851563, 4.2851563)
 sprite_frames = ExtResource("3_dyexf")
 animation = &"idle_right"
 autoplay = "idle_right"

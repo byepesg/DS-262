@@ -25,7 +25,7 @@ static func _frames_for(type: String) -> SpriteFrames:
 		"Serpiente":
 			frames = _build_snake_frames()
 		"rata":
-			frames = _build_single_sheet_frames("rat/rata.png", 5)
+			frames = _build_rat_frames()
 		_:
 			frames = _build_owl_frames()
 
@@ -82,9 +82,15 @@ static func _build_snake_frames() -> SpriteFrames:
 		["idle_right", "snakeRight.png", 8, 4.0],
 		["move_down", "SnakeWalkDown.png", 8, 12.0],
 		["move_up", "SnakeWalkUp.png", 7, 12.0],
+<<<<<<< Updated upstream
 		["move_left", "snakeLeftWalk.png", 8, 12.0],
 		["move_right", "snakeRightWalk.png", 8, 12.0],
 		["attack", "snakeAttc.png", 11, 24.0],
+=======
+		["move_left", "SnakeLeftWalk.png", 8, 12.0],
+		["move_right", "SnakeRightWalk.png", 8, 12.0],
+		["attack", "SnakeAttc.png", 11, 24.0],
+>>>>>>> Stashed changes
 	]
 	for strip in strips:
 		if not _add_strip(frames, strip[0], root + strip[1], strip[2], strip[3],
@@ -92,6 +98,30 @@ static func _build_snake_frames() -> SpriteFrames:
 			push_warning("No se pudo cargar la animación de la serpiente: %s" % strip[0])
 	return frames if frames.has_animation("idle") else null
 
+<<<<<<< Updated upstream
+=======
+static func _build_rat_frames() -> SpriteFrames:
+	var frames := _new_sprite_frames()
+	var root := ENEMY_SPRITES + "rat/"
+	var strips := [
+		["idle", "Rat.png", 12, 6.0],
+		["idle_down", "RatStandDown.png", 8, 4.0],
+		["idle_up", "RatStandUp.png", 8, 4.0],
+		["idle_left", "RatLeft.png", 8, 4.0],
+		["idle_right", "RatRight.png", 8, 4.0],
+		["move_down", "RatWalkDown.png", 8, 12.0],
+		["move_up", "RatWalkUp.png", 7, 12.0],
+		["move_left", "RatLeftWalk.png", 8, 12.0],
+		["move_right", "RatRightWalk.png", 8, 12.0],
+		["attack", "RatAttc.png", 11, 24.0],
+	]
+	for strip in strips:
+		if not _add_strip(frames, strip[0], root + strip[1], strip[2], strip[3],
+				strip[0] != "attack"):
+			push_warning("No se pudo cargar la animación de la rata: %s" % strip[0])
+	return frames if frames.has_animation("idle") else null
+
+>>>>>>> Stashed changes
 static func _add_strip(frames: SpriteFrames, animation_name: StringName, path: String,
 		frame_count: int, speed: float, loops: bool = true) -> bool:
 	var texture := load(path) as Texture2D

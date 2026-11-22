@@ -10,7 +10,7 @@ extends Node2D
 @onready var attack_button: Button = %AttackButton
 @onready var arrow: Polygon2D = %Arrow
 
-const COMBAT_SCALE := 4.945
+const COMBAT_SCALE := 3.5
 
 var max_hp: int = 1
 var alive: bool = true
