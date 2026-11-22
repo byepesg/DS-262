@@ -2,25 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bli0nr5qduk6v"
-<<<<<<< Updated upstream:DS4/teams/team-07/project/project-01/DungeonQuest/assets/sprites/characters/enemies/rat/rata.png.import
-path="res://.godot/imported/rata.png-818b7a0d34871a737c95f64dd4c216a7.ctex"
-=======
+uid="uid://p7hccv3niu4k"
 path="res://.godot/imported/Rat.png-e16f951cf401d148133da27811f5da7b.ctex"
->>>>>>> Stashed changes:DS4/teams/team-07/project/project-01/DungeonQuest/assets/sprites/characters/enemies/rat/rat.png.import
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-<<<<<<< Updated upstream:DS4/teams/team-07/project/project-01/DungeonQuest/assets/sprites/characters/enemies/rat/rata.png.import
-source_file="res://assets/sprites/characters/enemies/rat/rata.png"
-dest_files=["res://.godot/imported/rata.png-818b7a0d34871a737c95f64dd4c216a7.ctex"]
-=======
 source_file="res://assets/sprites/characters/enemies/rat/Rat.png"
 dest_files=["res://.godot/imported/Rat.png-e16f951cf401d148133da27811f5da7b.ctex"]
->>>>>>> Stashed changes:DS4/teams/team-07/project/project-01/DungeonQuest/assets/sprites/characters/enemies/rat/rat.png.import
 
 [params]
 

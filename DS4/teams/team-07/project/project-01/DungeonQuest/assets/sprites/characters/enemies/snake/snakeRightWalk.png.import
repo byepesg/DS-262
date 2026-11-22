@@ -2,21 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-<<<<<<< Updated upstream
-uid="uid://c5aa3p0y0bslb"
-path="res://.godot/imported/snakeRightWalk.png-bcd9cf48856883d512293ecc4482513c.ctex"
-=======
 uid="uid://delvfyxcfunur"
 path="res://.godot/imported/SnakeRightWalk.png-19a089715a0bb0f15d0c718c69f0d896.ctex"
->>>>>>> Stashed changes
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/characters/enemies/snake/snakeRightWalk.png"
-dest_files=["res://.godot/imported/snakeRightWalk.png-bcd9cf48856883d512293ecc4482513c.ctex"]
+source_file="res://assets/sprites/characters/enemies/snake/SnakeRightWalk.png"
+dest_files=["res://.godot/imported/SnakeRightWalk.png-19a089715a0bb0f15d0c718c69f0d896.ctex"]
 
 [params]
 

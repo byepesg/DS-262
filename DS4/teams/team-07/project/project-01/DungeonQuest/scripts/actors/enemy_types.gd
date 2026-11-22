@@ -75,7 +75,7 @@ static func _build_snake_frames() -> SpriteFrames:
 	var frames := _new_sprite_frames()
 	var root := ENEMY_SPRITES + "snake/"
 	var strips := [
-		["idle", "snake.png", 12, 6.0],
+		["idle", "Snake.png", 12, 6.0],
 		["idle_down", "SnakeStandDown.png", 8, 4.0],
 		["idle_up", "SnakeStandUp.png", 8, 4.0],
 		["idle_left", "SnakeLeft.png", 8, 4.0],
