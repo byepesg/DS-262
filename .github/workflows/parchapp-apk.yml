@@ -53,7 +53,9 @@ jobs:
           APK=app/build/outputs/apk/debug/app-debug.apk
           BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
           echo "build-tools: $BT"
-          "$BT/apksigner" verify --verbose --print-certs "$APK"
+          "$BT/apksigner" verify --verbose --print-certs --min-sdk-version 26 "$APK"
+          # El instalador de Xiaomi/HyperOS necesita la firma v1: si falta, se detiene aquí
+          unzip -l "$APK" | grep -q 'META-INF/.*\.RSA' || { echo "::error::Falta la firma v1"; exit 1; }
           "$BT/aapt2" dump badging "$APK" | head -20
           "$BT/zipalign" -c -P 16 -v 4 "$APK" | tail -1
           sha256sum "$APK"
