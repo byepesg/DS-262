@@ -78,19 +78,13 @@ static func _build_snake_frames() -> SpriteFrames:
 		["idle", "snake.png", 12, 6.0],
 		["idle_down", "SnakeStandDown.png", 8, 4.0],
 		["idle_up", "SnakeStandUp.png", 8, 4.0],
-		["idle_left", "snakeLeft.png", 8, 4.0],
-		["idle_right", "snakeRight.png", 8, 4.0],
+		["idle_left", "SnakeLeft.png", 8, 4.0],
+		["idle_right", "SnakeRight.png", 8, 4.0],
 		["move_down", "SnakeWalkDown.png", 8, 12.0],
 		["move_up", "SnakeWalkUp.png", 7, 12.0],
-<<<<<<< Updated upstream
-		["move_left", "snakeLeftWalk.png", 8, 12.0],
-		["move_right", "snakeRightWalk.png", 8, 12.0],
-		["attack", "snakeAttc.png", 11, 24.0],
-=======
 		["move_left", "SnakeLeftWalk.png", 8, 12.0],
 		["move_right", "SnakeRightWalk.png", 8, 12.0],
 		["attack", "SnakeAttc.png", 11, 24.0],
->>>>>>> Stashed changes
 	]
 	for strip in strips:
 		if not _add_strip(frames, strip[0], root + strip[1], strip[2], strip[3],
@@ -98,8 +92,6 @@ static func _build_snake_frames() -> SpriteFrames:
 			push_warning("No se pudo cargar la animación de la serpiente: %s" % strip[0])
 	return frames if frames.has_animation("idle") else null
 
-<<<<<<< Updated upstream
-=======
 static func _build_rat_frames() -> SpriteFrames:
 	var frames := _new_sprite_frames()
 	var root := ENEMY_SPRITES + "rat/"
@@ -121,7 +113,6 @@ static func _build_rat_frames() -> SpriteFrames:
 			push_warning("No se pudo cargar la animación de la rata: %s" % strip[0])
 	return frames if frames.has_animation("idle") else null
 
->>>>>>> Stashed changes
 static func _add_strip(frames: SpriteFrames, animation_name: StringName, path: String,
 		frame_count: int, speed: float, loops: bool = true) -> bool:
 	var texture := load(path) as Texture2D
