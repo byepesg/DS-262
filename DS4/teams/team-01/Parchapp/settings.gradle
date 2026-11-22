@@ -1,0 +1,31 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'Parchapp'
+
+// core:    estructuras de datos, dominio, servicios y datos. Java puro, sin dependencias.
+// consola: interfaz de texto (la de la Entrega 1). Solo necesita un JDK.
+// app:     aplicación Android. Usa core.
+include ':core', ':consola'
+
+// La app Android solo se compila donde hay un SDK de Android (GitHub Actions o Android Studio).
+// En un equipo sin SDK, core y consola se compilan y prueban igual.
+def haySdkAndroid = System.getenv('ANDROID_HOME') != null
+        || System.getenv('ANDROID_SDK_ROOT') != null
+        || file('local.properties').exists()
+if (haySdkAndroid) {
+    include ':app'
+}

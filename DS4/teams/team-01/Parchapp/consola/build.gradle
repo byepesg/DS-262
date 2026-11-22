@@ -1,0 +1,21 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':core')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+application {
+    mainClass = 'com.parchapp.Parchapp'
+}
+
+// Sin esto, "gradlew :consola:run" no le pasa el teclado a la aplicación
+tasks.named('run') {
+    standardInput = System.in
+}

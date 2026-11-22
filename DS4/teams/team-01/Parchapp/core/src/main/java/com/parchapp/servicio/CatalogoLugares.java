@@ -83,6 +83,6 @@ public class CatalogoLugares {
             return "";
         }
         String sinTildes = Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
-        return sinTildes.toLowerCase().strip();
+        return sinTildes.toLowerCase().trim();
     }
 }

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 // Actividad grupal en un lugar. Reglas:
 // - La capacidad incluye a quien crea el parche, que entra como primer participante.
 // - Nadie puede estar dos veces, ni como participante ni en la lista de espera.
-// i está lleno, quien quiera entrar va a la lista de espera (cola FIFO). Cuando alguien
+// - Si está lleno, quien quiera entrar va a la lista de espera (cola FIFO). Cuando alguien
 //  sale, el primero de la cola ocupa su cupo.
 // Solo los parches ABIERTO o LLENO aceptan cambios.
 public class Parche {
@@ -30,7 +30,8 @@ public class Parche {
         if (lugar == null || creador == null || fechaHora == null) {
             throw new IllegalArgumentException("El parche necesita lugar, creador y fecha");
         }
-        if (titulo == null || titulo.isBlank()) {
+        // trim() en vez de isBlank()/strip(): esos métodos no existen en Android antes de la API 33
+        if (titulo == null || titulo.trim().isEmpty()) {
             throw new IllegalArgumentException("El parche necesita un titulo");
         }
         if (titulo.length() > LARGO_MAXIMO_TITULO) {
@@ -43,7 +44,7 @@ public class Parche {
         this.id = id;
         this.lugar = lugar;
         this.creador = creador;
-        this.titulo = titulo.strip();
+        this.titulo = titulo.trim();
         this.fechaHora = fechaHora;
         this.capacidad = capacidad;
         participantes.agregarAlFinal(creador);

@@ -229,7 +229,7 @@ class VistaLugares {
     // Lo usan también las vistas de parches y de la ruta
     static void abrirComoLlegar(Pantalla pantalla, Lugar lugar) {
         String url = NavegacionMaps.urlComoLlegar(lugar);
-        if (NavegacionMaps.abrirEnNavegador(url)) {
+        if (Navegador.abrir(url)) {
             pantalla.exito("Abrimos Google Maps en tu navegador con la ruta a " + lugar.getNombre() + ".");
         } else {
             pantalla.aviso("No se pudo abrir el navegador. Copia este enlace: " + url);

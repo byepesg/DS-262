@@ -1,15 +1,27 @@
-# Salidas de compilación (NetBeans, VS Code, terminal)
+# Salidas de compilación (Gradle, VS Code, terminal)
 build/
-dist/
+.gradle/
 bin/
 out/
 *.class
 
-# Configuración local de NetBeans (rutas de cada equipo)
-nbproject/private/
+# Gradle wrapper: el .gitignore del repo del curso ignora *.jar, pero este sí debe subirse
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android: rutas locales del SDK, APKs generados y llaves de firma
+local.properties
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Examen 02: no hace parte del proyecto
+Examen02_Equipo_01/
+Examen02_Equipo_01.zip
 
 # IDEs y sistema
 .idea/
 *.iml
+.vscode/
 .DS_Store
 Thumbs.db

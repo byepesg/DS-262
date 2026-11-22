@@ -1,8 +1,8 @@
-# Parchapp — Entrega 1
+# Parchapp — Entrega 2 (en desarrollo)
 
 **Asignatura:** Estructuras de Datos · Universidad Nacional de Colombia · 2026-2
-**Lenguaje:** Java 17 o superior, sin librerías externas
-**Interfaz:** consola. La interfaz gráfica (Android) y la conexión con Google Places quedan para las siguientes entregas.
+**Lenguaje:** Java 17 o superior. El núcleo (`core`) no usa librerías externas.
+**Interfaces:** app **Android** (en construcción) y **consola** (la de la Entrega 1). Ambas usan el mismo núcleo.
 
 ## Participantes
 
@@ -43,24 +43,42 @@ funciona el núcleo completo:
 
 ## Cómo ejecutar
 
-Solo se necesita un **JDK 17 o superior** (`java -version`).
+### Consola y pruebas: solo se necesita un JDK 17 o superior (`java -version`)
 
-- **VS Code** (con *Extension Pack for Java*): abrir la carpeta, ir a *Run and Debug* y elegir
-  **Parchapp** o **Pruebas**.
-- **NetBeans:** *Clean and Build* (Shift+F11) y luego *Run* (F6). La ventana de salida de NetBeans no
-  limpia la pantalla ni muestra colores; para que se vea bien, en *Properties → Run → Arguments*
-  escribir `--simple`.
-- **IntelliJ IDEA:** marcar `src` como *Sources Root* y `test` como *Test Sources Root*, y ejecutar
-  `com.parchapp.Parchapp`.
-- **Terminal**, desde la carpeta del proyecto:
+El proyecto usa **Gradle** a través de su *wrapper* (`gradlew`), que descarga Gradle la primera vez.
+Desde la carpeta del proyecto:
 
 ```bash
-javac -encoding UTF-8 -d out --source-path src src/com/parchapp/Parchapp.java
+./gradlew :consola:run -q --console=plain          # la app de consola (Windows: gradlew.bat)
+./gradlew :consola:run -q --console=plain --args=--simple   # sin colores ni caracteres especiales
+./gradlew :core:pruebas                             # las pruebas automáticas
+```
+
+Sin Gradle, solo con `javac` (Linux/macOS; en Windows cambiar `:` por `;`):
+
+```bash
+javac -encoding UTF-8 -d out --source-path core/src/main/java:consola/src/main/java \
+      consola/src/main/java/com/parchapp/Parchapp.java
 java -cp out com.parchapp.Parchapp
+
+javac -encoding UTF-8 -d out --source-path core/src/main/java:core/src/test/java \
+      core/src/test/java/com/parchapp/pruebas/EjecutarPruebas.java
+java -cp out com.parchapp.pruebas.EjecutarPruebas
 ```
 
 Si la terminal muestra símbolos raros (`?`, `[1;36m`), ejecuten con `--simple`: sin colores, sin
-caracteres especiales y sin tildes.
+caracteres especiales y sin tildes. **VS Code**, **IntelliJ IDEA** y **NetBeans** abren el proyecto
+directamente como proyecto Gradle.
+
+### App Android
+
+- **Con Android Studio** (equipo x86_64): abrir la carpeta `Parchapp/` y ejecutar el módulo `app`.
+  Android Studio crea `local.properties` con la ruta del SDK, y con eso Gradle incluye el módulo.
+- **Sin Android Studio:** el APK se compila en GitHub Actions
+  (`.github/workflows/parchapp-apk.yml` en el fork del equipo) y se descarga desde la pestaña
+  *Actions*, en el artefacto `parchapp-apk`.
+
+Requisitos: Android 8.0 (API 26) o superior. Se compila contra la API 36 (Android 16).
 
 ## Pruebas
 
@@ -70,37 +88,30 @@ Son 38 pruebas automáticas:
 - de los servicios.
 
 Cubren los casos de la sección 11.3 del documento maestro y las pruebas T-02, T-04 a T-09. Usan un
-mini framework propio (`MiniTest`) para no depender de JUnit.
-
-```bash
-# Linux / macOS
-javac -encoding UTF-8 -d out --source-path src:test test/com/parchapp/pruebas/EjecutarPruebas.java
-# Windows
-javac -encoding UTF-8 -d out --source-path "src;test" test/com/parchapp/pruebas/EjecutarPruebas.java
-
-java -cp out com.parchapp.pruebas.EjecutarPruebas
-```
+mini framework propio (`MiniTest`) para no depender de JUnit. `./gradlew :core:check` también las
+ejecuta y falla si alguna falla.
 
 ## Organización del código
 
 ```
-src/com/parchapp/
-  Parchapp.java       Punto de entrada
-  estructuras/        Nodo, ListaEnlazada, Cola (hechas por el equipo)
-  dominio/            Lugar, Parche, Usuario, Ubicacion, Categoria, EstadoParche, ResultadoUnion
-  servicio/           CatalogoLugares, GestorParches, HistorialVistas, RutaDelDia, NavegacionMaps
-  datos/              DatosDemo (datos de demostración)
-  consola/            Pantalla (dibujar y leer), Sesion, App (menú) y las vistas de cada sección
-test/com/parchapp/pruebas/
+core/       Núcleo en Java puro: no depende de Android ni de la consola
+  src/main/java/com/parchapp/
+    estructuras/      Nodo, ListaEnlazada, Cola (hechas por el equipo)
+    dominio/          Lugar, Parche, Usuario, Ubicacion, Categoria, EstadoParche, ResultadoUnion
+    servicio/         CatalogoLugares, GestorParches, HistorialVistas, RutaDelDia, NavegacionMaps
+    datos/            DatosDemo (datos de demostración)
+  src/test/java/com/parchapp/pruebas/
+consola/    Interfaz de texto: Pantalla, Sesion, App (menú), vistas y Navegador
+app/        Aplicación Android
 ```
 
 **Regla de dependencias:**
-- `consola` usa `servicio` y `dominio`;
-- `dominio` y `servicio` usan `estructuras`;
-- `estructuras` no depende de nada.
+- `consola` y `app` usan `core`; `core` no conoce ninguna interfaz;
+- dentro de `core`, `dominio` y `servicio` usan `estructuras`, y `estructuras` no depende de nada.
 
-Así las estructuras y las reglas se pueden probar sin la consola, y pasarán sin cambios a la app
-Android.
+Así las estructuras y las reglas se escriben y prueban una sola vez y las usan las dos interfaces.
+`core` evita las APIs de Java que no existen en Android (`java.awt`, `String.strip()`, etc.): por eso
+`NavegacionMaps` solo arma el enlace a Google Maps, y cada interfaz decide cómo abrirlo.
 
 ## Estructuras de datos
 
