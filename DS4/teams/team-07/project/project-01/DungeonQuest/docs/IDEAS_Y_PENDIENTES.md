@@ -18,7 +18,7 @@ Leyenda: ✅ implementado · 🟡 parcial o por verificar · ⬜ pendiente · �
 ### Enemigos
 
 - Enemigos por sala con alerta grupal y reinicio al abandonar la sala.
-- Cuatro tipos con estadísticas almacenadas en `EnemyTypes`; las opciones dependen de la distancia a la entrada.
+- Tres tipos con estadísticas almacenadas en `EnemyTypes`; las opciones dependen de la distancia a la entrada.
 - 🟡 Marcadores y validación de espacios de aparición contra límites y colisiones; falta comprobar visualmente todas las plantillas.
 - 🟡 Cono direccional y raycast para bloquear la visión a través de paredes; el resultado visual aún requiere revisión en ejecución.
 
@@ -29,7 +29,7 @@ Leyenda: ✅ implementado · 🟡 parcial o por verificar · ⬜ pendiente · �
 - Cola circular de eventos para resolver la ventana de parry.
 - Trie para reconocer combos ocultos y cola circular como búfer de teclas.
 - Los poderes cuestan puntos de acción; no usan enfriamientos con heap.
-- 🟡 El jugador reutiliza sus animaciones de exploración; los enemigos usan `AnimatedSprite2D` con un placeholder de un solo frame hasta que existan sprites propios.
+- 🟡 El jugador reutiliza sus animaciones de exploración; búho y serpiente usan `AnimatedSprite2D` con reposo, movimiento direccional y ataque propios. La rata tiene tiras propias de tamaños mixtos y puede caer al fallback del búho.
 - 🟡 Transiciones clásicas de combate con franjas, ataques exagerados con squash/stretch, sacudida, daño y muerte procedural; los enemigos usan solo idle sin rebote constante. Falta verificar y ajustar visualmente.
 - 🟡 Parry con zona perfecta legible y resultado animado como impacto; combos con flechas geométricas grandes, una sola barra de tiempo y el nombre del poder en un impacto coloreado por su efecto. Falta comprobar legibilidad al jugar.
 - 🟡 El árbol revela nodos por niveles y anima el desbloqueo con una descarga sobre la conexión y el nodo; falta revisión visual en ejecución.
@@ -54,7 +54,7 @@ El archivo `tests/run_tests.gd` cubre:
 - `SkillTree`: inserción, desbloqueo, reinicio de ramas, recorrido, guardado y carga.
 - Integración de los identificadores de poderes y del orden de turnos entre estructuras.
 
-`tests/results.md` registra 100 verificaciones aprobadas, pruebas sobre 2400 generaciones de mapas y mediciones de tiempo. El equipo debe volver a ejecutar el comando documentado en el README antes de entregar y explicar qué valida cada grupo de pruebas y cómo interpretar los benchmarks.
+`tests/results.md` registra 101 verificaciones aprobadas, pruebas sobre 2400 generaciones de mapas y mediciones de tiempo. El equipo debe volver a ejecutar el comando documentado en el README antes de entregar y explicar qué valida cada grupo de pruebas y cómo interpretar los benchmarks.
 
 ## 3. Trabajo inmediato para la Entrega 2
 
@@ -63,7 +63,7 @@ El archivo `tests/run_tests.gd` cubre:
 - ✅ Alinear la descripción del combo roto con `BREAK_LOSES_TURN`: una flecha incorrecta hace perder el turno.
 - 🟡 Revisar visualmente las apariciones, la oclusión y los conos de visión en varias salas.
 - 🟡 Probar la pantalla del árbol con el catálogo de recursos y posiciones editables.
-- ⏸️ Integrar sprites reales y animaciones de enemigos cuando el equipo disponga de arte adecuado.
+- 🟡 Ajustar el builder de la rata para aceptar sus tiras de 16×16 y 32×32 sin recurrir al fallback del búho.
 - ⬜ Completar el PDF técnico como evolución del entregado en la primera etapa.
 - ⬜ Incluir en el PDF evidencia e interpretación de las pruebas de estructuras, generación procedural y rendimiento.
 - ⬜ Practicar una demostración del juego y preparar explicaciones de operaciones y complejidades.

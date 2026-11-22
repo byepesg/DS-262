@@ -147,12 +147,11 @@ El combate es por turnos; el orden se determina según la velocidad de cada comb
 
 | Enemigo | Vida | Ataque | Velocidad | Golpes por turno |
 |---|---:|---:|---:|---:|
-| Slime | 30 | 4 | 8 | 2 |
-| Esqueleto | 45 | 7 | 9 | 2 |
-| Murciélago | 20 | 5 | 14 | 3 |
-| Bruto | 70 | 10 | 5 | 1 |
+| Rata | 20 | 5 | 14 | 3 |
+| Serpiente | 45 | 7 | 9 | 2 |
+| Búho | 70 | 10 | 5 | 1 |
 
-La variedad de enemigos posibles aumenta con la distancia de la sala desde la entrada.
+La variedad de enemigos posibles aumenta con la distancia de la sala desde la entrada: rata y búho pueden aparecer desde el inicio; serpiente se agrega a partir de una distancia de 2.
 
 ## HUD
 
@@ -188,7 +187,7 @@ La generación procedural construye un mapa conexo con Union-Find, compresión d
 - `scripts/structures/min_heap.gd`: cola de prioridad para programar el orden de los turnos.
 - `scripts/structures/circular_queue.gd`: cola circular utilizada para los golpes del parry, el búfer de teclas del combo y el recorrido por niveles del árbol de habilidades.
 - `scripts/structures/combo_trie.gd`: trie que identifica los poderes a partir de sus secuencias de flechas.
-- `scripts/skills/skill_tree.gd`: árbol general de habilidades, recorrido por niveles con BFS y guardado de progreso.
+- `scripts/skills/skill_tree.gd`: árbol general de habilidades, recorrido por niveles con BFS, desbloqueo, reinicio de ramas y guardado de progreso.
 
 ## Estructura del proyecto
 

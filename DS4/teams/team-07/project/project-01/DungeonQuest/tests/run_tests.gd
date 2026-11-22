@@ -20,7 +20,7 @@ var _stats: Dictionary = {}        # suite -> [aprobadas, falladas]
 var _failures: PackedStringArray = []
 var _report: PackedStringArray = []
 
-func _initialize() -> void:
+func _init() -> void:
 	var save_backup := _backup_save()
 
 	test_min_heap()
@@ -807,6 +807,12 @@ func _write_report() -> void:
 	lines.append("| **Total** | **%d** | **%d** |" % [total_ok, total])
 	lines.append("")
 	lines.append_array(_report)
+	if not _failures.is_empty():
+		lines.append("")
+		lines.append("## Fallos")
+		lines.append("")
+		for failure in _failures:
+			lines.append("- %s" % failure)
 	var f := FileAccess.open("res://tests/results.md", FileAccess.WRITE)
 	if f == null:
 		push_warning("No se pudo escribir tests/results.md")

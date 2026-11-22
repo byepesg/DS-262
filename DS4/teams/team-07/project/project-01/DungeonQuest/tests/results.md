@@ -15,8 +15,8 @@ Generado con `tests/run_tests.gd` (Godot 4.7.2-stable (official)).
 | Generación procedural | 10 | 10 |
 | SkillTree | 27 | 27 |
 | SkillTree (guardado) | 7 | 7 |
-| Integración | 6 | 6 |
-| **Total** | **100** | **100** |
+| Integración | 7 | 7 |
+| **Total** | **101** | **101** |
 
 ## Generación procedural (n = 8 salas, 16 combinaciones de paredes de entrada/salida, 150 semillas c/u)
 
@@ -33,31 +33,31 @@ Generado con `tests/run_tests.gd` (Godot 4.7.2-stable (official)).
 
 | n | tiempo total (ms) | µs por operación | µs/op ÷ log₂(n) |
 |---|---|---|---|
-| 1000 | 13.4 | 6.70 | 0.672 |
-| 10000 | 197.9 | 9.89 | 0.745 |
-| 100000 | 2353.5 | 11.77 | 0.708 |
+| 1000 | 31.7 | 15.85 | 1.591 |
+| 10000 | 326.5 | 16.33 | 1.229 |
+| 100000 | 3912.1 | 19.56 | 1.178 |
 
 ### CircularQueue: n encolados seguidos de n desencolados
 
 | n | tiempo total (ms) | µs por operación |
 |---|---|---|
-| 1000 | 1.3 | 0.626 |
-| 10000 | 8.7 | 0.435 |
-| 100000 | 84.9 | 0.424 |
+| 1000 | 1.4 | 0.704 |
+| 10000 | 14.4 | 0.719 |
+| 100000 | 138.9 | 0.695 |
 
 ### DungeonGraph: generación (Kruskal + Union-Find) y BFS según el número de salas
 
 | Salas | generación (ms) | aristas | BFS entrada→salida (µs, promedio de 20) | salas en el camino |
 |---|---|---|---|---|
-| 8 | 0.19 | 8 | 8.2 | 5 |
-| 32 | 0.65 | 39 | 31.8 | 10 |
-| 128 | 6.73 | 159 | 125.2 | 25 |
-| 512 | 86.91 | 639 | 500.9 | 46 |
+| 8 | 0.19 | 8 | 15.4 | 5 |
+| 32 | 1.33 | 39 | 115.3 | 10 |
+| 128 | 13.63 | 159 | 219.5 | 25 |
+| 512 | 144.60 | 639 | 1530.2 | 46 |
 
 ### SkillTree: n habilidades (cadena de dos ramas)
 
 | n | n inserciones (ms) | find del último (µs) | levels() (ms) |
 |---|---|---|---|
-| 100 | 5.4 | 58 | 0.17 |
-| 500 | 134.8 | 297 | 1.01 |
-| 2000 | 2448.8 | 2448 | 4.12 |
+| 100 | 9.5 | 98 | 0.28 |
+| 500 | 264.4 | 530 | 1.42 |
+| 2000 | 4522.2 | 2067 | 5.80 |

@@ -14,7 +14,7 @@ La Entrega 2 es una evolución del documento técnico presentado en la Entrega 1
 
 - ✅ El juego incluye exploración procedural, grafo y BFS, enemigos, combate por turnos, combos, árbol de habilidades y guardado.
 - ✅ Las estructuras y scripts están organizados en `scripts/`.
-- ✅ `tests/run_tests.gd` contiene pruebas de estructuras de datos, algoritmos, persistencia y sus interacciones. `tests/results.md` registra 100/100 verificaciones, mediciones de rendimiento y 2400 generaciones de mapas.
+- ✅ `tests/run_tests.gd` contiene pruebas de estructuras de datos, algoritmos, persistencia y sus interacciones. `tests/results.md` registra 101/101 verificaciones, mediciones de rendimiento y 2400 generaciones de mapas.
 - 🟡 Las pruebas automatizadas se enfocan deliberadamente en las estructuras de datos y algoritmos del curso; ese es el alcance previsto para esta etapa, no una tarea pendiente de convertir en una suite de pruebas de escenas.
 - 🟡 El README y el documento técnico deben coincidir con la implementación exacta, incluidas las reglas actuales de combos y la versión de Godot.
 - ⬜ Completar y revisar el PDF técnico partiendo del documento de Entrega 1, no creando uno independiente.
@@ -42,7 +42,7 @@ La sustentación y la demostración complementan esa evidencia mostrando el func
 
 - 🟡 Las salas intermedias usan marcadores de aparición; el spawner limita el grupo a puntos dentro de la sala y libres de colisiones conocidas. Falta validar visualmente varias plantillas y mapas.
 - 🟡 Los enemigos tienen cono direccional y comprobación de visión con raycast. Falta inspeccionar visualmente su orientación, visibilidad y oclusión en ejecución.
-- 🟡 El jugador comparte sus `SpriteFrames` de exploración y combate. Los enemigos de combate ya usan `AnimatedSprite2D`, pero por ahora solo hay un frame placeholder; ataque, daño y muerte necesitan arte y animaciones reales.
+- 🟡 El jugador comparte sus `SpriteFrames` de exploración y combate. Búho y serpiente ya usan `AnimatedSprite2D` con reposo, movimiento direccional y ataque propios; daño y muerte siguen siendo procedurales. La rata conserva una limitación de slicing por sus tiras de tamaños mixtos.
 - 🟡 El combate ya incluye transiciones de franjas al entrar y salir, ataques con squash/stretch, sacudida de pantalla, números flotantes y efectos diferenciados; los enemigos conservan el idle sin rebote y usan hurt/death procedurales. Falta ajustar su apariencia en ejecución.
 - 🟡 Las habilidades se definen en recursos editables y la interfaz sigue generándose desde el grafo; cada recurso puede optar por una posición personalizada. El árbol ahora anima su aparición por niveles y el desbloqueo resalta la ruta y el nodo.
 - 🟡 Parry con ventana perfecta destacada y resultado animado como impacto; combos con flechas vectoriales grandes, una barra de tiempo y un rótulo de poder en impacto que toma el color de su efecto. Falta revisar estos efectos visualmente en ejecución.
@@ -62,7 +62,8 @@ La sustentación y la demostración complementan esa evidencia mostrando el func
 - ✅ Lógica principal separada en configuración, construcción de mapa, generación de enemigos y efectos de pantalla.
 - ✅ Scripts organizados por dominio.
 - ✅ README con instalación, ejecución y controles.
-- 🟡 Revisar consistencia final del README, PDF y código.
+- ✅ README y documentación de seguimiento alineados con los enemigos, SkillTree y resultados actuales.
+- 🟡 Revisar consistencia final del PDF técnico, la demostración y el código.
 - ⬜ Confirmar que el flujo de juego completo está listo para demostrarse en la versión que se entregará.
 
 ### Fase 2 — exploración ✅
@@ -75,10 +76,10 @@ La sustentación y la demostración complementan esa evidencia mostrando el func
 ### Fase 3 — enemigos 🟡
 
 - ✅ Enemigos por sala, detección de jugador, alerta de grupo y reinicio al salir.
-- ✅ Cuatro tipos con estadísticas distintas; la variedad depende de la distancia a la entrada.
+- ✅ Tres tipos con estadísticas distintas; la variedad depende de la distancia a la entrada.
 - 🟡 Apariciones con marcadores y validación de espacio; falta revisar el resultado visual en ejecución.
 - 🟡 Cono de visión direccional con bloqueo por paredes; falta validación visual.
-- ⏸️ Sprites propios para cada enemigo.
+- 🟡 Sprites propios para búho y serpiente integrados; la rata requiere ajustar sus tiras mixtas.
 - ⏸️ Navegación que esquive obstáculos.
 
 ### Fase 4 — combate 🟡
@@ -87,7 +88,7 @@ La sustentación y la demostración complementan esa evidencia mostrando el func
 - ✅ Ataque, defensa, puntos de acción y parry con cola circular.
 - ✅ Combos de flechas procesados por trie y con límite de tiempo.
 - ✅ Feedback de impacto para el resultado del parry y para el nombre del poder al completar un combo.
-- 🟡 Jugador animado con los frames compartidos de exploración; enemigos preparados para animación, aún con placeholder.
+- 🟡 Jugador animado con los frames compartidos de exploración; búho y serpiente tienen animaciones propias y la rata puede usar fallback.
 - ✅ Corregido el otorgamiento duplicado de puntos; verificar el flujo de victoria/derrota antes de presentar.
 - ⬜ Decidir más adelante si se recupera vida entre combates.
 - ⏸️ Efectos de estado con lista enlazada.
