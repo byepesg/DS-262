@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://c5egbtc1diu1c"]
+
+[ext_resource type="Texture2D" uid="uid://c10xhk20pg7uv" path="res://assets/sprites/skills/sanacion.png" id="1_fn6mj"]
+[ext_resource type="Script" uid="uid://xou088vmd1b7" path="res://scripts/skills/skill_definition.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"sanacion"
+parent_id = &"luz"
+display_name = "Sanación"
+description = "↓ ↓ ↑  ·  recupera 20 de vida. Cuesta 3 PA."
+cost = 2
+power_id = &"sanacion"
+icon = ExtResource("1_fn6mj")

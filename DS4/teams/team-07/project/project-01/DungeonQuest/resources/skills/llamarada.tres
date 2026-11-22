@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://vw2xfvx1jnxg"]
+
+[ext_resource type="Texture2D" uid="uid://7a0nydjtdnq1" path="res://assets/sprites/skills/llamarada.png" id="1_3urfu"]
+[ext_resource type="Script" uid="uid://xou088vmd1b7" path="res://scripts/skills/skill_definition.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"llamarada"
+parent_id = &"fuego"
+display_name = "Llamarada"
+description = "↑ ↑ →  ·  14 de daño a todos los enemigos. Cuesta 3 PA."
+cost = 2
+power_id = &"llamarada"
+icon = ExtResource("1_3urfu")

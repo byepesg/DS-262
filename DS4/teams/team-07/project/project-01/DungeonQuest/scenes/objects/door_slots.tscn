@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://c47e65gmaqpxm"]
+
+[ext_resource type="Script" uid="uid://dnwx83g4mqxd2" path="res://scripts/world/door_slots.gd" id="1_cobpx"]
+[ext_resource type="Script" uid="uid://c8pgjwdmrnwud" path="res://scripts/world/door_slot.gd" id="1_o45q0"]
+
+[node name="DoorSlots" type="Node2D" unique_id=1664934376]
+script = ExtResource("1_cobpx")
+
+[node name="Slot_0" type="Marker2D" parent="." unique_id=1071729449]
+position = Vector2(88, 34)
+script = ExtResource("1_o45q0")
+
+[node name="Slot_1" type="Marker2D" parent="." unique_id=1631454439]
+position = Vector2(232, 34)
+script = ExtResource("1_o45q0")
+
+[node name="Slot_2" type="Marker2D" parent="." unique_id=262264895]
+position = Vector2(376, 34)
+script = ExtResource("1_o45q0")
+
+[node name="Slot_3" type="Marker2D" parent="." unique_id=1572894711]
+position = Vector2(432, 99)
+script = ExtResource("1_o45q0")
+view = 3
+
+[node name="Slot_4" type="Marker2D" parent="." unique_id=1879128445]
+position = Vector2(432, 211)
+script = ExtResource("1_o45q0")
+view = 3
+
+[node name="Slot_5" type="Marker2D" parent="." unique_id=1687866637]
+position = Vector2(376, 256)
+script = ExtResource("1_o45q0")
+view = 1
+
+[node name="Slot_6" type="Marker2D" parent="." unique_id=27501398]
+position = Vector2(232, 256)
+script = ExtResource("1_o45q0")
+view = 1
+
+[node name="Slot_7" type="Marker2D" parent="." unique_id=104564177]
+position = Vector2(88, 256)
+script = ExtResource("1_o45q0")
+view = 1
+
+[node name="Slot_8" type="Marker2D" parent="." unique_id=1982176615]
+position = Vector2(32, 211)
+script = ExtResource("1_o45q0")
+view = 2
+
+[node name="Slot_9" type="Marker2D" parent="." unique_id=242974962]
+position = Vector2(32, 99)
+script = ExtResource("1_o45q0")
+view = 2

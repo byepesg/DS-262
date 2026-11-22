@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://bksro7m0lmfsq"]
+
+[ext_resource type="Texture2D" uid="uid://cv8nfdi4wlk82" path="res://assets/sprites/skills/luz.png" id="1_njjai"]
+[ext_resource type="Script" uid="uid://xou088vmd1b7" path="res://scripts/skills/skill_definition.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"luz"
+parent_id = &"aventurero"
+display_name = "Luz"
+description = "Rama de apoyo y curación."
+cost = 1
+icon = ExtResource("1_njjai")

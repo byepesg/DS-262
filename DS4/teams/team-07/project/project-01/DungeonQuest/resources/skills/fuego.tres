@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://d0cw5u4dk4dya"]
+
+[ext_resource type="Texture2D" uid="uid://cr6hk6nhv0ihb" path="res://assets/sprites/skills/fuego.png" id="1_e878f"]
+[ext_resource type="Script" uid="uid://xou088vmd1b7" path="res://scripts/skills/skill_definition.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"fuego"
+parent_id = &"aventurero"
+display_name = "Fuego"
+description = "Rama de daño en área."
+cost = 1
+icon = ExtResource("1_e878f")

@@ -1,0 +1,390 @@
+[gd_scene format=3 uid="uid://ch8myunw7t23q"]
+
+[ext_resource type="Script" uid="uid://ct1755k03m5xs" path="res://scripts/combat/combat.gd" id="1_combat"]
+[ext_resource type="Script" uid="uid://u70be8eslwnt" path="res://scripts/combat/parry_view.gd" id="2_parry"]
+[ext_resource type="Texture2D" path="res://assets/sprites/backgrounds/BattleBackGround.png" id="2_rx5ct"]
+[ext_resource type="SpriteFrames" uid="uid://bunkeoq3wmxhx" path="res://assets/sprites/player/player_frames.tres" id="3_dyexf"]
+[ext_resource type="LabelSettings" uid="uid://cqs84c65hgjs8" path="res://assets/fonts/label_config.tres" id="3_yi6w0"]
+[ext_resource type="FontFile" uid="uid://bge3cdwhwx1l6" path="res://assets/fonts/alagard.ttf" id="5_42t48"]
+[ext_resource type="StyleBox" uid="uid://dvafoxajby722" path="res://assets/fonts/defense_pressed.tres" id="7_dyexf"]
+[ext_resource type="Script" uid="uid://bsuat0n0h4ryr" path="res://scripts/combat/battle_effects.gd" id="8_effects"]
+[ext_resource type="Script" uid="uid://bbq0xx5wdocfc" path="res://scripts/combat/combo_arrows.gd" id="9_combo"]
+
+[sub_resource type="Theme" id="theme_small"]
+default_font_size = 8
+
+[sub_resource type="LabelSettings" id="LabelSettings_pbf1j"]
+font = ExtResource("5_42t48")
+font_size = 10
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.20392157)
+
+[sub_resource type="StyleBoxFlat" id="panel_mid"]
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+bg_color = Color(0.05, 0.05, 0.1, 0.6)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="bar_bg"]
+bg_color = Color(0.18039216, 0.13333334, 0.18431373, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9490196, 0.9254902, 0.54509807, 1)
+corner_detail = 1
+
+[sub_resource type="StyleBoxFlat" id="bar_combo"]
+bg_color = Color(1, 0.88, 0.4, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="btn_normal"]
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+bg_color = Color(0.9843137, 0.7254902, 0.32941177, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9490196, 0.9254902, 0.54509807, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c3q6u"]
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+bg_color = Color(0.9843137, 0.7254902, 0.32941177, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8039216, 0.40784314, 0.23921569, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_351qk"]
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+bg_color = Color(0.9843137, 0.7254902, 0.32941177, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8392157, 0.85490197, 0.827451, 1)
+
+[sub_resource type="StyleBoxFlat" id="btn_disabled"]
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+bg_color = Color(0.28, 0.27, 0.34, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.2, 0.26, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="panel_bottom"]
+content_margin_left = 5.0
+content_margin_top = 4.0
+content_margin_right = 5.0
+content_margin_bottom = 4.0
+bg_color = Color(0.18039216, 0.13333334, 0.18431373, 0.7764706)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9490196, 0.9254902, 0.54509807, 1)
+
+[sub_resource type="StyleBoxFlat" id="bar_player"]
+bg_color = Color(0.9843137, 0.7254902, 0.32941177, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9490196, 0.9254902, 0.54509807, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_id1t6"]
+font = ExtResource("5_42t48")
+font_size = 11
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.20392157)
+
+[sub_resource type="LabelSettings" id="LabelSettings_dyexf"]
+font = ExtResource("5_42t48")
+font_size = 11
+font_color = Color(0.9490196, 0.9254902, 0.54509807, 1)
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.20392157)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pbf1j"]
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+bg_color = Color(0.8039216, 0.40784314, 0.23921569, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9490196, 0.9254902, 0.54509807, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hf4gd"]
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+bg_color = Color(0.8039216, 0.40784314, 0.23921569, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9843137, 0.7254902, 0.32941177, 1)
+
+[node name="CombatScene" type="CanvasLayer" unique_id=1686166617]
+process_mode = 3
+layer = 60
+script = ExtResource("1_combat")
+
+[node name="Background" type="TextureRect" parent="." unique_id=2047847485]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -30.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_rx5ct")
+expand_mode = 3
+
+[node name="Stage" type="Node2D" parent="." unique_id=1109942471]
+
+[node name="BattleEffects" type="Node2D" parent="Stage" unique_id=650680515]
+script = ExtResource("8_effects")
+
+[node name="PlayerSprite" type="AnimatedSprite2D" parent="Stage" unique_id=945625582]
+unique_name_in_owner = true
+position = Vector2(89, 125.00001)
+scale = Vector2(4.945313, 4.945313)
+sprite_frames = ExtResource("3_dyexf")
+animation = &"idle_right"
+autoplay = "idle_right"
+
+[node name="FoeSlots" type="Node2D" parent="Stage" unique_id=626929111]
+unique_name_in_owner = true
+
+[node name="Slot1" type="Marker2D" parent="Stage/FoeSlots" unique_id=1642696342]
+position = Vector2(310, 140)
+
+[node name="Slot2" type="Marker2D" parent="Stage/FoeSlots" unique_id=962621064]
+position = Vector2(400, 140)
+
+[node name="Slot3" type="Marker2D" parent="Stage/FoeSlots" unique_id=1282647093]
+position = Vector2(355, 110)
+
+[node name="UI" type="Control" parent="." unique_id=1995999611]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("theme_small")
+
+[node name="TurnLabel" type="Label" parent="UI" unique_id=1914302830]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 64.0
+offset_top = 4.0
+offset_right = -8.0
+offset_bottom = 28.0
+grow_horizontal = 2
+text = "Turno de:"
+label_settings = SubResource("LabelSettings_pbf1j")
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ParryView" type="Control" parent="UI" unique_id=634831930]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 58.0
+offset_top = 40.0
+offset_right = 258.0
+offset_bottom = 230.0
+mouse_filter = 2
+script = ExtResource("2_parry")
+
+[node name="ComboBox" type="Panel" parent="UI" unique_id=2060478879]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 110.0
+offset_top = 45.0
+offset_right = 370.0
+offset_bottom = 150.0
+pivot_offset = Vector2(130, 52)
+theme_override_styles/panel = SubResource("panel_mid")
+
+[node name="ComboView" type="Control" parent="UI/ComboBox" unique_id=1658520005]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = 255.0
+offset_bottom = 82.0
+script = ExtResource("9_combo")
+
+[node name="ComboBar" type="ProgressBar" parent="UI/ComboBox" unique_id=1268185060]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = 86.0
+offset_right = 254.0
+offset_bottom = 94.0
+theme_override_styles/background = SubResource("bar_bg")
+theme_override_styles/fill = SubResource("bar_combo")
+max_value = 2.0
+show_percentage = false
+
+[node name="ComboMenu" type="MenuButton" parent="UI" unique_id=972916768]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 57.0
+offset_bottom = 26.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.15, 0.12, 0.22, 1)
+theme_override_colors/font_pressed_color = Color(0.15, 0.12, 0.22, 1)
+theme_override_colors/font_hover_color = Color(0.15, 0.12, 0.22, 1)
+theme_override_colors/font_disabled_color = Color(0.5, 0.5, 0.58, 1)
+theme_override_fonts/font = ExtResource("5_42t48")
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_c3q6u")
+theme_override_styles/hover = SubResource("StyleBoxFlat_351qk")
+theme_override_styles/disabled = SubResource("btn_disabled")
+text = "Combos"
+flat = false
+
+[node name="BottomPanel" type="Panel" parent="UI" unique_id=1566250135]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -76.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("panel_bottom")
+
+[node name="PlayerName" type="Label" parent="UI/BottomPanel" unique_id=828300588]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = 118.0
+offset_bottom = 18.0
+text = "Jugador"
+label_settings = ExtResource("3_yi6w0")
+
+[node name="PlayerBar" type="ProgressBar" parent="UI/BottomPanel" unique_id=1599113843]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 22.0
+offset_right = 118.0
+offset_bottom = 32.0
+theme_override_styles/background = SubResource("bar_bg")
+theme_override_styles/fill = SubResource("bar_player")
+show_percentage = false
+
+[node name="PlayerHPLabel" type="Label" parent="UI/BottomPanel" unique_id=1516326958]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 36.0
+offset_right = 118.0
+offset_bottom = 52.0
+text = "60/60"
+label_settings = SubResource("LabelSettings_id1t6")
+
+[node name="APLabel" type="Label" parent="UI/BottomPanel" unique_id=1966614222]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 52.0
+offset_right = 118.0
+offset_bottom = 70.0
+text = "PA 2/6"
+label_settings = SubResource("LabelSettings_dyexf")
+
+[node name="PowerButton" type="Button" parent="UI/BottomPanel" unique_id=1133491255]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 126.0
+offset_top = 8.0
+offset_right = 246.0
+offset_bottom = 36.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.15, 0.12, 0.22, 1)
+theme_override_colors/font_pressed_color = Color(0.15, 0.12, 0.22, 1)
+theme_override_colors/font_hover_color = Color(0.15, 0.12, 0.22, 1)
+theme_override_colors/font_disabled_color = Color(0.5, 0.5, 0.58, 1)
+theme_override_fonts/font = ExtResource("5_42t48")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_c3q6u")
+theme_override_styles/hover = SubResource("StyleBoxFlat_351qk")
+theme_override_styles/disabled = SubResource("btn_disabled")
+text = "Poder"
+clip_text = true
+
+[node name="DefendButton" type="Button" parent="UI/BottomPanel" unique_id=1014221672]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 126.0
+offset_top = 40.0
+offset_right = 246.0
+offset_bottom = 68.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.15, 0.12, 0.22, 1)
+theme_override_colors/font_pressed_color = Color(0.15, 0.12, 0.22, 1)
+theme_override_colors/font_hover_color = Color(0.15, 0.12, 0.22, 1)
+theme_override_colors/font_disabled_color = Color(0.5, 0.5, 0.58, 1)
+theme_override_fonts/font = ExtResource("5_42t48")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_pbf1j")
+theme_override_styles/pressed = ExtResource("7_dyexf")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hf4gd")
+theme_override_styles/disabled = SubResource("btn_disabled")
+text = "Defender (+1 PA)"
+
+[node name="LogLabel" type="RichTextLabel" parent="UI/BottomPanel" unique_id=213042951]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 256.0
+offset_top = 6.0
+offset_right = 470.0
+offset_bottom = 68.0
+theme_override_fonts/normal_font = ExtResource("5_42t48")
+theme_override_font_sizes/normal_font_size = 10
+text = "default"
+scroll_following = true
