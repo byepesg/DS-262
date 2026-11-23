@@ -1,0 +1,27 @@
+﻿Mapa (5x6):
+S..#..
+.#..#.
+.#....
+...##.
+#....E
+
+BFS | ruta: SI | pasos: 9 | costo: 9 | explorados: 22 | tiempo: 19.448 ms
+S**#..
+.#**#.
+.#.***
+...##*
+#....E
+
+Dijkstra | ruta: SI | pasos: 9 | costo: 9 | explorados: 22 | tiempo: 2.919 ms
+S**#..
+.#**#.
+.#.***
+...##*
+#....E
+
+A* | ruta: SI | pasos: 9 | costo: 9 | explorados: 20 | tiempo: 0.463 ms
+S**#..
+.#**#.
+.#.***
+...##*
+#....E

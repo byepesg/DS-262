@@ -1,0 +1,13 @@
+﻿Mapa (2x4):
+S9.E
+....
+
+BFS omitido: BFS requiere costos unitarios (use Dijkstra o A*).
+
+Dijkstra | ruta: SI | pasos: 5 | costo: 5 | explorados: 7 | tiempo: 26.592 ms
+S9*E
+***.
+
+A* | ruta: SI | pasos: 5 | costo: 5 | explorados: 7 | tiempo: 0.596 ms
+S9*E
+***.

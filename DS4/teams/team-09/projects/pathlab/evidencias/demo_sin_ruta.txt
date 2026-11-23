@@ -1,0 +1,10 @@
+﻿Mapa (3x3):
+S#E
+###
+...
+
+BFS | ruta: NO | pasos: -1 | costo: -1 | explorados: 1 | tiempo: 17.944 ms
+
+Dijkstra | ruta: NO | pasos: -1 | costo: -1 | explorados: 1 | tiempo: 2.062 ms
+
+A* | ruta: NO | pasos: -1 | costo: -1 | explorados: 1 | tiempo: 0.111 ms

@@ -1,0 +1,125 @@
+\documentclass[conference]{IEEEtran}
+% Evolucion del articulo PathLab de la Entrega 1.
+% Actualice datos personales y resultados tras ejecutar en su equipo.
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{cite}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{balance}
+\usepackage{float}
+\raggedbottom
+
+\title{PathLab: implementaci\'on y evaluaci\'on preliminar de algoritmos de b\'usqueda en cuadr\'iculas}
+\author{\IEEEauthorblockN{Alfrek Arthur Pinto Garc\'ia}
+\IEEEauthorblockA{Universidad Nacional de Colombia, Sede Bogot\'a\\
+Bogot\'a D. C., Colombia\\
+Correo institucional: \texttt{abadillop@unal.edu.co}}}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+PathLab es una aplicaci\'on de consola en Java que permite encontrar rutas en mapas de cuadr\'icula y comparar los algoritmos BFS, Dijkstra y A*. Como evoluci\'on de la propuesta de la primera entrega, se implementaron una representaci\'on matricial del mapa, una cola circular y un heap binario m\'inimo, adem\'as de las b\'usquedas, la reconstrucci\'on de caminos y la medici\'on de nodos explorados y tiempos de ejecuci\'on. Se probaron mapas con obst\'aculos, costos variables, ausencia de ruta y entradas incorrectas. Los resultados preliminares permiten estudiar el compromiso entre exploraci\'on y costo de ejecuci\'on. Las mediciones incluidas se obtuvieron en el equipo del autor (Windows 11, Java 27) y son reproducibles con los programas incluidos en el repositorio.
+\end{abstract}
+\begin{IEEEkeywords}
+estructuras de datos, grafos, BFS, Dijkstra, A*, heap binario, evaluaci\'on experimental.
+\end{IEEEkeywords}
+
+\section{Introducci\'on y alcance}
+Buscar rutas en mapas discretos requiere decidir c\'omo representar los espacios, administrar las posiciones pendientes y recuperar un camino v\'alido. Si todas las transiciones cuestan una unidad, resulta suficiente minimizar la cantidad de pasos; con costos distintos, el camino m\'as corto en pasos puede no ser el de menor costo. PathLab permite observar estas diferencias con entradas comunes y algoritmos reproducibles.
+
+El objetivo general es implementar y comparar BFS, Dijkstra y A* sobre cuadr\'iculas con obst\'aculos. Como objetivos verificables se definieron: (i) validar mapas en archivos de texto; (ii) implementar estructuras auxiliares propias; (iii) obtener rutas y costos correctos; (iv) medir exploraci\'on y ejecuci\'on.
+
+El programa acepta mapas rectangulares, un origen \texttt{S}, un destino \texttt{E}, celdas transitables \texttt{.}, obst\'aculos \texttt{\#} y costos de entrada enteros de 1 a 9. Se permiten movimientos horizontales y verticales. BFS se restringe a costos unitarios. No se desarrollan interfaz gr\'afica, rutas geogr\'aficas ni cambios din\'amicos del mapa.
+
+\section{Trabajo relacionado}
+BFS recorre un grafo por niveles y encuentra caminos m\'inimos en n\'umero de aristas cuando los pasos tienen igual costo \cite{goodrich}. Dijkstra obtiene rutas de costo m\'inimo con aristas de peso no negativo \cite{dijkstra}. A* utiliza una heur\'istica para priorizar estados prometedores \cite{astar}. El aporte de PathLab no es un algoritmo nuevo, sino una implementaci\'on comparable de estos m\'etodos y de las estructuras que los soportan. En contraste con visualizadores generales, la propuesta prioriza un n\'ucleo de Java sin dependencias y mediciones reproducibles.
+
+\section{Metodolog\'ia y dise\~no}
+\subsection{Evoluci\'on respecto a la primera entrega}
+En la propuesta inicial se describieron los algoritmos y estructuras previstos, pero no exist\'ian mediciones ni una versi\'on ejecutable confirmada. En esta etapa se implementaron las clases de mapas y b\'usqueda, estructuras propias, pruebas y benchmarks que se incluyen con el c\'odigo. No se proporcion\'o retroalimentaci\'on de la primera sustentaci\'on, por lo que no se atribuyen correcciones no verificadas.
+
+\subsection{Modelo del mapa y flujo}
+La clase \texttt{GridMap} almacena una matriz \texttt{char[][]}, valida las dimensiones y verifica unicidad de origen y destino. Las posiciones transitables forman un \emph{grafo impl\'icito}: una celda tiene hasta cuatro vecinos; las aristas no se guardan expl\'icitamente. \texttt{PathFinder} ejecuta la b\'usqueda y produce un \texttt{SearchResult}, que contiene ruta, costo total, pasos, explorados y duraci\'on. La interfaz \texttt{Main} permite elegir un algoritmo y mostrar la ruta sobre el mapa.
+
+\subsection{Estructuras de datos y algoritmos}
+BFS utiliza una cola circular de capacidad igual al n\'umero de celdas. Cada posici\'on se encola a lo sumo una vez. Dijkstra y A* usan un heap m\'inimo binario propio que admite inserciones repetidas; las entradas desactualizadas se descartan al extraerlas. Las matrices de distancias, visitas y predecesores permiten determinar costos y reconstruir caminos.
+
+En Dijkstra la prioridad es la distancia acumulada $g(n)$; en A* es $f(n)=g(n)+h(n)$, con heur\'istica Manhattan $h(n)=|r_n-r_E|+|c_n-c_E|$. Dado que cada movimiento ortogonal cuesta al menos una unidad, la heur\'istica es admisible y consistente. La b\'usqueda termina al extraer el destino con su mejor costo conocido.
+
+\begin{table}[H]
+\caption{Costos asint\'oticos esperados}
+\label{tab:complex}
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+Operaci\'on o algoritmo & Complejidad temporal \\
+\midrule
+Consultar una celda & $O(1)$ \\
+Cola circular: insertar/extraer & $O(1)$ \\
+Heap: insertar/extraer m\'inimo & $O(\log V)$ \\
+BFS & $O(V+E)$ \\
+Dijkstra y A* (cota superior) & $O((V+E)\log V)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Para una cuadr\'icula, $V$ denota celdas transitables y $E$ sus conexiones, con $E=O(V)$. Las estructuras principales requieren memoria proporcional al mapa y a la frontera de b\'usqueda. Los experimentos se repiten 30 veces por algoritmo, con calentamiento previo, y usan mapas deterministas de tama\~nos crecientes.
+
+\balance
+\section{Implementaci\'on y validaci\'on}
+Se implementaron \texttt{Position}, \texttt{GridMap}, \texttt{CircularQueue}, \texttt{BinaryMinHeap}, \texttt{PathFinder}, \texttt{SearchResult}, \texttt{Main} y \texttt{Benchmark}. Se incluyeron pruebas sin bibliotecas externas, ejecutables desde la terminal. En el equipo del autor (Java 27, Windows 11) se superaron 120 comprobaciones automatizadas y 200 comparaciones adicionales contra una implementaci\'on independiente de Dijkstra sobre 80 mapas aleatorios con semilla fija. Las pruebas abarcan FIFO, orden del heap, costos m\'inimos, geometr\'ia de rutas, entradas inv\'alidas y grafos desconectados.
+
+En el mapa sin pesos de ejemplo, BFS, Dijkstra y A* encontraron una ruta de nueve pasos y costo nueve. En el mapa ponderado \texttt{S9.E / ....}, Dijkstra y A* encontraron un camino de cinco pasos y costo cinco que evita entrar a la celda de costo nueve. Un mapa desconectado produjo correctamente el resultado sin ruta para los tres algoritmos.
+
+\section{Resultados preliminares}
+Los mapas de prueba de $20\times20$, $50\times50$, $100\times100$ y $200\times200$ se generaron con semilla fija, probabilidad 22\% de obst\'aculo por celda antes de garantizar un corredor transitable, y movimientos de costo unitario. En cada ejecuci\'on se recuper\'o una ruta de costo $2(n-1)$, para una cuadr\'icula de lado $n$.
+
+\begin{table}[H]
+\caption{Celdas exploradas (datos medidos en el equipo del autor)}
+\label{tab:explored}
+\centering
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+Lado $n$ & BFS & Dijkstra & A* \\
+\midrule
+20 & 321 & 321 & 210 \\
+50 & 1958 & 1958 & 1203 \\
+100 & 7796 & 7796 & 5825 \\
+200 & 31098 & 31098 & 23283 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Tiempo medio en ms, 30 repeticiones (Windows 11, Java 27)}
+\label{tab:times}
+\centering
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+Lado $n$ & BFS & Dijkstra & A* \\
+\midrule
+20 & 0.628 & 1.078 & 0.702 \\
+50 & 1.125 & 2.012 & 1.273 \\
+100 & 4.768 & 6.813 & 7.860 \\
+200 & 4.279 & 12.727 & 15.539 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Los valores de las tablas \ref{tab:explored} y \ref{tab:times} se obtuvieron en el equipo del autor, en Windows 11 con Java 27, y constan en los archivos CSV del proyecto. No son resultados universales; cada medici\'on depende del entorno y de la configuraci\'on del mapa. En estos mapas A* explor\'o menos celdas que Dijkstra, pero el ahorro de exploraci\'on no implic\'o una reducci\'on proporcional de tiempo: en los mapas de lado 100 y 200 el costo de la heur\'istica y del heap super\'o el ahorro por menor exploraci\'on.
+
+\section{Discusi\'on y trabajo pendiente}
+Las pruebas respaldan la correcci\'on b\'asica de las tres b\'usquedas. BFS resulta adecuado para caminos de costo unitario, mientras que Dijkstra y A* admiten terrenos con pesos. Aunque A* reduce la exploraci\'on en los ejemplos evaluados, sus tiempos tambi\'en dependen de la heur\'istica y del trabajo de la cola de prioridad.
+
+Para la entrega final queda ampliar la diversidad de mapas, analizar el consumo de memoria y fortalecer las pruebas sobre entradas grandes y distribuciones adversas. El c\'odigo y los resultados se incluyen en la carpeta \texttt{DS4/teams/team-09/projects/pathlab}. Durante el desarrollo y la ejecuci\'on de pruebas y mediciones se emplearon herramientas de inteligencia artificial como apoyo.
+
+\begin{thebibliography}{00}
+\bibitem{goodrich} M. T. Goodrich, R. Tamassia y M. H. Goldwasser, \textit{Data Structures and Algorithms in Java}, 6.a ed., Wiley, 2014.
+\bibitem{dijkstra} E. W. Dijkstra, ``A note on two problems in connexion with graphs,'' \textit{Numerische Mathematik}, vol. 1, pp. 269--271, 1959.
+\bibitem{astar} P. E. Hart, N. J. Nilsson y B. Raphael, ``A formal basis for the heuristic determination of minimum cost paths,'' \textit{IEEE Trans. Systems Science and Cybernetics}, vol. 4, pp. 100--107, 1968.
+\end{thebibliography}
+\end{document}

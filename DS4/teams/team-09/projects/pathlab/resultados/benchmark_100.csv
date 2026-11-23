@@ -1,0 +1,4 @@
+﻿algoritmo,filas,columnas,repeticiones,ruta,pasos,costo,explorados,tiempo_medio_ms
+BFS,100,100,30,true,198,198,7796,4.768416
+Dijkstra,100,100,30,true,198,198,7796,6.813260
+A*,100,100,30,true,198,198,5825,7.859813
