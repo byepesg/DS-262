@@ -5,8 +5,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Function;
 
-// Cola FIFO con nodos enlazados. Se encola por "fin" y se desencola por "frente",
-// así encolar y desencolar son O(1) sin recorrer nada.
+// Cola FIFO enlazada: se encola por fin y se desencola por frente, las dos en O(1).
 // Invariantes: frente == null <=> fin == null <=> tamano == 0, y fin.siguiente == null.
 public class Cola<T> implements Iterable<T> {
 
@@ -25,7 +24,7 @@ public class Cola<T> implements Iterable<T> {
         tamano++;
     }
 
-    // Con la cola vacía se lanza una excepción y la cola no cambia; quien llama debe revisar estaVacia()
+    // Vacía -> excepción (revisar estaVacia() antes)
     public T desencolar() {
         if (estaVacia()) {
             throw new NoSuchElementException("La cola esta vacia");

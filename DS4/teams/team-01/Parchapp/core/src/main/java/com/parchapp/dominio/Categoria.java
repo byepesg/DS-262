@@ -1,11 +1,16 @@
 package com.parchapp.dominio;
 
 public enum Categoria {
-
-    ESTUDIO("Estudio"),
+    COMIDA("Comida"),
+    CAFE("Cafés"),
+    RUMBA("Rumba"),
     CULTURA("Cultura"),
+    MIRADOR("Miradores"),
+    PARQUE("Parques"),
     DEPORTE("Deporte"),
-    PARQUE("Parques");
+    DIVERSION("Diversión"),
+    AVENTURA("Aventura"),
+    ESTUDIO("Estudio");
 
     private final String nombre;
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_inicio" android:icon="@drawable/ic_inicio" android:title="Inicio" />
+    <item android:id="@+id/nav_explorar" android:icon="@drawable/ic_explorar" android:title="Explorar" />
+    <item android:id="@+id/nav_parches" android:icon="@drawable/ic_grupo" android:title="Parches" />
+    <item android:id="@+id/nav_perfil" android:icon="@drawable/ic_persona" android:title="Perfil" />
+</menu>

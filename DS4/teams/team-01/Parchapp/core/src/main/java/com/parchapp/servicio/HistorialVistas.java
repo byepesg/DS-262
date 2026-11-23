@@ -3,9 +3,8 @@ package com.parchapp.servicio;
 import com.parchapp.dominio.Lugar;
 import com.parchapp.estructuras.ListaEnlazada;
 
-// Lugares vistos recientemente: el más reciente va primero, sin repetidos y con un máximo.
-// Se usa una lista enlazada porque la operación principal es insertar al inicio, que es O(1);
-// en un arreglo habría que correr todos los elementos una posición (O(n)).
+// Vistos recientemente: el último primero, sin repetidos y con tope.
+// Lista enlazada porque casi todo es insertar al inicio (O(1); en un arreglo sería O(n)).
 public class HistorialVistas {
 
     private final ListaEnlazada<Lugar> vistos = new ListaEnlazada<>();
@@ -24,7 +23,7 @@ public class HistorialVistas {
         }
     }
 
-    // Copia, para que la pantalla no pueda modificar el historial
+    // copia, para que nadie lo cambie desde afuera
     public ListaEnlazada<Lugar> recientes() {
         ListaEnlazada<Lugar> copia = new ListaEnlazada<>();
         for (Lugar lugar : vistos) {

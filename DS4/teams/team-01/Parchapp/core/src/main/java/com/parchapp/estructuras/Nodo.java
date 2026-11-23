@@ -1,6 +1,6 @@
 package com.parchapp.estructuras;
 
-// Solo es visible dentro del paquete: nadie por fuera puede dañar los enlaces de la lista o la cola.
+// Sin public: solo ListaEnlazada y Cola tocan los enlaces
 class Nodo<T> {
 
     T dato;

@@ -1,78 +1,75 @@
 package com.parchapp.android;
 
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import com.parchapp.datos.DatosDemo;
-import com.parchapp.dominio.Lugar;
-import com.parchapp.dominio.Usuario;
-import com.parchapp.estructuras.ListaEnlazada;
-import com.parchapp.servicio.CatalogoLugares;
-import com.parchapp.servicio.GestorParches;
-import com.parchapp.servicio.NavegacionMaps;
-import java.time.LocalDateTime;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.parchapp.dominio.Categoria;
 
-// Prueba de concepto (etapa 1): comprueba que el módulo core corre dentro de Android
-// y que el enlace "Cómo llegar" abre Google Maps. Las pantallas reales vienen después.
+// Las cuatro pestañas. Se crean una vez y se muestran/ocultan para no perder el scroll ni los filtros.
 public class MainActivity extends AppCompatActivity {
+
+    private static final int[] MENU = {R.id.nav_inicio, R.id.nav_explorar, R.id.nav_parches, R.id.nav_perfil};
+    private static final String[] ETIQUETAS = {"inicio", "explorar", "parches", "perfil"};
+
+    private BottomNavigationView navegacion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        respetarBarrasDelSistema(findViewById(R.id.raiz));
+        Ui.respetarBarras(findViewById(R.id.contenedor), true, false);
 
-        CatalogoLugares catalogo = new CatalogoLugares(DatosDemo.lugares());
-        ListaEnlazada<Usuario> usuarios = DatosDemo.usuarios();
-        GestorParches gestor = new GestorParches();
-        DatosDemo.crearParches(gestor, catalogo, usuarios, LocalDateTime.now());
-
-        boolean estructurasOk = catalogo.invariantesValidos() && gestor.invariantesValidos();
-        String resumen = catalogo.cantidad() + " lugares y "
-                + gestor.activos(LocalDateTime.now()).tamano() + " parches activos (datos de demostración).\n"
-                + "Invariantes de las estructuras: " + (estructurasOk ? "OK" : "FALLA");
-        ((TextView) findViewById(R.id.resumen)).setText(resumen);
-
-        ListaEnlazada<Lugar> lugares = catalogo.todos();
-        CatalogoLugares.ordenarPorNombre(lugares);
-        StringBuilder texto = new StringBuilder();
-        for (Lugar lugar : lugares) {
-            texto.append("• ").append(lugar.getNombre())
-                    .append(" (").append(lugar.getCategoria().getNombre()).append(")\n");
+        FragmentManager fm = getSupportFragmentManager();
+        if (savedInstanceState == null) {
+            FragmentTransaction t = fm.beginTransaction();
+            Fragment[] pestanas = {new InicioFragment(), new ExplorarFragment(), new ParchesFragment(), new PerfilFragment()};
+            for (int i = 0; i < pestanas.length; i++) {
+                t.add(R.id.contenedor, pestanas[i], ETIQUETAS[i]);
+                if (i > 0) {
+                    t.hide(pestanas[i]);
+                }
+            }
+            t.commitNow();
         }
-        ((TextView) findViewById(R.id.lugares)).setText(texto);
 
-        Lugar primero = lugares.obtenerPrimero();
-        findViewById(R.id.botonComoLlegar).setOnClickListener(v -> abrirComoLlegar(primero));
-    }
-
-    private void abrirComoLlegar(Lugar lugar) {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(NavegacionMaps.urlComoLlegar(lugar)));
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.sin_app_mapas, Toast.LENGTH_LONG).show();
-        }
-    }
-
-    // Desde Android 15 las apps dibujan detrás de las barras del sistema: se agrega ese espacio como margen
-    private static void respetarBarrasDelSistema(View vista) {
-        int izquierda = vista.getPaddingLeft();
-        int arriba = vista.getPaddingTop();
-        int derecha = vista.getPaddingRight();
-        int abajo = vista.getPaddingBottom();
-        ViewCompat.setOnApplyWindowInsetsListener(vista, (v, insets) -> {
-            Insets barras = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(izquierda + barras.left, arriba + barras.top, derecha + barras.right, abajo + barras.bottom);
-            return insets;
+        navegacion = findViewById(R.id.navegacion);
+        navegacion.setOnItemSelectedListener(item -> {
+            mostrar(item.getItemId());
+            return true;
         });
+    }
+
+    void irA(int idMenu) {
+        navegacion.setSelectedItemId(idMenu);
+    }
+
+    void explorarCategoria(Categoria categoria) {
+        ExplorarFragment explorar = (ExplorarFragment) getSupportFragmentManager().findFragmentByTag("explorar");
+        if (explorar != null) {
+            explorar.filtrarPor(categoria);
+        }
+        irA(R.id.nav_explorar);
+    }
+
+    private void mostrar(int idMenu) {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction t = fm.beginTransaction().setCustomAnimations(R.anim.aparecer, R.anim.desaparecer);
+        for (int i = 0; i < MENU.length; i++) {
+            Fragment pestana = fm.findFragmentByTag(ETIQUETAS[i]);
+            if (pestana == null) {
+                continue;
+            }
+            if (MENU[i] == idMenu) {
+                t.show(pestana);
+            } else if (!pestana.isHidden()) {
+                t.hide(pestana);
+            }
+        }
+        t.commit();
     }
 }

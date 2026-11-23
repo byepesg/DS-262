@@ -24,7 +24,7 @@ public class ListaEnlazada<T> implements Iterable<T> {
         tamano++;
     }
 
-    // Es O(1) porque guardamos la referencia al último nodo; sin ella habría que recorrer toda la lista
+    // O(1) gracias a la referencia al último
     public void agregarAlFinal(T dato) {
         Nodo<T> nuevo = new Nodo<>(dato);
         if (estaVacia()) {
@@ -83,7 +83,7 @@ public class ListaEnlazada<T> implements Iterable<T> {
         return dato;
     }
 
-    // O(n): en una lista simple hay que llegar hasta el penúltimo nodo para poder actualizar "ultimo"
+    // O(n): toca llegar al penúltimo para actualizar ultimo
     public T eliminarUltimo() {
         if (estaVacia()) {
             throw new NoSuchElementException("La lista esta vacia");
@@ -102,7 +102,7 @@ public class ListaEnlazada<T> implements Iterable<T> {
         return dato;
     }
 
-    // Elimina la primera aparición. Devuelve false si el dato no estaba (la lista no cambia).
+    // Quita la primera aparición; false si no estaba
     public boolean eliminar(T dato) {
         if (estaVacia()) {
             return false;
@@ -141,8 +141,7 @@ public class ListaEnlazada<T> implements Iterable<T> {
         return tamano == 0;
     }
 
-    // Merge sort: O(n log n). Se eligió porque solo recorre y reenlaza nodos;
-    // otros métodos (como quicksort) necesitan acceder por posición, que en una lista cuesta O(n).
+    // Merge sort, O(n log n). Solo reenlaza nodos; quicksort necesitaría acceso por posición
     public void ordenar(Comparator<T> comparador) {
         primero = ordenarDesde(primero, comparador);
         ultimo = primero;
@@ -174,7 +173,7 @@ public class ListaEnlazada<T> implements Iterable<T> {
         Nodo<T> auxiliar = new Nodo<>(null); // evita tratar aparte el primer nodo del resultado
         Nodo<T> fin = auxiliar;
         while (a != null && b != null) {
-            // Con <= los elementos iguales conservan su orden original (ordenamiento estable)
+            // <= y no <, para que sea estable
             if (comparador.compare(a.dato, b.dato) <= 0) {
                 fin.siguiente = a;
                 a = a.siguiente;
@@ -192,8 +191,7 @@ public class ListaEnlazada<T> implements Iterable<T> {
         return auxiliar.siguiente;
     }
 
-    // Permite usar for-each: recorre la lista una sola vez, O(n) en total.
-    // Usar obtener(i) dentro de un for sería O(n²).
+    // Para el for-each. Recorrer con obtener(i) sería O(n²)
     @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
@@ -225,7 +223,7 @@ public class ListaEnlazada<T> implements Iterable<T> {
         }
         int contados = 0;
         Nodo<T> actual = primero;
-        // El límite evita quedarse en un ciclo infinito si los enlaces estuvieran dañados
+        // por si los enlaces quedaron en ciclo, no quedarse dando vueltas
         while (actual != null && contados <= tamano) {
             contados++;
             if (actual.siguiente == null && actual != ultimo) {

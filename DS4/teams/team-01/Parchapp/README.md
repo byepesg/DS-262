@@ -1,8 +1,8 @@
-# Parchapp — Entrega 2 (en desarrollo)
+# Parchapp — Entrega 2
 
 **Asignatura:** Estructuras de Datos · Universidad Nacional de Colombia · 2026-2
 **Lenguaje:** Java 17 o superior. El núcleo (`core`) no usa librerías externas.
-**Interfaces:** app **Android** (en construcción) y **consola** (la de la Entrega 1). Ambas usan el mismo núcleo.
+**Interfaces:** app **Android** (versión 0.4.0) y **consola** (la de la Entrega 1). Ambas usan el mismo núcleo.
 
 ## Participantes
 
@@ -14,10 +14,16 @@
 
 ## ¿Qué hace?
 
-Parchapp sirve para descubrir lugares y armar planes en grupo, llamados **parches**. En esta entrega
-funciona el núcleo completo:
+Parchapp sirve para descubrir lugares y armar planes en grupo, llamados **parches**.
+
+**¿Qué hacemos hoy?** (app Android)
+- Unas preguntas cortas: con quién vas (solo, en pareja, con amigos, en familia), cuántos son, qué
+  tipo de plan, si quieren tragos, si quieren comer y cuánto gastar.
+- Al final muestra los 5 lugares que mejor encajan y por qué. Usa un **montículo de máximos**.
 
 **Lugares**
+- 68 lugares de Bogotá y alrededores en 10 categorías (comida, cafés, rumba, cultura, miradores,
+  parques, deporte, diversión, aventura y estudio), con zona, precio y etiquetas.
 - Explorar, buscar por nombre (sin importar tildes ni mayúsculas) y filtrar por categoría.
 - Ordenar por nombre, cercanía o categoría.
 - Ver el detalle de un lugar y abrir **"Cómo llegar" en Google Maps**.
@@ -30,16 +36,14 @@ funciona el núcleo completo:
 - **Salir** de un parche y **cancelarlo** si lo organizas.
 - Estados: abierto, lleno, cancelado y finalizado. Cuando pasa la fecha, el parche queda finalizado solo.
 
-**Tu día**
+**Solo en la consola**
 - **Ruta del día**: lugares para visitar en orden, con la distancia de cada tramo.
+- **"Ver estructuras de datos"**: muestra los nodos reales de cada lista y cola, y si cumplen sus
+  invariantes. Sirve para la sustentación.
 
-**Para la sustentación**
-- La pantalla **"Ver estructuras de datos"** muestra los nodos reales de cada lista y cola, y si
-  cumplen sus invariantes.
-
-> Los lugares, usuarios y parches iniciales son **datos de demostración**. Las coordenadas son
-> aproximadas y la app lo indica. Para probar cómo otra persona se une a tu parche, usa
-> *Cambiar de usuario*.
+> Los lugares, 40 usuarios y unos 50 parches iniciales son datos de prueba (los parches se generan
+> con una semilla fija). Las coordenadas son aproximadas. Para probar cómo otra persona se une a tu
+> parche, usa *Cambiar de cuenta* en Perfil.
 
 ## Cómo ejecutar
 
@@ -82,10 +86,11 @@ Requisitos: Android 8.0 (API 26) o superior. Se compila contra la API 36 (Androi
 
 ## Pruebas
 
-Son 38 pruebas automáticas:
+Son 47 pruebas automáticas:
 - de las estructuras;
 - de las reglas de los parches;
-- de los servicios.
+- de los servicios;
+- del montículo y del recomendador.
 
 Cubren los casos de la sección 11.3 del documento maestro y las pruebas T-02, T-04 a T-09. Usan un
 mini framework propio (`MiniTest`) para no depender de JUnit. `./gradlew :core:check` también las
@@ -96,13 +101,14 @@ ejecuta y falla si alguna falla.
 ```
 core/       Núcleo en Java puro: no depende de Android ni de la consola
   src/main/java/com/parchapp/
-    estructuras/      Nodo, ListaEnlazada, Cola (hechas por el equipo)
-    dominio/          Lugar, Parche, Usuario, Ubicacion, Categoria, EstadoParche, ResultadoUnion
-    servicio/         CatalogoLugares, GestorParches, HistorialVistas, RutaDelDia, NavegacionMaps
+    estructuras/      Nodo, ListaEnlazada, Cola, MonticuloMax (hechas por el equipo)
+    dominio/          Lugar, Parche, Usuario, Ubicacion, Categoria, Etiqueta, Compania, EstadoParche, ResultadoUnion
+    servicio/         CatalogoLugares, GestorParches, HistorialVistas, RutaDelDia, NavegacionMaps,
+                      Preferencias, Recomendador, Recomendacion
     datos/            DatosDemo (datos de demostración)
   src/test/java/com/parchapp/pruebas/
 consola/    Interfaz de texto: Pantalla, Sesion, App (menú), vistas y Navegador
-app/        Aplicación Android
+app/        Aplicación Android (pantallas, adaptadores y recursos)
 ```
 
 **Regla de dependencias:**
@@ -115,7 +121,7 @@ Así las estructuras y las reglas se escriben y prueban una sola vez y las usan 
 
 ## Estructuras de datos
 
-Ninguna usa `ArrayList`, `LinkedList` ni otra colección de `java.util` para guardar datos.
+Ninguna usa `ArrayList`, `LinkedList`, `PriorityQueue` ni otra colección de `java.util` para guardar datos.
 
 ### `ListaEnlazada<T>`: lista simple con referencias al primero y al último
 
@@ -141,7 +147,7 @@ necesita recorrer y reenlazar nodos; los métodos que acceden por posición ser�
 | Dónde se usa | Por qué |
 |---|---|
 | **Lista de espera** de cada parche | Es justo que entre primero quien llegó primero. |
-| **Ruta del día** | Las paradas se visitan en el orden en que se agregaron. |
+| **Ruta del día** (consola) | Las paradas se visitan en el orden en que se agregaron. |
 
 | Operación | Costo |
 |---|---|
@@ -150,11 +156,32 @@ necesita recorrer y reenlazar nodos; los métodos que acceden por posición ser�
 
 Con la cola vacía, `desencolar` y `verFrente` lanzan `NoSuchElementException` y la cola no cambia.
 
+### `MonticuloMax<T>`: montículo binario de máximos sobre un arreglo
+
+| Dónde se usa | Por qué |
+|---|---|
+| **¿Qué hacemos hoy?** (`Recomendador`) | Hay que mostrar los 5 mejores lugares sin ordenar todo el catálogo. |
+
+| Operación | Costo |
+|---|---|
+| `insertar` | O(log n); el arreglo se duplica cuando se llena (O(1) amortizado) |
+| `extraerMax` | O(log n) |
+| `verMax`, `tamano`, `estaVacio` | O(1) |
+
+Para el nodo en `i`, los hijos están en `2i+1` y `2i+2` y el padre en `(i-1)/2`. Ningún hijo es mayor
+que su padre. Recomendar k lugares entre n cuesta O(n log n + k log n).
+
+### Etiquetas como bits
+
+Cada lugar tiene etiquetas (romántico, con vista, con tragos, en familia…). Cada una es un bit de un
+`int`, así que cruzar lo que tiene un lugar con lo que se busca es un AND: O(1).
+
 ### Invariantes (se verifican con `invariantesValidos()`)
 
 - `primero == null ⇔ ultimo == null ⇔ tamano == 0`. En la cola es lo mismo con `frente` y `fin`.
 - El siguiente del último nodo es `null`.
 - `tamano` es igual al número de nodos que se alcanzan desde el primero.
+- En el montículo: ningún hijo es mayor que su padre y las casillas después de `tamano` son `null`.
 
 ## Reglas de los parches
 
@@ -178,7 +205,16 @@ Con la cola vacía, `desencolar` y `verFrente` lanzan `NoSuchElementException` y
 | Historial de vistos (lista enlazada) | Implementado |
 | Crear, unirse, salir y cancelar parches; estados | Implementado |
 | Lista de espera (cola) | Implementado |
-| Ruta del día (cola) | Implementado |
+| Ruta del día (cola, en la consola) | Implementado |
+| ¿Qué hacemos hoy? (montículo y etiquetas) | Implementado |
+| App Android | Implementado (0.4.0) |
 | Pruebas automáticas | Implementado |
 | Datos guardados entre ejecuciones (persistencia) | Pendiente: todo vive en memoria mientras la app está abierta |
-| Google Places, interfaz Android, cuentas reales | Pendiente (siguientes entregas) |
+| Google Places, cuentas reales, tabla hash por id | Pendiente (siguientes entregas) |
+
+## Créditos
+
+- Tipografía de títulos: **DM Serif Display** (Google Fonts), licencia SIL Open Font License 1.1.
+  El texto de la licencia está en `licencias/OFL-DM-Serif-Display.txt`.
+- Íconos: **Material Symbols Rounded** de Google, licencia Apache 2.0. Cada archivo
+  `app/src/main/res/drawable/ic_*.xml` dice de qué ícono viene.

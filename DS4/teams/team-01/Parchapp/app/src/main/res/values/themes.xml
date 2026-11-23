@@ -1,4 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Parchapp" parent="Theme.Material3.DayNight.NoActionBar" />
+    <!-- Paleta de Parchapp. Los colores de modo oscuro están en values-night -->
+    <style name="Theme.Parchapp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primario</item>
+        <item name="colorOnPrimary">@color/sobre_primario</item>
+        <item name="colorPrimaryContainer">@color/contenedor_primario</item>
+        <item name="colorOnPrimaryContainer">@color/sobre_contenedor_primario</item>
+        <item name="colorSecondary">@color/secundario</item>
+        <item name="colorOnSecondary">@color/sobre_secundario</item>
+        <item name="colorSecondaryContainer">@color/contenedor_secundario</item>
+        <item name="colorOnSecondaryContainer">@color/sobre_contenedor_secundario</item>
+        <item name="colorTertiary">@color/terciario</item>
+        <item name="colorOnTertiary">@color/sobre_terciario</item>
+        <item name="colorTertiaryContainer">@color/contenedor_terciario</item>
+        <item name="colorOnTertiaryContainer">@color/sobre_contenedor_terciario</item>
+        <item name="android:colorBackground">@color/fondo</item>
+        <item name="colorOnBackground">@color/sobre_fondo</item>
+        <item name="colorSurface">@color/fondo</item>
+        <item name="colorOnSurface">@color/sobre_fondo</item>
+        <item name="colorSurfaceVariant">@color/variante_superficie</item>
+        <item name="colorOnSurfaceVariant">@color/sobre_variante_superficie</item>
+        <item name="colorOutline">@color/contorno</item>
+        <item name="colorOutlineVariant">@color/contorno_variante</item>
+        <item name="colorSurfaceContainerLowest">@color/sup_mas_baja</item>
+        <item name="colorSurfaceContainerLow">@color/sup_baja</item>
+        <item name="colorSurfaceContainer">@color/sup_media</item>
+        <item name="colorSurfaceContainerHigh">@color/sup_alta</item>
+        <item name="colorSurfaceContainerHighest">@color/sup_mas_alta</item>
+        <item name="colorError">@color/error</item>
+        <item name="colorOnError">@color/sobre_error</item>
+        <item name="android:windowAnimationStyle">@style/Parchapp.Transiciones</item>
+        <item name="bottomNavigationStyle">@style/Parchapp.BarraInferior</item>
+        <item name="materialButtonStyle">@style/Parchapp.Boton</item>
+    </style>
+
+    <!-- Transiciones entre pantallas -->
+    <style name="Parchapp.Transiciones" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/entrar_derecha</item>
+        <item name="android:activityOpenExitAnimation">@anim/salir_izquierda</item>
+        <item name="android:activityCloseEnterAnimation">@anim/entrar_izquierda</item>
+        <item name="android:activityCloseExitAnimation">@anim/salir_derecha</item>
+    </style>
+
+    <style name="Parchapp.BarraInferior" parent="Widget.Material3.BottomNavigationView">
+        <item name="backgroundTint">?attr/colorSurfaceContainerLow</item>
+        <item name="itemActiveIndicatorStyle">@style/Parchapp.IndicadorBarra</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <style name="Parchapp.IndicadorBarra" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">?attr/colorPrimaryContainer</item>
+    </style>
+
+    <style name="Parchapp.Boton" parent="Widget.Material3.Button">
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <!-- Tarjeta base (se encoge un poco al tocarla) -->
+    <style name="Parchapp.Tarjeta" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainerLow</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">?attr/colorOutlineVariant</item>
+        <item name="android:stateListAnimator">@animator/presionar</item>
+    </style>
+
+    <!-- Títulos con serifa -->
+    <style name="Parchapp.Titulo" parent="">
+        <item name="android:fontFamily">@font/dm_serif_display</item>
+        <item name="android:textSize">34sp</item>
+        <item name="android:lineSpacingMultiplier">0.95</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="Parchapp.TituloMedio" parent="">
+        <item name="android:fontFamily">@font/dm_serif_display</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="Parchapp.Seccion" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceTitleMedium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="Parchapp.Detalle" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceBodyMedium</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="Parchapp.Pastilla" parent="">
+        <item name="android:background">@drawable/bg_pastilla</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelMedium</item>
+    </style>
+
+    <!-- Botón de texto de "Ver todos" en las secciones -->
+    <style name="Parchapp.VerTodos" parent="Widget.Material3.Button.TextButton">
+        <item name="android:minHeight">40dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
 </resources>

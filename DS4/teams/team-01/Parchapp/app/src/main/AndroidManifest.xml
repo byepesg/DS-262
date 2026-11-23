@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Desde Android 11 hay que declarar qué apps se consultan: aquí, las que abren enlaces (Maps o navegador) -->
+    <!-- Android 11+: hay que declarar que se van a abrir enlaces (Maps o navegador) -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -11,17 +11,27 @@
 
     <application
         android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:enableOnBackInvokedCallback="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.Parchapp">
 
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".LugarActivity" android:exported="false" />
+        <activity android:name=".ParcheActivity" android:exported="false" />
+        <activity
+            android:name=".CrearParcheActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".PlanActivity" android:exported="false" />
     </application>
 </manifest>

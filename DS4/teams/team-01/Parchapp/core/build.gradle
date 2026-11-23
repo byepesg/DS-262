@@ -8,8 +8,7 @@ tasks.withType(JavaCompile).configureEach {
     options.release = 17
 }
 
-// Las pruebas usan MiniTest (framework propio, sin JUnit). EjecutarPruebas termina con
-// código distinto de 0 si alguna falla, así que la tarea falla también.
+// Pruebas con MiniTest (sin JUnit). Si alguna falla, EjecutarPruebas sale con código != 0
 tasks.register('pruebas', JavaExec) {
     group = 'verification'
     description = 'Ejecuta las pruebas automáticas de Parchapp (MiniTest).'

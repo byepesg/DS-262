@@ -137,7 +137,7 @@ public class Parche {
         return listaEspera.tamano();
     }
 
-    // Se devuelven como Iterable para que desde afuera solo se puedan recorrer, no modificar
+    // Iterable para que desde afuera solo se puedan recorrer
     public Iterable<Usuario> getParticipantes() {
         return participantes;
     }

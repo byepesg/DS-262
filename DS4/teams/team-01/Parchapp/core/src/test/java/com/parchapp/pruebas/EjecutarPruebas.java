@@ -7,6 +7,7 @@ public class EjecutarPruebas {
         PruebasEstructuras.ejecutar();
         PruebasParches.ejecutar();
         PruebasServicios.ejecutar();
+        PruebasRecomendaciones.ejecutar();
         System.exit(MiniTest.resumen());
     }
 }

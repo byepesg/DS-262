@@ -2,8 +2,7 @@ package com.parchapp.pruebas;
 
 import java.util.Objects;
 
-// Pruebas para no depender de JUnit (así corre en cualquier IDE solo con el JDK).
-// Cuando pasemos a Gradle se puede migrar: cada caso
+// Mini framework de pruebas para no depender de JUnit: corre solo con el JDK
 final class MiniTest {
 
     private static int aprobadas;
