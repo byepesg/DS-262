@@ -9,7 +9,7 @@ public class Selection {
 
     public Selection(int totalPixels) { sel = new boolean[totalPixels]; }
 
-    public boolean isSelected(int idx) { return sel[idx]; }
+    public boolean isSelected(int idx){return sel[idx];}
     public boolean hasAny() { return count > 0; }
     public int count() { return count; }
 
@@ -32,4 +32,15 @@ public class Selection {
         Arrays.fill(sel, false);
         count = 0;
     }
+
+    public void selectRect(int face, int n, int x0, int y0, int x1, int y1, boolean add) {
+        int xa = Math.max(0, Math.min(x0, x1)), xb = Math.min(n - 1, Math.max(x0, x1));
+        int ya = Math.max(0, Math.min(y0, y1)), yb = Math.min(n - 1, Math.max(y0, y1));
+        int base = face * n * n;
+        for (int y = ya; y <= yb; y++)
+            for (int x = xa; x <= xb; x++)
+                set(base + y * n + x, add);
+    }
+
+
 }

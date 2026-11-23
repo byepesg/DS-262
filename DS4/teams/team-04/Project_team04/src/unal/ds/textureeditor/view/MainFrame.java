@@ -36,6 +36,8 @@ public class MainFrame extends JFrame {
         top.add(button("Ajustar", e -> canvas.fit()));
         top.add(button("-", e -> canvas.zoomBy(1 / 1.25)));
         top.add(button("+", e -> canvas.zoomBy(1.25)));
+        top.add(button("Rect Select", e -> toggleRectSelect()));
+        top.add(button("Deselect", e -> { state.selection.clear(); state.fireChanged(); }));
 
         status.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
         setLayout(new BorderLayout());
@@ -59,7 +61,8 @@ public class MainFrame extends JFrame {
 
     private void refreshStatus() {
         status.setText(Face.NAMES[state.currentFace] + "   |   " + state.block.n + " x " + state.block.n
-                + " px por cara   |   color #" + String.format("%06X", state.rgb & 0xFFFFFF));
+                + " px per face   |   color #" + String.format("%06X", state.rgb & 0xFFFFFF)
+                + "   |   " + state.tool + "   |   selected: " + state.selection.count());
     }
 
     private void newBlock() {
@@ -85,4 +88,14 @@ public class MainFrame extends JFrame {
             refreshStatus();
         }
     }
+
+    private void toggleRectSelect() {
+        boolean on = state.tool != EditorState.Tool.RECT_SELECT;
+        state.tool = on ? EditorState.Tool.RECT_SELECT : EditorState.Tool.PAINT;
+        canvas.setCursor(java.awt.Cursor.getPredefinedCursor(
+                on ? java.awt.Cursor.CROSSHAIR_CURSOR : java.awt.Cursor.DEFAULT_CURSOR));
+        refreshStatus();
+    }
+
+
 }

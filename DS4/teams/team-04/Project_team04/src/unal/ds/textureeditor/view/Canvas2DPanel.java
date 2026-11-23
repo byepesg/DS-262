@@ -24,6 +24,8 @@ public class Canvas2DPanel extends JComponent {
     private boolean needFit = true;
     private boolean panning;
     private int lastMx, lastMy;
+    private boolean selecting;
+    private int selFace, selX0, selY0, selX1, selY1;
 
     public Canvas2DPanel(EditorState state) {
         this.state = state;
@@ -33,7 +35,9 @@ public class Canvas2DPanel extends JComponent {
                 lastMx = e.getX();
                 lastMy = e.getY();
                 panning = SwingUtilities.isMiddleMouseButton(e) || e.isAltDown();
-                if (!panning) handle(e);
+                if (panning) return;
+                if (state.tool == EditorState.Tool.RECT_SELECT) beginSelect(e);
+                else handle(e);
             }
 
             @Override public void mouseDragged(MouseEvent e) {
@@ -43,13 +47,17 @@ public class Canvas2DPanel extends JComponent {
                     lastMx = e.getX();
                     lastMy = e.getY();
                     repaint();
+                } else if (state.tool == EditorState.Tool.RECT_SELECT) {
+                    updateSelect(e);
                 } else {
                     handle(e);
                 }
             }
 
-            @Override public void mouseReleased(MouseEvent e) { panning = false; }
-
+            @Override public void mouseReleased(MouseEvent e) {
+                if (selecting) finishSelect(e);
+                panning = false;
+            }
             @Override public void mouseWheelMoved(MouseWheelEvent e) {
                 zoomAt(e.getX(), e.getY(), Math.pow(1.15, -e.getPreciseWheelRotation()));
             }
@@ -103,6 +111,49 @@ public class Canvas2DPanel extends JComponent {
         state.fireChanged();
     }
 
+    // ---- rectangular selection ----
+    private void beginSelect(MouseEvent e) {
+        if (!SwingUtilities.isLeftMouseButton(e)) return;
+        int[] h = hit(e.getX(), e.getY());
+        if (h == null) return;
+        selecting = true;
+        selFace = h[0];
+        selX0 = selX1 = h[1];
+        selY0 = selY1 = h[2];
+        state.currentFace = selFace;
+        state.fireChanged();
+    }
+
+    /** Texel under the mouse, clamped to the face where the drag began (so dragging outside still works). */
+    private int[] clampedTexel(int mx, int my) {
+        int n = state.block.n;
+        double wx = (mx - panX) / zoom - Face.NET_COL[selFace] * n;
+        double wy = (my - panY) / zoom - Face.NET_ROW[selFace] * n;
+        int x = (int) Math.max(0, Math.min(n - 1, Math.floor(wx)));
+        int y = (int) Math.max(0, Math.min(n - 1, Math.floor(wy)));
+        return new int[]{x, y};
+    }
+
+    private void updateSelect(MouseEvent e) {
+        if (!selecting) return;
+        int[] t = clampedTexel(e.getX(), e.getY());
+        selX1 = t[0];
+        selY1 = t[1];
+        repaint();
+    }
+
+    private void finishSelect(MouseEvent e) {
+        int[] t = clampedTexel(e.getX(), e.getY());
+        selX1 = t[0];
+        selY1 = t[1];
+        boolean subtract = e.isControlDown();
+        boolean add = e.isShiftDown();
+        if (!add && !subtract) state.selection.clear();      // no modifier: replace
+        state.selection.selectRect(selFace, state.block.n, selX0, selY0, selX1, selY1, !subtract);
+        selecting = false;
+        state.fireChanged();                                  // repaints and refreshes the status bar
+    }
+
     private static int edge(int o, int len, int n, int i) {
         return o + (int) Math.round(i * (double) len / n);
     }
@@ -152,6 +203,25 @@ public class Canvas2DPanel extends JComponent {
                     if (yy >= vis.y && yy <= vis.y + vis.height) g.drawLine(vis.x, yy, vis.x + vis.width, yy);
                 }
             }
+
+            if (state.selection.hasAny()) {
+                int base = f * n * n;
+                for (int ty = 0; ty < n; ty++)
+                    for (int tx = 0; tx < n; tx++) {
+                        if (!state.selection.isSelected(base + ty * n + tx)) continue;
+                        int px0 = edge(x0, fw, n, tx), px1 = edge(x0, fw, n, tx + 1);
+                        int py0 = edge(y0, fh, n, ty), py1 = edge(y0, fh, n, ty + 1);
+                        g.setColor(new Color(60, 120, 255, 90));
+                        g.fillRect(px0, py0, px1 - px0, py1 - py0);
+                        // outline only where the neighbour is not selected
+                        g.setColor(Color.WHITE);
+                        if (ty == 0 || !state.selection.isSelected(base + (ty - 1) * n + tx)) g.drawLine(px0, py0, px1 - 1, py0);
+                        if (ty == n - 1 || !state.selection.isSelected(base + (ty + 1) * n + tx)) g.drawLine(px0, py1 - 1, px1 - 1, py1 - 1);
+                        if (tx == 0 || !state.selection.isSelected(base + ty * n + tx - 1)) g.drawLine(px0, py0, px0, py1 - 1);
+                        if (tx == n - 1 || !state.selection.isSelected(base + ty * n + tx + 1)) g.drawLine(px1 - 1, py0, px1 - 1, py1 - 1);
+                    }
+            }
+
         }
         g.setClip(oldClip);
 
@@ -171,6 +241,19 @@ public class Canvas2DPanel extends JComponent {
         g.setStroke(new BasicStroke(2f));
         g.setColor(new Color(0xFFD33D));
         g.drawRect(r[0], r[1], r[2] - r[0], r[3] - r[1]);
+
+        if (selecting) {
+            int[] fr = rects[selFace];
+            int fw = fr[2] - fr[0], fh = fr[3] - fr[1];
+            int xa = Math.min(selX0, selX1), xb = Math.max(selX0, selX1);
+            int ya = Math.min(selY0, selY1), yb = Math.max(selY0, selY1);
+            int rx0 = edge(fr[0], fw, n, xa), rx1 = edge(fr[0], fw, n, xb + 1);
+            int ry0 = edge(fr[1], fh, n, ya), ry1 = edge(fr[1], fh, n, yb + 1);
+            g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, new float[]{5f, 4f}, 0f));
+            g.setColor(Color.WHITE);
+            g.drawRect(rx0, ry0, rx1 - rx0, ry1 - ry0);
+            g.setStroke(new BasicStroke(1f));
+        }
 
         g.setColor(new Color(255, 255, 255, 120));
         g.drawString("Rueda: zoom   Clic central o Alt+arrastrar: mover", 10, H - 10);
