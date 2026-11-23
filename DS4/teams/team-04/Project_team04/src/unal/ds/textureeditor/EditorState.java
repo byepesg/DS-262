@@ -1,8 +1,11 @@
 package unal.ds.textureeditor;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import unal.ds.textureeditor.model.BlockModel;
+import unal.ds.textureeditor.model.Selection;
+import unal.ds.textureeditor.model.Face;
 
 public class EditorState {
     public BlockModel block;
@@ -13,6 +16,9 @@ public class EditorState {
     public boolean contiguous = true;
     public boolean wholeBlock = false; // false = solo la cara actual
     public int brushSize = 1;
+    public enum Tool { PAINT, RECT_SELECT }
+    public Tool tool = Tool.PAINT;
+    public Selection selection;
 
     private final List<Runnable> listeners = new ArrayList<>();
 
@@ -20,9 +26,11 @@ public class EditorState {
 
     public void newBlock(int n) {
         block = new BlockModel(n);
+        selection = new Selection(Face.COUNT * n * n);
         currentFace = 0;
         fireChanged();
     }
+
 
     public int colorArgb() { return (alpha << 24) | (rgb & 0xFFFFFF); }
 
