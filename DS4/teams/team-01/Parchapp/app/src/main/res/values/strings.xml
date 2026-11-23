@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Parchapp</string>
+    <string name="como_llegar">Cómo llegar</string>
+    <string name="sin_app_mapas">No hay ninguna app para abrir el enlace</string>
+    <string name="atras">Atrás</string>
+</resources>

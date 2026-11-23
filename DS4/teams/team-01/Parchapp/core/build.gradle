@@ -1,0 +1,21 @@
+plugins {
+    id 'java-library'
+}
+
+// Java 17: es el nivel que Android compila sin problemas y el mínimo que pide la consola.
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+// Pruebas con MiniTest (sin JUnit). Si alguna falla, EjecutarPruebas sale con código != 0
+tasks.register('pruebas', JavaExec) {
+    group = 'verification'
+    description = 'Ejecuta las pruebas automáticas de Parchapp (MiniTest).'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.parchapp.pruebas.EjecutarPruebas'
+}
+
+tasks.named('check') {
+    dependsOn 'pruebas'
+}

@@ -1,0 +1,63 @@
+plugins {
+    id 'com.android.application' version '8.10.1'
+}
+
+android {
+    namespace 'com.parchapp.android'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'com.parchapp'
+        // Android 8.0: desde ahí existe java.time (fechas de los parches) sin configuración extra
+        minSdk 26
+        targetSdk 36
+        versionCode 4
+        versionName '0.4.0'
+    }
+
+    // Firma v1+v2+v3: con minSdk 26 Gradle quita la v1, pero algunos instaladores la piden.
+    // Si existe la llave fija (~/.android/parchapp-debug.keystore, fuera del repo) se usa esa,
+    // para instalar encima sin desinstalar. "android" es la contraseña estándar de debug.
+    signingConfigs {
+        debug {
+            def llaveFija = file("${System.getProperty('user.home')}/.android/parchapp-debug.keystore")
+            if (llaveFija.exists()) {
+                storeFile llaveFija
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
+            enableV1Signing true
+            enableV2Signing true
+            enableV3Signing true
+        }
+    }
+
+    // BuildConfig.VERSION_NAME se muestra en la pestaña Perfil
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    // Toda la lógica (estructuras propias, reglas de parches, servicios) viene de core
+    implementation project(':core')
+
+    // Solo interfaz, nada de estructuras de datos
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.activity:activity:1.9.3'
+    implementation 'androidx.fragment:fragment:1.8.5'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'com.google.android.material:material:1.12.0'
+}

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/barra"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:navigationContentDescription="@string/atras"
+        app:navigationIcon="@drawable/ic_atras"
+        app:navigationIconTint="?attr/colorOnSurface"
+        app:title="Crear parche" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/capaLugar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Lugar"
+                app:startIconDrawable="@drawable/ic_lugar">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/campoLugar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/capaTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Nombre del plan"
+                app:counterEnabled="true"
+                app:counterMaxLength="40"
+                app:helperText="Ej.: Fútbol 5, cena de cumpleaños, picnic">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/campoTitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences"
+                    android:maxLength="40"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/capaFecha"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:hint="Día"
+                    app:startIconDrawable="@drawable/ic_calendario">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/campoFecha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/capaHora"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:hint="Hora"
+                    app:startIconDrawable="@drawable/ic_reloj">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/campoHora"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/etiquetaCapacidad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/capacidad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stepSize="1"
+                android:value="6"
+                android:valueFrom="2"
+                android:valueTo="30" />
+
+            <TextView
+                style="@style/Parchapp.Detalle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Te cuenta a ti. Si se llena, los demás quedan en fila y entran en orden si alguien se baja." />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/barraAccion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurfaceContainer"
+        android:padding="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/crear"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Crear parche"
+            app:icon="@drawable/ic_check" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="20dp">
+
+            <TextView
+                android:id="@+id/saludo"
+                style="@style/Parchapp.Detalle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+            <TextView
+                android:id="@+id/avatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_circulo"
+                android:gravity="center"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/Parchapp.Titulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="¿Qué hacemos\nhoy?" />
+
+        <!-- Tarjeta principal: abre el cuestionario -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/heroe"
+            style="@style/Parchapp.Tarjeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            app:cardBackgroundColor="@color/heroe"
+            app:cardCornerRadius="28dp"
+            app:strokeWidth="0dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
+                    android:layout_gravity="end|bottom"
+                    android:layout_marginEnd="-40dp"
+                    android:layout_marginBottom="-50dp"
+                    android:alpha="0.13"
+                    android:importantForAccessibility="no"
+                    android:rotation="-15"
+                    android:src="@drawable/ic_explorar"
+                    app:tint="@color/heroe_texto" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/dm_serif_display"
+                        android:text="¿No sabes qué hacer?"
+                        android:textColor="@color/heroe_texto"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="48dp"
+                        android:alpha="0.9"
+                        android:text="Dinos con quién vas y qué te provoca. Te armamos el plan en un minuto."
+                        android:textAppearance="?attr/textAppearanceBodyLarge"
+                        android:textColor="@color/heroe_texto" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/empezar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:backgroundTint="@color/heroe_texto"
+                        android:text="Empezar"
+                        android:textColor="@color/heroe"
+                        app:icon="@drawable/ic_flecha"
+                        app:iconGravity="end"
+                        app:iconTint="@color/heroe" />
+                </LinearLayout>
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Atajos: saltan la primera pregunta -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:clipToPadding="false"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/atajos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <include
+            android:id="@+id/seccionParches"
+            layout="@layout/item_encabezado_seccion" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/carruselParches"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:nestedScrollingEnabled="false"
+            android:paddingStart="20dp"
+            android:paddingEnd="12dp" />
+
+        <include
+            android:id="@+id/seccionCitas"
+            layout="@layout/item_encabezado_seccion" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/carruselCitas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:nestedScrollingEnabled="false"
+            android:paddingStart="20dp"
+            android:paddingEnd="12dp" />
+
+        <include
+            android:id="@+id/seccionCategorias"
+            layout="@layout/item_encabezado_seccion" />
+
+        <GridLayout
+            android:id="@+id/categorias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:useDefaultMargins="false" />
+
+        <include
+            android:id="@+id/seccionCerca"
+            layout="@layout/item_encabezado_seccion" />
+
+        <LinearLayout
+            android:id="@+id/cerca"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

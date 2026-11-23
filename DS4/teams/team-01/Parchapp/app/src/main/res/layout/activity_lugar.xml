@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/desplazable"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Cabecera de color según la categoría; se extiende detrás de la barra de estado -->
+            <FrameLayout
+                android:id="@+id/cabecera"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="220dp">
+
+                <ImageView
+                    android:id="@+id/icono"
+                    android:layout_width="170dp"
+                    android:layout_height="170dp"
+                    android:layout_gravity="end|bottom"
+                    android:layout_marginEnd="-24dp"
+                    android:layout_marginBottom="-28dp"
+                    android:alpha="0.9"
+                    android:importantForAccessibility="no"
+                    android:rotation="-10" />
+
+                <TextView
+                    android:id="@+id/categoria"
+                    style="@style/Parchapp.Pastilla"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|bottom"
+                    android:layout_margin="20dp" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/nombre"
+                    style="@style/Parchapp.Titulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="30sp" />
+
+                <TextView
+                    android:id="@+id/meta"
+                    style="@style/Parchapp.Detalle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                <TextView
+                    android:id="@+id/descripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:lineSpacingMultiplier="1.15"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/etiquetas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp" />
+
+                <TextView
+                    android:id="@+id/direccion"
+                    style="@style/Parchapp.Detalle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
+                    app:drawableStartCompat="@drawable/ic_lugar"
+                    app:drawableTint="?attr/colorOnSurfaceVariant" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/comoLlegar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/como_llegar"
+                        app:icon="@drawable/ic_como_llegar" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/crearAqui"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:minHeight="52dp"
+                        android:text="Armar parche"
+                        app:icon="@drawable/ic_agregar" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/Parchapp.Seccion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:text="Parches aquí" />
+
+                <TextView
+                    android:id="@+id/sinParches"
+                    style="@style/Parchapp.Detalle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Nadie ha armado nada aquí todavía. Sé el primero." />
+
+                <LinearLayout
+                    android:id="@+id/parches"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Botón de atrás flotante sobre la cabecera -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/atras"
+        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:contentDescription="@string/atras"
+        app:backgroundTint="?attr/colorSurfaceContainerLow"
+        app:icon="@drawable/ic_atras"
+        app:iconTint="?attr/colorOnSurface" />
+</FrameLayout>
