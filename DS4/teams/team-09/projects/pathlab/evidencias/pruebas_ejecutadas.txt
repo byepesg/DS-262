@@ -1,0 +1,2 @@
+﻿OK: 120 comprobaciones superadas.
+OK: 80 mapas aleatorios, 200 comparaciones contra referencia.
