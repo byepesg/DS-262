@@ -28,14 +28,15 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       # Llave de firma fija: así cada APK nuevo se instala encima del anterior sin desinstalar.
-      # Si el secret no existe, Gradle crea una llave temporal y habrá que desinstalar antes de actualizar.
+      # app/build.gradle la busca en ~/.android/parchapp-debug.keystore. Si el secret no existe, Gradle usa
+      # una llave temporal y habrá que desinstalar antes de actualizar.
       - name: Restaurar llave de firma de depuración
         env:
           LLAVE: ${{ secrets.PARCHAPP_DEBUG_KEYSTORE }}
         run: |
           if [ -n "$LLAVE" ]; then
             mkdir -p ~/.android
-            echo "$LLAVE" | base64 --decode > ~/.android/debug.keystore
+            echo "$LLAVE" | base64 --decode > ~/.android/parchapp-debug.keystore
           else
             echo "::warning::Falta el secret PARCHAPP_DEBUG_KEYSTORE; se usará una llave temporal."
           fi
